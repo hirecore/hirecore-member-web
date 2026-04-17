@@ -26,7 +26,7 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
     company: "카카오",
     position: "프론트엔드 개발자",
     visibility: "public",
-    interestFields: ["웹개발", "UI/UX"],
+    interestFields: ["FRONTEND_ENGINEER", "UI_UX_DESIGNER"],
     tags: ["React", "성장동기", "협업"],
     externalLinks: [
       { label: "GitHub", url: "https://github.com/example" },
@@ -45,7 +45,7 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
     company: "라인 플러스",
     position: "백엔드 개발자",
     visibility: "private",
-    interestFields: ["백엔드", "서버개발"],
+    interestFields: ["BACKEND_ENGINEER", "SERVER_DEVELOPER"],
     tags: ["Java", "Spring Boot", "MSA"],
     externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,
@@ -60,7 +60,7 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
     company: "토스",
     position: "서버 개발자",
     visibility: "private",
-    interestFields: ["결제시스템", "서버개발"],
+    interestFields: ["BACKEND_ENGINEER", "SERVER_DEVELOPER"],
     tags: ["Kotlin", "MSA", "결제시스템"],
     externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,
@@ -72,7 +72,7 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
 
 // ── 마이페이지 자기소개서 관리 탭 ────────────────────────────────────
 export const MOCK_MANAGED_COVERLETTERS_DATA: ManagedCoverLetter[] = [
-  { id: "1", title: "카카오 프론트엔드 개발자 자기소개서", privateMemo: "2026 상반기 공채", updatedAt: "2026-03-08", visibility: "public", tags: ["React", "성장동기", "협업"], interestFields: ["서비스기획", "프론트엔드"], linkedPortfolioCount: 2, linkedPortfolioIds: ["1", "2"] },
-  { id: "2", title: "라인 플러스 백엔드 자기소개서", privateMemo: "1차 서류 통과 후 보완 예정", updatedAt: "2026-02-20", visibility: "private", tags: ["Java", "Spring Boot", "MSA"], interestFields: ["백엔드 개발", "시스템 설계"], linkedPortfolioCount: 1, linkedPortfolioIds: ["2"] },
-  { id: "3", title: "토스 서버 개발자 자기소개서", privateMemo: "초안 — 추가 수정 필요", updatedAt: "2026-01-15", visibility: "private", tags: ["Kotlin", "MSA", "결제시스템"], interestFields: ["핀테크", "결제 시스템"], linkedPortfolioCount: 0, linkedPortfolioIds: [] },
+  { id: "1", title: "카카오 프론트엔드 개발자 자기소개서", privateMemo: "2026 상반기 공채", updatedAt: "2026-03-08", visibility: "public", tags: ["React", "성장동기", "협업"], interestFields: ["FRONTEND_ENGINEER", "SERVICE_PLANNER"], linkedPortfolioCount: 2, linkedPortfolioIds: ["1", "2"] },
+  { id: "2", title: "라인 플러스 백엔드 자기소개서", privateMemo: "1차 서류 통과 후 보완 예정", updatedAt: "2026-02-20", visibility: "private", tags: ["Java", "Spring Boot", "MSA"], interestFields: ["BACKEND_ENGINEER", "SYSTEM_ARCHITECT"], linkedPortfolioCount: 1, linkedPortfolioIds: ["2"] },
+  { id: "3", title: "토스 서버 개발자 자기소개서", privateMemo: "초안 — 추가 수정 필요", updatedAt: "2026-01-15", visibility: "private", tags: ["Kotlin", "MSA", "결제시스템"], interestFields: ["BACKEND_ENGINEER", "SERVER_DEVELOPER"], linkedPortfolioCount: 0, linkedPortfolioIds: [] },
 ]

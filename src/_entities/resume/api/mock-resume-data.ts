@@ -32,7 +32,7 @@ export const MOCK_RESUME_DETAIL_DATA: Record<string, ResumeDetail> = {
     authorId: "u_mock_1",
     title: "3년차 프론트엔드 개발자 이력서",
     visibility: "public",
-    interestFields: ["웹개발", "프론트엔드"],
+    interestFields: ["FRONTEND_ENGINEER", "WEB_DEVELOPER"],
     tags: ["React", "Next.js", "TypeScript", "TailwindCSS", "GraphQL"],
     externalLinks: [
       { label: "GitHub", url: "https://github.com/example" },
@@ -51,7 +51,7 @@ export const MOCK_RESUME_DETAIL_DATA: Record<string, ResumeDetail> = {
     authorId: "u_mock_1",
     title: "풀스택 개발자 이력서 (스타트업 지원용)",
     visibility: "private",
-    interestFields: ["풀스택", "백엔드"],
+    interestFields: ["FULLSTACK_ENGINEER", "BACKEND_ENGINEER"],
     tags: ["Node.js", "PostgreSQL", "Docker", "AWS"],
     externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,
@@ -63,6 +63,6 @@ export const MOCK_RESUME_DETAIL_DATA: Record<string, ResumeDetail> = {
 
 // ── 마이페이지 이력서 관리 탭 ────────────────────────────────────────
 export const MOCK_MANAGED_RESUMES_DATA: ManagedResume[] = [
-  { id: "1", title: "3년차 프론트엔드 개발자 이력서", privateMemo: "네이버/카카오 공채 지원용", updatedAt: "2026-03-10", visibility: "public", tags: ["React", "Next.js", "TypeScript"], interestFields: ["웹 프론트엔드", "UI 개발"], linkedPortfolioCount: 2, linkedPortfolioIds: ["1", "2"] },
-  { id: "2", title: "풀스택 개발자 이력서 (스타트업 지원용)", updatedAt: "2026-02-28", visibility: "private", tags: ["Node.js", "PostgreSQL", "Docker"], interestFields: ["풀스택 개발", "백엔드", "DevOps"], linkedPortfolioCount: 1, linkedPortfolioIds: ["2"] },
+  { id: "1", title: "3년차 프론트엔드 개발자 이력서", privateMemo: "네이버/카카오 공채 지원용", updatedAt: "2026-03-10", visibility: "public", tags: ["React", "Next.js", "TypeScript"], interestFields: ["FRONTEND_ENGINEER", "WEB_DEVELOPER"], linkedPortfolioCount: 2, linkedPortfolioIds: ["1", "2"] },
+  { id: "2", title: "풀스택 개발자 이력서 (스타트업 지원용)", updatedAt: "2026-02-28", visibility: "private", tags: ["Node.js", "PostgreSQL", "Docker"], interestFields: ["FULLSTACK_ENGINEER", "BACKEND_ENGINEER", "DEVOPS_ENGINEER"], linkedPortfolioCount: 1, linkedPortfolioIds: ["2"] },
 ]

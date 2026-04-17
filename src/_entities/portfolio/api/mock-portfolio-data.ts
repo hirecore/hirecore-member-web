@@ -53,14 +53,14 @@ export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
     content: MOCK_PORTFOLIO_CONTENT,
     linkedResume: {
       id: "r1", type: "resume", title: "프론트엔드 개발자 이력서 (2025)",
-      visibility: "public", interestFields: ["웹개발", "프론트엔드"],
+      visibility: "public", interestFields: ["FRONTEND_ENGINEER", "WEB_DEVELOPER"],
       tags: ["React", "Next.js", "TypeScript", "TailwindCSS"],
       author: MOCK_DEFAULT_AUTHOR, updatedAt: "2025-12-20",
       content: MOCK_LINKED_RESUME_CONTENT,
     },
     linkedCoverletter: {
       id: "cl1", type: "coverletter", title: "네이버 공채 자기소개서",
-      visibility: "public", interestFields: ["웹개발", "UI/UX"],
+      visibility: "public", interestFields: ["FRONTEND_ENGINEER", "UI_UX_DESIGNER"],
       tags: ["React", "성장동기", "협업"],
       author: MOCK_DEFAULT_AUTHOR, updatedAt: "2025-12-15",
       content: MOCK_LINKED_CL_CONTENT,

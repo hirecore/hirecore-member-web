@@ -28,7 +28,7 @@ import {
 } from "@/_features/editor"
 
 import { LinkedPortfoliosSection } from "@/_features/document-link"
-import { WriteActionBar, ExternalLinksSection } from "@/_widgets/portfolio-editor"
+import { WriteActionBar, ExternalLinksSection, MultiJobCategorySection } from "@/_widgets/portfolio-editor"
 import { useResumeWriteView } from "../model/use-resume-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
 import type { Visibility } from "@/_shared/model"
@@ -119,7 +119,6 @@ export function ResumeWriteView() {
 
   // 순수 UI 임시 상태
   const [tagInput,      setTagInput]      = useState("")
-  const [interestInput, setInterestInput] = useState("")
 
   // 태그 키다운: view의 tagInput과 model의 tags를 연결
   const handleTagKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -227,47 +226,13 @@ export function ResumeWriteView() {
               {errors.visibility && <p className="rw-error">{errors.visibility}</p>}
             </section>
 
-            {/* 02. 관심분야 */}
-            <section className="rw-section">
-              <div className="rw-section__head">
-                <span className="rw-section__label">관심분야</span>
-                <span className="rw-section__optional">선택</span>
-                <span className="rw-section__hint">채용담당자가 한눈에 파악할 수 있어요</span>
-              </div>
-              <div className="rw-tags-wrap">
-                {interestFields.map((f) => (
-                  <span key={f} className="rw-interest-chip">
-                    {f}
-                    <button type="button" className="rw-tag-chip__remove" onClick={() => setInterestFields((v) => v.filter((x) => x !== f))} aria-label={`${f} 삭제`}>
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-                <input
-                  type="text"
-                  className="rw-tag-input"
-                  placeholder={interestFields.length === 0 ? "관심 분야 단어를 입력 후 Enter를 눌러주세요. (최대 5개)" : interestFields.length < 5 ? "Enter를 눌러 추가하세요." : ""}
-                  value={interestInput}
-                  onChange={(e) => setInterestInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.nativeEvent.isComposing) return
-                    if (e.key === "Enter" || e.key === ",") {
-                      e.preventDefault()
-                      const trimmed = interestInput.trim()
-                      if (trimmed && !interestFields.includes(trimmed) && interestFields.length < 5) {
-                        setInterestFields((prev) => [...prev, trimmed])
-                      }
-                      setInterestInput("")
-                    } else if (e.key === "Backspace" && interestInput === "" && interestFields.length > 0) {
-                      setInterestFields((prev) => prev.slice(0, -1))
-                    }
-                  }}
-                  disabled={interestFields.length >= 5}
-                />
-              </div>
-            </section>
+            {/* 02. 직무 선택 */}
+            <MultiJobCategorySection
+              value={interestFields}
+              maxCount={5}
+              onChange={setInterestFields}
+              classPrefix="rw"
+            />
 
             {/* 03. 제목 */}
             <section className="rw-section" id="rw-field-title">
