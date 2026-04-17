@@ -11,3 +11,4 @@ export type { DraftState } from "./create-draft-store";
 export {
   MOCK_DEFAULT_AUTHOR, mockText, mockHeading, mockParagraph, mockBulletList, mockDoc,
 } from "./mock-helpers";
+export { formatDate, formatDateShort } from "./format-date";

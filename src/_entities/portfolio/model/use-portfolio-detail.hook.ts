@@ -1,11 +1,7 @@
 // _entities/portfolio/model | 포트폴리오 상세 조회
 // TODO: API 연결 시 GET /api/portfolios/:id 로 교체
 import { MOCK_PORTFOLIO_DETAIL_DATA } from "../api/mock-portfolio-data"
-
-interface PortfolioLink {
-  label: string
-  url: string
-}
+import type { ExternalLink } from "@/_shared/model"
 
 export interface LinkedDocEmbed {
   id: string
@@ -34,7 +30,7 @@ export interface PortfolioDetail {
   title: string
   thumbnailUrl: string | null
   tags: string[]
-  externalLinks: PortfolioLink[]
+  externalLinks: ExternalLink[]
   author: { name: string; profileImageUrl: string | null }
   updatedAt: string
   likeCount: number

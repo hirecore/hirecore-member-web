@@ -1,10 +1,6 @@
 import type { JSONContent } from "@tiptap/core"
 import { createDraftStore } from "@/_shared/lib"
-
-export interface ExternalLink {
-  label: string
-  url: string
-}
+import type { ExternalLink } from "@/_shared/model"
 
 export interface ResumeDraftData {
   visibility: "public" | "private"

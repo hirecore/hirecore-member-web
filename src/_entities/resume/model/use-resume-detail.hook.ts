@@ -1,18 +1,7 @@
 // _entities/resume/model | 이력서 상세 조회
 // TODO: API 연결 시 GET /api/resumes/:id 로 교체
 import { MOCK_RESUME_DETAIL_DATA } from "../api/mock-resume-data"
-
-interface LinkedPortfolio {
-  id: string
-  title: string
-  thumbnailUrl: string | null
-  tags: string[]
-}
-
-interface ExternalLink {
-  label: string
-  url: string
-}
+import type { ExternalLink, LinkedPortfolio } from "@/_shared/model"
 
 export interface ResumeDetail {
   id: string

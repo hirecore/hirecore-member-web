@@ -2,8 +2,6 @@
 
 import { useState } from "react"
 import { EditorContent } from "@tiptap/react"
-import type { LinkablePortfolio } from "@/_features/document-link"
-import Link from "next/link"
 import { USER_ROUTES } from "@/_shared/config"
 import { useRouter } from "next/navigation"
 import { useCoverLetterReadView } from "../model/use-cover-letter-read-view"
@@ -11,43 +9,12 @@ import { PageContainer } from "@/_shared/ui/layout"
 import { DetailPageLayout } from "@/_shared/ui/detail-page-layout"
 import { DeleteConfirmModal } from "@/_shared/ui/delete-confirm-modal"
 import { PortfolioTocSidebar } from "@/_widgets/portfolio"
+import { AvatarPlaceholder } from "@/_shared/ui/avatar-placeholder"
+import { LinkedPortfolioChip } from "@/_shared/ui/linked-portfolio-chip"
+import { formatDate } from "@/_shared/lib"
 
 import "@/_features/editor/editor.scss"
 import "./coverletter-read-view.scss"
-
-
-function AvatarPlaceholder({ name }: { name: string }) {
-  const hue = (name.charCodeAt(0) * 37) % 360
-  return (
-    <div className="cld-avatar" style={{ background: `hsl(${hue} 65% 55%)` }} aria-hidden>
-      {name.slice(0, 1)}
-    </div>
-  )
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("ko-KR", { year: "numeric", month: "long", day: "2-digit" })
-}
-
-function PortfolioChip({ p }: { p: LinkablePortfolio }) {
-  const c0 = p.title.charCodeAt(0) || 65
-  const c1 = p.title.charCodeAt(1) || 90
-  const hue = (c0 * 47 + c1 * 19) % 360
-  const hue2 = (hue + 55) % 360
-  return (
-    <Link href={USER_ROUTES.portfolio.detail(p.id)} className="cld-pf-chip">
-      <div className="cld-pf-chip__thumb" style={{ background: `linear-gradient(140deg, hsl(${hue} 68% 52%), hsl(${hue2} 72% 38%))` }} aria-hidden>
-        {p.title.slice(0, 1)}
-      </div>
-      <div className="cld-pf-chip__info">
-        <span className="cld-pf-chip__title">{p.title}</span>
-        <div className="cld-pf-chip__tags">
-          {p.tags.slice(0, 2).map((t) => <span key={t} className="cld-pf-chip__tag">#{t}</span>)}
-        </div>
-      </div>
-    </Link>
-  )
-}
 
 interface Props { id: string }
 
@@ -185,7 +152,7 @@ export function CoverLetterReadView({ id }: Props) {
                     연결된 포트폴리오
                   </h2>
                   <div className="cld-portfolios__list">
-                    {data.linkedPortfolios.map((p) => <PortfolioChip key={p.id} p={p} />)}
+                    {data.linkedPortfolios.map((p) => <LinkedPortfolioChip key={p.id} portfolio={p} />)}
                   </div>
                 </div>
               )}

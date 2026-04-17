@@ -9,7 +9,6 @@ import {
   PortfolioMetaCard,
   PortfolioTabBar,
   PortfolioTocSidebar,
-  PortfolioPostLayout,
   PortfolioLinkedDocsTab,
 } from "@/_widgets/portfolio"
 import {
@@ -32,49 +31,19 @@ import "@/_features/editor/editor.scss"
 import "./portfolio-read-view.scss"
 
 
-/* ── 연결 이력서/자소서 탭 패널 ── */
-function LinkedDocPanel({ doc }: { doc: LinkedDocEmbed }) {
-  const editor = useReadOnlyEditor({ content: doc.content, includeImages: doc.type === "resume" })
+/* ── 연결 문서 에디터 훅 — content 없으면 빈 에디터 ── */
+function useLinkedDocEditor(doc: LinkedDocEmbed | null) {
+  const editor = useReadOnlyEditor({ content: doc?.content, includeImages: doc?.type === "resume" })
   const { tocHeadings, activeId, scrollToHeading } = useTocTracking({
     editor,
-    content: doc.content as JSONContent | undefined,
+    content: doc?.content as JSONContent | undefined,
     scrollOffset: 160,
   })
+  const updatedAt = doc ? new Date(doc.updatedAt).toLocaleDateString("ko-KR", {
+    year: "numeric", month: "2-digit", day: "2-digit",
+  }).replace(/\. /g, ".").replace(/\.$/, "") : ""
 
-  return (
-    <PortfolioPostLayout
-      content={
-        <div className="pr-linked-doc">
-          <div className="pr-linked-doc__header">
-            <span className={`pr-linked-doc__badge pr-linked-doc__badge--${doc.type}`}>
-              {doc.type === "resume" ? "이력서" : "자기소개서"}
-            </span>
-            <span className={`pr-linked-doc__vis pr-linked-doc__vis--${doc.visibility}`}>
-              {doc.visibility === "public" ? "공개" : "비공개"}
-            </span>
-          </div>
-          <h2 className="pr-linked-doc__title">{doc.title}</h2>
-          {doc.interestFields.length > 0 && (
-            <div className="pr-linked-doc__interests">
-              {doc.interestFields.map((f) => <span key={f} className="pr-linked-doc__interest-chip">{f}</span>)}
-            </div>
-          )}
-          {doc.tags.length > 0 && (
-            <div className="pr-linked-doc__tags">
-              {doc.tags.map((t) => <span key={t} className="pr-linked-doc__tag">#{t}</span>)}
-            </div>
-          )}
-          <div className="pr-linked-doc__divider" />
-          <EditorContent editor={editor} className="simple-editor-content pr-linked-doc__content" />
-        </div>
-      }
-      toc={
-        tocHeadings.length > 0 ? (
-          <PortfolioTocSidebar headings={tocHeadings} activeId={activeId} onClickHeading={scrollToHeading} />
-        ) : undefined
-      }
-    />
-  )
+  return { editor, tocHeadings, activeId, scrollToHeading, updatedAt }
 }
 
 /* ── 다른 포트폴리오 카드 ── */
@@ -141,9 +110,9 @@ function OtherPortfoliosSection({ currentId, authorName }: { currentId: string; 
 }
 
 const TABS: { id: ActiveTab; label: string }[] = [
-  { id: "portfolio", label: "포트폴리오" },
   { id: "resume", label: "이력서" },
   { id: "coverletter", label: "자기소개서" },
+  { id: "portfolio", label: "포트폴리오" },
 ]
 
 interface Props { id: string }
@@ -161,6 +130,10 @@ export function PortfolioReadView({ id }: Props) {
   } = usePortfolioReadView(id)
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+
+  // 연결 문서 에디터 — 항상 호출 (React hooks 규칙 준수)
+  const linkedResume = useLinkedDocEditor(data?.linkedResume ?? null)
+  const linkedCoverletter = useLinkedDocEditor(data?.linkedCoverletter ?? null)
 
   if (!data) return null
 
@@ -252,10 +225,16 @@ export function PortfolioReadView({ id }: Props) {
               {/* 이력서 탭 */}
               {tab === "resume" && (
                 <div className="pr-post-area">
-                  {data.linkedResume
-                    ? <LinkedDocPanel doc={data.linkedResume} />
-                    : <PortfolioLinkedDocsTab type="resume" docs={[]} isOwner={isOwner} />
-                  }
+                  {data.linkedResume ? (
+                    <>
+                      <div className="pr-post-meta-bar">
+                        <span className="pr-post-meta-bar__updated">마지막 업데이트 : {linkedResume.updatedAt}</span>
+                      </div>
+                      <EditorContent editor={linkedResume.editor} className="simple-editor-content pr-editor-content" />
+                    </>
+                  ) : (
+                    <PortfolioLinkedDocsTab type="resume" docs={[]} isOwner={isOwner} />
+                  )}
                   <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
                 </div>
               )}
@@ -263,10 +242,16 @@ export function PortfolioReadView({ id }: Props) {
               {/* 자기소개서 탭 */}
               {tab === "coverletter" && (
                 <div className="pr-post-area">
-                  {data.linkedCoverletter
-                    ? <LinkedDocPanel doc={data.linkedCoverletter} />
-                    : <PortfolioLinkedDocsTab type="coverletter" docs={[]} isOwner={isOwner} />
-                  }
+                  {data.linkedCoverletter ? (
+                    <>
+                      <div className="pr-post-meta-bar">
+                        <span className="pr-post-meta-bar__updated">마지막 업데이트 : {linkedCoverletter.updatedAt}</span>
+                      </div>
+                      <EditorContent editor={linkedCoverletter.editor} className="simple-editor-content pr-editor-content" />
+                    </>
+                  ) : (
+                    <PortfolioLinkedDocsTab type="coverletter" docs={[]} isOwner={isOwner} />
+                  )}
                   <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
                 </div>
               )}
@@ -292,11 +277,11 @@ export function PortfolioReadView({ id }: Props) {
           }
           sideBottom={
             tab === "portfolio" && tocHeadings.length > 0 ? (
-              <PortfolioTocSidebar
-                headings={tocHeadings}
-                activeId={activeId}
-                onClickHeading={scrollToHeading}
-              />
+              <PortfolioTocSidebar headings={tocHeadings} activeId={activeId} onClickHeading={scrollToHeading} />
+            ) : tab === "resume" && linkedResume.tocHeadings.length > 0 ? (
+              <PortfolioTocSidebar headings={linkedResume.tocHeadings} activeId={linkedResume.activeId} onClickHeading={linkedResume.scrollToHeading} />
+            ) : tab === "coverletter" && linkedCoverletter.tocHeadings.length > 0 ? (
+              <PortfolioTocSidebar headings={linkedCoverletter.tocHeadings} activeId={linkedCoverletter.activeId} onClickHeading={linkedCoverletter.scrollToHeading} />
             ) : undefined
           }
         />

@@ -1,9 +1,5 @@
 import type { JSONContent } from "@tiptap/core"
-
-export interface PortfolioLink {
-  label: string
-  url: string
-}
+import type { ExternalLink } from "@/_shared/model"
 
 /**
  * 직무 카테고리 선택 결과.
@@ -29,9 +25,11 @@ export interface ConfirmData {
   privateMemo?: string
   thumbnailUrl: string | null
   tags: string[]
-  externalLinks: PortfolioLink[]
+  externalLinks: ExternalLink[]
   content: JSONContent
 }
+
+export type { ExternalLink as PortfolioLink }
 
 export type ActiveTab = "resume" | "coverletter" | "portfolio"
 

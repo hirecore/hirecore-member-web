@@ -30,6 +30,20 @@ export interface ManagedDocument {
  *
  * tier는 백엔드 응답 대소문자 혼용("gold" | "Gold" | "GOLD")을 수용하기 위해 string으로 선언.
  */
+/** 외부 링크 (GitHub, Blog 등) — 포트폴리오·이력서·자기소개서 공통 */
+export interface ExternalLink {
+  label: string
+  url: string
+}
+
+/** 연결된 포트폴리오 요약 — 이력서·자기소개서 상세에서 사용 */
+export interface LinkedPortfolio {
+  id: string
+  title: string
+  thumbnailUrl: string | null
+  tags: string[]
+}
+
 export interface StorageInfo {
   used: number
   quota: number

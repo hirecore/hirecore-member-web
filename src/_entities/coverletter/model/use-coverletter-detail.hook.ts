@@ -1,18 +1,7 @@
 // _entities/coverletter/model | 자기소개서 상세 조회
 // TODO: API 연결 시 GET /api/coverletters/:id 로 교체
 import { MOCK_COVERLETTER_DETAIL_DATA } from "../api/mock-coverletter-data"
-
-interface LinkedPortfolio {
-  id: string
-  title: string
-  thumbnailUrl: string | null
-  tags: string[]
-}
-
-interface ExternalLink {
-  label: string
-  url: string
-}
+import type { ExternalLink, LinkedPortfolio } from "@/_shared/model"
 
 export interface CoverLetterDetail {
   id: string

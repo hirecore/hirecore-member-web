@@ -21,4 +21,4 @@ export { useBodyLock } from "./use-body-lock.hook"
 export { useTheme } from "./use-theme.hook"
 
 // 작성 흐름 공통 타입
-export type { Visibility, StorageInfo, ManagedDocument } from "./authoring.schema"
+export type { Visibility, StorageInfo, ManagedDocument, ExternalLink, LinkedPortfolio } from "./authoring.schema"
