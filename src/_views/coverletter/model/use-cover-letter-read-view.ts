@@ -8,11 +8,16 @@ import type { JSONContent } from "@tiptap/core"
 import { useReadOnlyEditor } from "@/_features/editor"
 import { USER_ROUTES } from "@/_shared/config"
 import { useCoverLetterDetail } from "@/_entities/coverletter"
+import { useCurrentUser } from "@/_features/auth"
 import { useTocTracking } from "@/_features/portfolio"
 
 export function useCoverLetterReadView(id: string) {
   const router = useRouter()
   const data = useCoverLetterDetail(id)
+  const { data: currentUser } = useCurrentUser()
+
+  // TODO: API 연결 시 authorId 비교로 교체 — 현재는 mock 데이터 확인용으로 로그인 시 소유자로 간주
+  const isOwner = !!(currentUser && data)
 
   // 이미지 확장 제외 — 자기소개서는 텍스트 전용
   const editor = useReadOnlyEditor({ content: data?.content, includeImages: false })
@@ -29,5 +34,5 @@ export function useCoverLetterReadView(id: string) {
     if (!data) router.replace(USER_ROUTES.mypage)
   }, [data, router])
 
-  return { data, editor, tocHeadings, scrollToHeading, activeId }
+  return { data, editor, tocHeadings, scrollToHeading, activeId, isOwner }
 }

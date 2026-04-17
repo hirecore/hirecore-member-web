@@ -59,7 +59,7 @@ export function UserMypagePortfolioTab() {
       <DraftSection
         items={draftPortfolios}
         onEdit={(id) => router.push(`${USER_ROUTES.portfolio.write}?editId=${id}`)}
-        onDelete={(id) => { if (window.confirm("임시저장��� 삭제하시겠습니까?")) { /* TODO: API 호출 */ } }}
+        onDelete={(id) => { if (window.confirm("임시저장을 삭제하시겠습니까?")) { /* TODO: API 호출 */ } }}
       />
       <PortfolioList
         portfolios={filtered}

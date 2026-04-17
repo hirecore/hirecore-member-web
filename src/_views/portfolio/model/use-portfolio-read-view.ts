@@ -8,14 +8,19 @@ import { useReadOnlyEditor } from "@/_features/editor"
 import { USER_ROUTES } from "@/_shared/config"
 import { usePortfolioDetail } from "@/_entities/portfolio"
 import { useTocTracking } from "@/_features/portfolio"
+import { useCurrentUser } from "@/_features/auth"
 import type { ActiveTab } from "@/_features/portfolio/lib"
 
 export function usePortfolioReadView(id: string) {
   const router = useRouter()
   const data = usePortfolioDetail(id)
+  const { data: currentUser } = useCurrentUser()
 
   const [tab, setTab]     = useState<ActiveTab>("portfolio")
   const [liked, setLiked] = useState(false)
+
+  // TODO: API 연결 시 authorId 비교로 교체 — 현재는 mock 데이터 확인용으로 로그인 시 소유자로 간주
+  const isOwner = !!(currentUser && data)
 
   const editor = useReadOnlyEditor({ content: data?.content, includeImages: true })
 
@@ -34,5 +39,6 @@ export function usePortfolioReadView(id: string) {
     tabsSticky,
     activeId,
     scrollToHeading,
+    isOwner,
   }
 }

@@ -23,6 +23,8 @@ export interface LinkedDocEmbed {
 
 export interface PortfolioDetail {
   id: string
+  /** 작성자 사용자 ID — 소유자 판별에 사용 */
+  authorId: string
   /** L3 직무 코드 (assignable=true 인 노드) */
   categoryCode: string
   /** "기타(직접입력)" 선택 시 사용자 입력 텍스트 */

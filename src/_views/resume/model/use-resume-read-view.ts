@@ -8,12 +8,17 @@ import type { JSONContent } from "@tiptap/core"
 import { useReadOnlyEditor } from "@/_features/editor"
 import { USER_ROUTES } from "@/_shared/config"
 import { useResumeDetail } from "@/_entities/resume"
+import { useCurrentUser } from "@/_features/auth"
 // TOC 추적 훅은 portfolio feature에 정의되어 있으나 일반 에디터 기능이라 재사용 (추후 _features/editor로 이동 권장)
 import { useTocTracking } from "@/_features/portfolio"
 
 export function useResumeReadView(id: string) {
   const router = useRouter()
   const data = useResumeDetail(id)
+  const { data: currentUser } = useCurrentUser()
+
+  // TODO: API 연결 시 authorId 비교로 교체 — 현재는 mock 데이터 확인용으로 로그인 시 소유자로 간주
+  const isOwner = !!(currentUser && data)
 
   const editor = useReadOnlyEditor({ content: data?.content, includeImages: true })
 
@@ -30,5 +35,5 @@ export function useResumeReadView(id: string) {
     if (!data) router.replace(USER_ROUTES.mypage)
   }, [data, router])
 
-  return { data, editor, tocHeadings, scrollToHeading, activeId }
+  return { data, editor, tocHeadings, scrollToHeading, activeId, isOwner }
 }

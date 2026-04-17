@@ -25,7 +25,7 @@ import {
 } from "@/_features/editor"
 
 import { LinkedPortfoliosSection } from "@/_features/document-link"
-import { WriteActionBar } from "@/_widgets/portfolio-editor"
+import { WriteActionBar, ExternalLinksSection } from "@/_widgets/portfolio-editor"
 import { useCoverLetterWriteView } from "../model/use-cover-letter-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
 import type { Visibility } from "@/_shared/model"
@@ -101,6 +101,7 @@ export function CoverLetterWriteView() {
     interestFields, setInterestFields,
     tags, setTags,
     linkedIds, setLinkedIds,
+    externalLinks, setExternalLinks,
     errors, setErrors,
     myPortfolios,
     editor, editorFocused,
@@ -329,7 +330,15 @@ export function CoverLetterWriteView() {
               {errors.content && <p className="clw-error">{errors.content}</p>}
             </section>
 
-            {/* 06. 태그 */}
+            {/* 06. 링크 */}
+            <ExternalLinksSection
+              externalLinks={externalLinks}
+              onAdd={(link) => setExternalLinks((prev) => [...prev, link])}
+              onRemove={(i) => setExternalLinks((prev) => prev.filter((_, idx) => idx !== i))}
+              classPrefix="clw"
+            />
+
+            {/* 07. 태그 */}
             <section className="clw-section">
               <div className="clw-section__head">
                 <span className="clw-section__label">태그</span>
@@ -358,7 +367,7 @@ export function CoverLetterWriteView() {
               </div>
             </section>
 
-            {/* 07. 포트폴리오 연결 */}
+            {/* 08. 포트폴리오 연결 */}
             <section className="clw-section">
               <div className="clw-section__head">
                 <span className="clw-section__label">포트폴리오 연결</span>

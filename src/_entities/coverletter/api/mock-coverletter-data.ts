@@ -21,12 +21,16 @@ export const MOCK_CL_CONTENT = mockDoc(
 export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
   "1": {
     id: "1",
+    authorId: "u_mock_1",
     title: "카카오 프론트엔드 개발자 자기소개서",
     company: "카카오",
     position: "프론트엔드 개발자",
     visibility: "public",
     interestFields: ["웹개발", "UI/UX"],
     tags: ["React", "성장동기", "협업"],
+    externalLinks: [
+      { label: "GitHub", url: "https://github.com/example" },
+    ],
     author: MOCK_DEFAULT_AUTHOR,
     updatedAt: "2026-03-08",
     linkedPortfolios: [
@@ -36,12 +40,14 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
   },
   "2": {
     id: "2",
+    authorId: "u_mock_1",
     title: "라인 플러스 백엔드 자기소개서",
     company: "라인 플러스",
     position: "백엔드 개발자",
     visibility: "private",
     interestFields: ["백엔드", "서버개발"],
     tags: ["Java", "Spring Boot", "MSA"],
+    externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,
     updatedAt: "2026-02-20",
     linkedPortfolios: [],
@@ -49,12 +55,14 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
   },
   "3": {
     id: "3",
+    authorId: "u_mock_1",
     title: "토스 서버 개발자 자기소개서",
     company: "토스",
     position: "서버 개발자",
     visibility: "private",
     interestFields: ["결제시스템", "서버개발"],
     tags: ["Kotlin", "MSA", "결제시스템"],
+    externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,
     updatedAt: "2026-01-15",
     linkedPortfolios: [],

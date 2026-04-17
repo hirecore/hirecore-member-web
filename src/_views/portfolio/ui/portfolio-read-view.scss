@@ -18,7 +18,10 @@
 .pr-top-bar {
   display: flex;
   align-items: center;
+  justify-content: space-between;
+  max-width: layout.$content-col-max;
   padding: 1.5rem 0 0.5rem;
+  @media (max-width: layout.$bp-lg) { max-width: none; }
 }
 
 .pr-back-btn {
@@ -36,6 +39,46 @@
   transition: color 0.13s;
   &:hover { color: #374151; }
   .dark & { color: #9ca3af; &:hover { color: #f9fafb; } }
+}
+
+.pr-owner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.pr-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #3b82f6;
+  background: none;
+  border: 1.5px solid rgba(59, 130, 246, 0.3);
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s;
+  &:hover { background: rgba(59, 130, 246, 0.06); border-color: rgba(59, 130, 246, 0.5); }
+  .dark & { color: #60a5fa; border-color: rgba(96, 165, 250, 0.3); &:hover { background: rgba(96, 165, 250, 0.08); border-color: rgba(96, 165, 250, 0.5); } }
+}
+
+.pr-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #9ca3af;
+  background: none;
+  border: 1.5px solid rgba(156, 163, 175, 0.25);
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.13s;
+  &:hover { color: #ef4444; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.04); }
+  .dark & { color: #6b7280; border-color: rgba(107, 114, 128, 0.25); &:hover { color: #f87171; border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.06); } }
 }
 
 /* ── 포스팅 뷰 영역 ── */

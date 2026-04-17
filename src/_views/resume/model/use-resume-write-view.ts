@@ -25,6 +25,7 @@ import {
 } from "@/_shared/config"
 import type { StorageInfo, Visibility } from "@/_shared/model"
 import { previewSizesSave, previewSizesRestore } from "@/_shared/lib"
+import type { PortfolioLink } from "@/_features/portfolio/lib"
 import { useAuthGuard } from "@/_features/auth"
 import { useResumeDraftStore } from "@/_features/resume"
 import { useStorageInfo } from "@/_entities/user"
@@ -47,6 +48,7 @@ export function useResumeWriteView() {
   const [interestFields,  setInterestFields]  = useState<string[]>([])
   const [tags,            setTags]            = useState<string[]>([])
   const [linkedIds,       setLinkedIds]       = useState<string[]>([])
+  const [externalLinks,   setExternalLinks]   = useState<PortfolioLink[]>([])
   const [errors,          setErrors]          = useState<Partial<Record<string, string>>>({})
 
   // ── 스토리지 & 업로드 상태 ───────────────────────────────────────
@@ -125,6 +127,7 @@ export function useResumeWriteView() {
         if (saved.interestFields.length) setInterestFields(saved.interestFields)
         if (saved.tags.length)           setTags(saved.tags)
         if (saved.linkedIds.length)      setLinkedIds(saved.linkedIds)
+        if (saved.externalLinks?.length) setExternalLinks(saved.externalLinks)
       }
       const sizes = previewSizesRestore(RESUME_PREVIEW_SIZES_KEY)
       if (sizes) {
@@ -146,7 +149,7 @@ export function useResumeWriteView() {
     onRestored: () => editor && calcEditorSessionBytes(editor, uploadedSizesRef, sessionBytesRef, setSessionBytes),
   })
 
-  // ── 필수값 유효성 검사 (등록 & 임시저장 & 미리보기 공통) ────���─────
+  // ── 필수값 유효성 검사 (등록 & 임시저장 & 미리보기 공통) ─────────
   const validate = (): typeof errors => {
     const newErrors: typeof errors = {}
     if (!visibility)               newErrors.visibility = "공개 설정을 선택해주세요"
@@ -169,7 +172,7 @@ export function useResumeWriteView() {
     previewSizesSave(RESUME_PREVIEW_SIZES_KEY, sizesRecord)
     useResumeDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
-      memo, interestFields, tags, linkedIds,
+      memo, interestFields, tags, linkedIds, externalLinks,
       content: editor!.getJSON(),
     })
     router.push(USER_ROUTES.resume.preview)
@@ -189,7 +192,7 @@ export function useResumeWriteView() {
     previewSizesSave(RESUME_PREVIEW_SIZES_KEY, sizesRecord)
     useResumeDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
-      memo, interestFields, tags, linkedIds,
+      memo, interestFields, tags, linkedIds, externalLinks,
       content: editor!.getJSON(),
     })
     router.push(USER_ROUTES.resume.preview)
@@ -218,6 +221,7 @@ export function useResumeWriteView() {
     interestFields, setInterestFields,
     tags, setTags,
     linkedIds, setLinkedIds,
+    externalLinks, setExternalLinks,
     errors, setErrors,
     myPortfolios,
     // storage

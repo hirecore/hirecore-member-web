@@ -22,6 +22,8 @@ export interface LinkedDoc {
 interface Props {
   type: "resume" | "coverletter"
   docs: LinkedDoc[]
+  /** 현재 로그인 사용자가 이 포트폴리오의 소유자인지 여부 */
+  isOwner?: boolean
 }
 
 function AvatarPlaceholder({ name }: { name: string }) {
@@ -47,24 +49,28 @@ function formatDate(iso: string) {
 
 const CONFIG = {
   resume: {
-    typeLabel:   "이력서",
-    badgeMod:    "pldt-card__type-badge--resume",
-    emptyTitle:  "연결된 이력서가 없어요",
-    emptyDesc:   "이 포트폴리오를 이력서에 연결하면 여기에 표시됩니다. 이력서를 작성하고 포트폴리오와 연결해보세요.",
-    ctaLabel:    "이력서 작성하기",
-    ctaHref:     USER_ROUTES.resume.write,
+    typeLabel:    "이력서",
+    badgeMod:     "pldt-card__type-badge--resume",
+    ownerTitle:   "연결된 이력서가 없어요",
+    ownerDesc:    "이 포트폴리오를 이력서에 연결하면 여기에 표시됩니다.\n이력서를 작성하고 포트폴리오와 연결해보세요.",
+    ctaLabel:     "이력서 작성하기",
+    ctaHref:      USER_ROUTES.resume.write,
+    guestTitle:   "연결된 이력서가 없습니다",
+    guestDesc:    "작성자가 이 포트폴리오에 이력서를 연결하지 않았습니다.",
   },
   coverletter: {
-    typeLabel:   "자기소개서",
-    badgeMod:    "pldt-card__type-badge--coverletter",
-    emptyTitle:  "연결된 자기소개서가 없어요",
-    emptyDesc:   "이 포트폴리오를 자기소개서에 연결하면 여기에 표시됩니다. 자기소개서를 작성하고 포트폴리오와 연결해보세요.",
-    ctaLabel:    "자기소개서 작성하기",
-    ctaHref:     USER_ROUTES.coverletter.write,
+    typeLabel:    "자기소개서",
+    badgeMod:     "pldt-card__type-badge--coverletter",
+    ownerTitle:   "연결된 자기소개서가 없어요",
+    ownerDesc:    "이 포트폴리오를 자기소개서에 연결하면 여기에 표시됩니다.\n자기소개서를 작성하고 포트폴리오와 연결해보세요.",
+    ctaLabel:     "자기소개서 작성하기",
+    ctaHref:      USER_ROUTES.coverletter.write,
+    guestTitle:   "연결된 자기소개서가 없습니다",
+    guestDesc:    "작성자가 이 포트폴리오에 자기소개서를 연결하지 않았습니다.",
   },
 } as const
 
-export function PortfolioLinkedDocsTab({ type, docs }: Props) {
+export function PortfolioLinkedDocsTab({ type, docs, isOwner = false }: Props) {
   const cfg = CONFIG[type]
 
   if (docs.length === 0) {
@@ -84,14 +90,16 @@ export function PortfolioLinkedDocsTab({ type, docs }: Props) {
               </svg>
             )}
           </div>
-          <p className="pldt-empty__title">{cfg.emptyTitle}</p>
-          <p className="pldt-empty__desc">{cfg.emptyDesc}</p>
-          <Link href={cfg.ctaHref} className="pldt-empty__cta">
-            {cfg.ctaLabel}
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
-              <path d="M2.5 6h7M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </Link>
+          <p className="pldt-empty__title">{isOwner ? cfg.ownerTitle : cfg.guestTitle}</p>
+          <p className="pldt-empty__desc">{isOwner ? cfg.ownerDesc : cfg.guestDesc}</p>
+          {isOwner && (
+            <Link href={cfg.ctaHref} className="pldt-empty__cta">
+              {cfg.ctaLabel}
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" aria-hidden>
+                <path d="M2.5 6h7M7 3l3 3-3 3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </Link>
+          )}
         </div>
       </div>
     )

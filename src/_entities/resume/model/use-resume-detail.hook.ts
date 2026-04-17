@@ -9,12 +9,19 @@ interface LinkedPortfolio {
   tags: string[]
 }
 
+interface ExternalLink {
+  label: string
+  url: string
+}
+
 export interface ResumeDetail {
   id: string
+  authorId: string
   title: string
   visibility: "public" | "private"
   interestFields: string[]
   tags: string[]
+  externalLinks: ExternalLink[]
   author: { name: string; profileImageUrl: string | null }
   updatedAt: string
   linkedPortfolios: LinkedPortfolio[]

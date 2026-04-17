@@ -1,6 +1,7 @@
 "use client"
 
 // _views/portfolio/ui | 포트폴리오 상세 읽기 뷰 — 비즈니스 로직은 model/use-portfolio-read-view에 위임
+import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { EditorContent } from "@tiptap/react"
@@ -26,6 +27,7 @@ import type { JSONContent } from "@tiptap/core"
 import { usePortfolioReadView } from "../model/use-portfolio-read-view"
 
 import { PageContainer } from "@/_shared/ui/layout"
+import { DeleteConfirmModal } from "@/_shared/ui/delete-confirm-modal"
 import "@/_features/editor/editor.scss"
 import "./portfolio-read-view.scss"
 
@@ -148,7 +150,10 @@ export function PortfolioReadView({ id }: Props) {
     tabsSticky,
     activeId,
     scrollToHeading,
+    isOwner,
   } = usePortfolioReadView(id)
+
+  const [showDeleteModal, setShowDeleteModal] = useState(false)
 
   if (!data) return null
 
@@ -175,7 +180,37 @@ export function PortfolioReadView({ id }: Props) {
             </svg>
             돌아가기
           </button>
+          {isOwner && (
+            <div className="pr-owner-actions">
+              <button type="button" className="pr-edit-btn" onClick={() => router.push(`${USER_ROUTES.portfolio.write}?editId=${data.id}`)}>
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <path d="M11.5 2.5l2 2-7 7H4.5v-2l7-7Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+                  <path d="M9.5 4.5l2 2" stroke="currentColor" strokeWidth="1.3" />
+                </svg>
+                편집하기
+              </button>
+              <button type="button" className="pr-delete-btn" onClick={() => setShowDeleteModal(true)}>
+                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
+                  <path d="M5 6h6M5.5 6V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 10.5 5v1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                  <path d="M5.5 6l.4 7a1 1 0 0 0 1 1h2.2a1 1 0 0 0 1-1l.4-7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                </svg>
+                삭제
+              </button>
+            </div>
+          )}
         </div>
+        {showDeleteModal && (
+          <DeleteConfirmModal
+            docTypeName="포트폴리오"
+            notice="포트폴리오만 삭제되며, 연결된 이력서와 자기소개서는 그대로 유지됩니다."
+            onConfirm={() => {
+              setShowDeleteModal(false)
+              // TODO: API 호출 — DELETE /api/portfolios/{id}
+              router.push(USER_ROUTES.mypage)
+            }}
+            onCancel={() => setShowDeleteModal(false)}
+          />
+        )}
         <PortfolioMetaCard
           majorLabel={majorLabel}
           subCategory={subLabel}
@@ -211,7 +246,7 @@ export function PortfolioReadView({ id }: Props) {
                 ? <LinkedDocPanel doc={data.linkedResume} />
                 : (
                   <PortfolioPostLayout
-                    content={<PortfolioLinkedDocsTab type="resume" docs={[]} />}
+                    content={<PortfolioLinkedDocsTab type="resume" docs={[]} isOwner={isOwner} />}
                   />
                 )
               }
@@ -235,7 +270,7 @@ export function PortfolioReadView({ id }: Props) {
                 ? <LinkedDocPanel doc={data.linkedCoverletter} />
                 : (
                   <PortfolioPostLayout
-                    content={<PortfolioLinkedDocsTab type="coverletter" docs={[]} />}
+                    content={<PortfolioLinkedDocsTab type="coverletter" docs={[]} isOwner={isOwner} />}
                   />
                 )
               }

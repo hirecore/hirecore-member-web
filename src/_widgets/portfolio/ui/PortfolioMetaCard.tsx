@@ -44,6 +44,17 @@ export function PortfolioMetaCard({
         </div>
       )}
 
+      <div className="pr-meta-card__type">
+        <div className="pr-type-icon" aria-hidden>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+            <rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/>
+            <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+            <path d="M2 12h20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
+          </svg>
+        </div>
+        <span className="pr-type-label">포트폴리오</span>
+      </div>
+
       <div className="pr-meta-card__top">
         <div className="pr-meta-card__cats">
           <span className="pr-badge pr-badge--major">{majorLabel}</span>

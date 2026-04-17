@@ -88,7 +88,7 @@ export default function PortfolioPreviewView() {
       {/* ── 이력서 / 자기소개서 연결 탭 ── */}
       {(tab === "resume" || tab === "coverletter") && (
         <PageContainer width="wide">
-          <PortfolioLinkedDocsTab type={tab} docs={[]} />
+          <PortfolioLinkedDocsTab type={tab} docs={[]} isOwner />
         </PageContainer>
       )}
 

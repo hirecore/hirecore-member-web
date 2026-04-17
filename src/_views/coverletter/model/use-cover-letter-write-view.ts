@@ -13,6 +13,7 @@ import {
 } from "@/_features/editor"
 import { USER_ROUTES } from "@/_shared/config"
 import type { Visibility } from "@/_shared/model"
+import type { PortfolioLink } from "@/_features/portfolio/lib"
 import { useAuthGuard } from "@/_features/auth"
 import { useCoverLetterDraftStore } from "@/_features/coverletter"
 import { useMyPortfolios } from "@/_entities/portfolio"
@@ -33,6 +34,7 @@ export function useCoverLetterWriteView() {
   const [interestFields,  setInterestFields]  = useState<string[]>([])
   const [tags,            setTags]            = useState<string[]>([])
   const [linkedIds,       setLinkedIds]       = useState<string[]>([])
+  const [externalLinks,   setExternalLinks]   = useState<PortfolioLink[]>([])
   const [errors,          setErrors]          = useState<Partial<Record<string, string>>>({})
 
   // 미리보기 복귀 후 editor가 준비되면 콘텐츠 복원을 허용하는 플래그
@@ -68,6 +70,7 @@ export function useCoverLetterWriteView() {
         if (saved.interestFields.length) setInterestFields(saved.interestFields)
         if (saved.tags.length)           setTags(saved.tags)
         if (saved.linkedIds.length)      setLinkedIds(saved.linkedIds)
+        if (saved.externalLinks?.length) setExternalLinks(saved.externalLinks)
       }
       return
     }
@@ -82,7 +85,7 @@ export function useCoverLetterWriteView() {
     getPreviewContent: () => useCoverLetterDraftStore.getState().previewData?.content,
   })
 
-  // ── 필수값 유효성 검사 (등록 & 임시저장 & 미리보기 공통) ────��────
+  // ── 필수값 유효성 검사 (등록 & 임시저장 & 미리보기 공통) ─────────
   const validate = (): typeof errors => {
     const newErrors: typeof errors = {}
     if (!visibility)               newErrors.visibility = "공개 설정을 선택해주세요"
@@ -102,7 +105,7 @@ export function useCoverLetterWriteView() {
     }
     useCoverLetterDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
-      memo, interestFields, tags, linkedIds,
+      memo, interestFields, tags, linkedIds, externalLinks,
       content: editor!.getJSON(),
     })
     router.push(USER_ROUTES.coverletter.preview)
@@ -119,7 +122,7 @@ export function useCoverLetterWriteView() {
     }
     useCoverLetterDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
-      memo, interestFields, tags, linkedIds,
+      memo, interestFields, tags, linkedIds, externalLinks,
       content: editor!.getJSON(),
     })
     router.push(USER_ROUTES.coverletter.preview)
@@ -148,6 +151,7 @@ export function useCoverLetterWriteView() {
     interestFields, setInterestFields,
     tags, setTags,
     linkedIds, setLinkedIds,
+    externalLinks, setExternalLinks,
     errors, setErrors,
     myPortfolios,
     // editor

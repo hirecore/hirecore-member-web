@@ -39,7 +39,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1.5rem;
+  max-width: layout.$content-col-max;
+  margin-bottom: 0.5rem;
+  @media (max-width: layout.$bp-lg) { max-width: none; }
 }
 
 .rd-back-btn {
@@ -58,6 +60,46 @@
 
   &:hover { background: rgba(0,0,0,0.04); color: #111827; }
   .dark & { color: #9ca3af; &:hover { background: rgba(255,255,255,0.06); color: #f9fafb; } }
+}
+
+.rd-owner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.rd-edit-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #059669;
+  background: none;
+  border: 1.5px solid rgba(16, 185, 129, 0.3);
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background 0.13s, border-color 0.13s;
+  &:hover { background: rgba(16, 185, 129, 0.06); border-color: rgba(16, 185, 129, 0.5); }
+  .dark & { color: #34d399; border-color: rgba(52, 211, 153, 0.3); &:hover { background: rgba(52, 211, 153, 0.08); border-color: rgba(52, 211, 153, 0.5); } }
+}
+
+.rd-delete-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: #9ca3af;
+  background: none;
+  border: 1.5px solid rgba(156, 163, 175, 0.25);
+  padding: 0.35rem 0.75rem;
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: all 0.13s;
+  &:hover { color: #ef4444; border-color: rgba(239, 68, 68, 0.4); background: rgba(239, 68, 68, 0.04); }
+  .dark & { color: #6b7280; border-color: rgba(107, 114, 128, 0.25); &:hover { color: #f87171; border-color: rgba(248, 113, 113, 0.4); background: rgba(248, 113, 113, 0.06); } }
 }
 
 /* ── 공개 뱃지 ── */
@@ -91,6 +133,8 @@
   margin-top: .75rem;
   padding: 2rem;
   border: 1px solid rgba(0,0,0,0.06);
+  max-width: layout.$content-col-max;
+  @media (max-width: layout.$bp-lg) { max-width: none; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   margin-bottom: 1.5rem;
 
@@ -141,7 +185,6 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    margin-bottom: 1rem;
   }
 
   &__title {
@@ -167,6 +210,35 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
+  }
+}
+
+.rd-header-card__top-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1rem;
+}
+
+.rd-vis-badge {
+  font-size: 0.72rem;
+  font-weight: 600;
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  border: 1.5px solid;
+
+  &--public {
+    color: #059669;
+    border-color: rgba(16, 185, 129, 0.35);
+    background: rgba(16, 185, 129, 0.06);
+    .dark & { color: #34d399; border-color: rgba(52, 211, 153, 0.3); background: rgba(52, 211, 153, 0.08); }
+  }
+
+  &--private {
+    color: #6b7280;
+    border-color: rgba(107, 114, 128, 0.3);
+    background: rgba(107, 114, 128, 0.06);
+    .dark & { color: #9ca3af; border-color: rgba(156, 163, 175, 0.25); background: rgba(156, 163, 175, 0.08); }
   }
 }
 
@@ -222,24 +294,78 @@
   .dark & { background: rgba(255,255,255,0.07); color: #9ca3af; }
 }
 
-/* ── 작성자/날짜 ── */
+.rd-header-card__divider {
+  height: 1px;
+  background: rgba(0, 0, 0, 0.06);
+  margin: 0.25rem 0 1rem;
+  .dark & { background: rgba(255, 255, 255, 0.07); }
+}
+
+/* ── 작성자 블록 (아바타 + 이름/날짜 + 링크) ── */
+.rd-header-card__author {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-top: 0.25rem;
+}
+
 .rd-avatar {
-  width: 1.75rem;
-  height: 1.75rem;
+  width: 2.5rem;
+  height: 2.5rem;
   border-radius: 50%;
-  font-size: 0.7rem;
+  font-size: 0.95rem;
   font-weight: 700;
   color: #fff;
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+}
 
-  /* aside용 큰 아바타 */
-  &--lg {
-    width: 2.5rem;
-    height: 2.5rem;
-    font-size: 0.95rem;
+.rd-author-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  min-width: 0;
+
+  &__top {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    margin-top: 0.15rem;
+  }
+}
+
+.rd-meta-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.8rem;
+  min-width: 0;
+
+  &__label {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: #9ca3af;
+    min-width: 3.5rem;
+    .dark & { color: #6b7280; }
+  }
+
+  &__val {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #3b82f6;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+    .dark & { color: #60a5fa; }
   }
 }
 
@@ -259,6 +385,21 @@
   font-size: 0.78rem;
   color: #9ca3af;
   .dark & { color: #6b7280; }
+}
+
+/* ── 업데이트 메타 바 ── */
+.rd-post-meta-bar {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 0.875rem;
+  padding-bottom: 1.25rem;
+
+  &__updated {
+    font-size: 0.84rem;
+    color: #c4c9d2;
+    letter-spacing: -0.01em;
+    .dark & { color: #4b5563; }
+  }
 }
 
 /* ── 본문 ── */

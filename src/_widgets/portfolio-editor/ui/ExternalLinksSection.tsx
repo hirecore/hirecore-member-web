@@ -11,9 +11,13 @@ interface Props {
   externalLinks: PortfolioLink[]
   onAdd: (link: PortfolioLink) => void
   onRemove: (index: number) => void
+  /** 외부 section 래퍼 클래스 (기본: "pw-section pw-section--links") */
+  sectionClassName?: string
+  /** 라벨/선택 클래스 접두어 (기본: "pw") */
+  classPrefix?: string
 }
 
-export function ExternalLinksSection({ externalLinks, onAdd, onRemove }: Props) {
+export function ExternalLinksSection({ externalLinks, onAdd, onRemove, sectionClassName, classPrefix = "pw" }: Props) {
   const [label, setLabel] = useState("")
   const [url,   setUrl]   = useState("")
   const [error, setError] = useState<string | null>(null)
@@ -41,11 +45,11 @@ export function ExternalLinksSection({ externalLinks, onAdd, onRemove }: Props) 
   }
 
   return (
-    <section className="pw-section pw-section--links">
-      <div className="pw-section__head">
-        <span className="pw-section__label">링크</span>
-        <span className="pw-section__optional">선택</span>
-        <span className="pw-section__hint">{externalLinks.length}/6</span>
+    <section className={sectionClassName ?? `${classPrefix}-section ${classPrefix}-section--links`}>
+      <div className={`${classPrefix}-section__head`}>
+        <span className={`${classPrefix}-section__label`}>링크</span>
+        <span className={`${classPrefix}-section__optional`}>선택</span>
+        <span className={`${classPrefix}-section__hint`}>{externalLinks.length}/6</span>
       </div>
 
       {/* 프리셋 */}

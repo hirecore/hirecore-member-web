@@ -28,7 +28,7 @@ import {
 } from "@/_features/editor"
 
 import { LinkedPortfoliosSection } from "@/_features/document-link"
-import { WriteActionBar } from "@/_widgets/portfolio-editor"
+import { WriteActionBar, ExternalLinksSection } from "@/_widgets/portfolio-editor"
 import { useResumeWriteView } from "../model/use-resume-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
 import type { Visibility } from "@/_shared/model"
@@ -107,6 +107,7 @@ export function ResumeWriteView() {
     interestFields, setInterestFields,
     tags, setTags,
     linkedIds, setLinkedIds,
+    externalLinks, setExternalLinks,
     errors, setErrors,
     myPortfolios,
     storageInfo, sessionBytes, uploadError, uploadErrorKey,
@@ -353,7 +354,15 @@ export function ResumeWriteView() {
               {errors.content && <p className="rw-error">{errors.content}</p>}
             </section>
 
-            {/* 06. 태그 */}
+            {/* 06. 링크 */}
+            <ExternalLinksSection
+              externalLinks={externalLinks}
+              onAdd={(link) => setExternalLinks((prev) => [...prev, link])}
+              onRemove={(i) => setExternalLinks((prev) => prev.filter((_, idx) => idx !== i))}
+              classPrefix="rw"
+            />
+
+            {/* 07. 태그 */}
             <section className="rw-section">
               <div className="rw-section__head">
                 <span className="rw-section__label">태그</span>
@@ -382,7 +391,7 @@ export function ResumeWriteView() {
               </div>
             </section>
 
-            {/* 07. 포트폴리오 연결 */}
+            {/* 08. 포트폴리오 연결 */}
             <section className="rw-section">
               <div className="rw-section__head">
                 <span className="rw-section__label">포트폴리오 연결</span>

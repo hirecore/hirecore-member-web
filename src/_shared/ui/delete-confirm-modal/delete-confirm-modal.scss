@@ -1,0 +1,192 @@
+/* ============================================================
+   DeleteConfirmModal — 삭제 확인 모달
+   기존 EmptyContentModal과 동일한 디자인 시스템 기반
+   ============================================================ */
+
+@keyframes dcm-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes dcm-modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dcm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: dcm-backdrop-in 0.18s ease;
+}
+
+.dcm-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 1.5rem;
+  padding: 2rem 1.875rem 1.75rem;
+  width: 100%;
+  max-width: 400px;
+  text-align: center;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 24px 64px rgba(0, 0, 0, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: dcm-modal-in 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .dark & {
+    background: #151A22;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 24px 64px rgba(0, 0, 0, 0.55),
+      0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ── 닫기 버튼 ── */
+  &__close {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(0, 0, 0, 0.09); }
+
+    .dark & {
+      background: rgba(255, 255, 255, 0.07);
+      color: #9ca3af;
+      &:hover { background: rgba(255, 255, 255, 0.12); }
+    }
+  }
+
+  /* ── 아이콘 ── */
+  &__icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    color: #ef4444;
+
+    .dark & { background: rgba(239, 68, 68, 0.14); color: #f87171; }
+  }
+
+  /* ── 제목 ── */
+  &__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.015em;
+
+    .dark & { color: #f9fafb; }
+  }
+
+  /* ── 설명 ── */
+  &__desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0 0 1rem;
+
+    .dark & { color: #9ca3af; }
+  }
+
+  /* ── 부가 안내 (연결 해제 등) ── */
+  &__notice {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.75rem;
+    background: rgba(245, 158, 11, 0.06);
+    border: 1px solid rgba(245, 158, 11, 0.15);
+    margin-bottom: 1.5rem;
+    text-align: left;
+
+    svg {
+      flex-shrink: 0;
+      color: #f59e0b;
+      margin-top: 0.1rem;
+    }
+
+    span {
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: #92400e;
+      line-height: 1.55;
+    }
+
+    .dark & {
+      background: rgba(245, 158, 11, 0.08);
+      border-color: rgba(245, 158, 11, 0.18);
+
+      svg { color: #fbbf24; }
+      span { color: #fde68a; }
+    }
+  }
+
+  /* ── 버튼 행 ── */
+  &__actions {
+    display: flex;
+    gap: 0.625rem;
+  }
+
+  &__btn {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border-radius: 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    letter-spacing: -0.01em;
+
+    &:active { transform: scale(0.98); }
+
+    &--cancel {
+      background: rgba(0, 0, 0, 0.05);
+      color: #374151;
+
+      &:hover { background: rgba(0, 0, 0, 0.08); }
+
+      .dark & {
+        background: rgba(255, 255, 255, 0.07);
+        color: #d1d5db;
+        &:hover { background: rgba(255, 255, 255, 0.1); }
+      }
+    }
+
+    &--delete {
+      background: #ef4444;
+      color: #fff;
+
+      &:hover { background: #dc2626; }
+
+      .dark & {
+        background: #dc2626;
+        &:hover { background: #b91c1c; }
+      }
+    }
+  }
+}

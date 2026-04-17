@@ -29,10 +29,15 @@ export const MOCK_RESUME_CONTENT = mockDoc(
 export const MOCK_RESUME_DETAIL_DATA: Record<string, ResumeDetail> = {
   "1": {
     id: "1",
+    authorId: "u_mock_1",
     title: "3년차 프론트엔드 개발자 이력서",
     visibility: "public",
     interestFields: ["웹개발", "프론트엔드"],
     tags: ["React", "Next.js", "TypeScript", "TailwindCSS", "GraphQL"],
+    externalLinks: [
+      { label: "GitHub", url: "https://github.com/example" },
+      { label: "Blog", url: "https://blog.example.com" },
+    ],
     author: MOCK_DEFAULT_AUTHOR,
     updatedAt: "2026-03-10",
     linkedPortfolios: [
@@ -43,10 +48,12 @@ export const MOCK_RESUME_DETAIL_DATA: Record<string, ResumeDetail> = {
   },
   "2": {
     id: "2",
+    authorId: "u_mock_1",
     title: "풀스택 개발자 이력서 (스타트업 지원용)",
     visibility: "private",
     interestFields: ["풀스택", "백엔드"],
     tags: ["Node.js", "PostgreSQL", "Docker", "AWS"],
+    externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,
     updatedAt: "2026-02-28",
     linkedPortfolios: [],

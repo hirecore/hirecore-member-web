@@ -39,6 +39,7 @@ const MOCK_LINKED_CL_CONTENT = mockDoc(
 export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
   "1": {
     id: "1",
+    authorId: "u_mock_1",
     categoryCode: "FRONTEND_ENGINEER",
     projectType: "team",
     visibility: "public",
@@ -66,7 +67,7 @@ export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
     },
   },
   "2": {
-    id: "2", categoryCode: "BACKEND_ENGINEER", projectType: "personal",
+    id: "2", authorId: "u_mock_1", categoryCode: "BACKEND_ENGINEER", projectType: "personal",
     visibility: "public", title: "AI 기반 코드 리뷰 자동화 도구", thumbnailUrl: null,
     tags: ["Python", "FastAPI", "OpenAI"],
     externalLinks: [{ label: "GitHub", url: "https://github.com" }],
@@ -74,7 +75,7 @@ export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
     likeCount: 87, content: MOCK_PORTFOLIO_CONTENT, linkedResume: null, linkedCoverletter: null,
   },
   "3": {
-    id: "3", categoryCode: "FRONTEND_ENGINEER", projectType: "personal",
+    id: "3", authorId: "u_mock_1", categoryCode: "FRONTEND_ENGINEER", projectType: "personal",
     visibility: "private", title: "사내 인사 관리 시스템 리뉴얼", thumbnailUrl: null,
     tags: ["React", "TypeScript", "PostgreSQL"], externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR, updatedAt: "2025-10-02",
