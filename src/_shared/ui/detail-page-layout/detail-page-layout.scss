@@ -1,0 +1,66 @@
+@use "@/_shared/styles/portfolio-layout" as layout;
+
+$detail-toc-hide-bp: 1080px;
+
+/* ── 2컬럼 × 2행 grid 레이아웃 ──
+   row 1: header(좌) | sideTop(우)
+   row 2: main(좌)   | sideBottom(우, TOC sticky)
+   ─────────────────────────────── */
+.detail-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) layout.$toc-width;
+  grid-template-rows: auto 1fr;
+  gap: 0 layout.$content-toc-gap;
+
+  @media (max-width: $detail-toc-hide-bp) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* 단일 컬럼 fallback (side 없음) */
+.detail-layout--single {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ── 좌측 상단: 헤더 (row 1, col 1) ── */
+.detail-layout__header {
+  grid-column: 1;
+  grid-row: 1;
+  min-width: 0;
+}
+
+/* ── 좌측 하단: 메인 (row 2, col 1) ── */
+.detail-layout__main {
+  grid-column: 1;
+  grid-row: 2;
+  min-width: 0;
+}
+
+/* ── 우측 상단: sideTop (row 1, col 2) ── */
+.detail-layout__side-top {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+
+  @media (max-width: $detail-toc-hide-bp) {
+    display: none;
+  }
+}
+
+/* ── 우측 하단: sideBottom / TOC (row 2, col 2) ── */
+.detail-layout__side-bottom {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  position: sticky;
+  top: calc(#{layout.$header-height} + 1rem);
+  max-height: calc(100vh - #{layout.$header-height} - 2rem);
+  overflow-y: auto;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+
+  @media (max-width: $detail-toc-hide-bp) {
+    display: none;
+  }
+}

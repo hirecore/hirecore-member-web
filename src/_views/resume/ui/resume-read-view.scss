@@ -39,9 +39,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  max-width: layout.$content-col-max;
   margin-bottom: 0.5rem;
-  @media (max-width: layout.$bp-lg) { max-width: none; }
 }
 
 .rd-back-btn {
@@ -133,8 +131,6 @@
   margin-top: .75rem;
   padding: 2rem;
   border: 1px solid rgba(0,0,0,0.06);
-  max-width: layout.$content-col-max;
-  @media (max-width: layout.$bp-lg) { max-width: none; }
   box-shadow: 0 2px 8px rgba(0,0,0,0.04);
   margin-bottom: 1.5rem;
 

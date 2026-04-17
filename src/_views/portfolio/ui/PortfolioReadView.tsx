@@ -1,10 +1,10 @@
 "use client"
 
-// _views/portfolio/ui | 포트폴리오 상세 읽기 뷰 — 비즈니스 로직은 model/use-portfolio-read-view에 위임
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { EditorContent } from "@tiptap/react"
+import { DetailPageLayout } from "@/_shared/ui/detail-page-layout"
 import {
   PortfolioMetaCard,
   PortfolioTabBar,
@@ -31,63 +31,65 @@ import { DeleteConfirmModal } from "@/_shared/ui/delete-confirm-modal"
 import "@/_features/editor/editor.scss"
 import "./portfolio-read-view.scss"
 
-// ── 탭 ────────────────────────────────────────────────────────────
-const TABS = [
-  { id: "resume"      as ActiveTab, label: "이력서" },
-  { id: "coverletter" as ActiveTab, label: "자기소개서" },
-  { id: "portfolio"   as ActiveTab, label: "포트폴리오 소개" },
-]
 
-// ── 연결 문서 패널 (본문 + 자체 TOC) ──────────────────────────────
-// 이력서/자기소개서 탭에서 LinkedDocReader를 wrap해 PostLayout + TOC를 자체적으로 처리.
-// 각 패널은 자기 문서의 헤딩으로부터 TOC를 동적으로 만들어 우측 사이드바로 표시.
-// 헤더(타입/제목/메타)는 표시하지 않음 — 사용자는 탭 상태로 어떤 문서인지 인지.
+/* ── 연결 이력서/자소서 탭 패널 ── */
 function LinkedDocPanel({ doc }: { doc: LinkedDocEmbed }) {
-  const editor = useReadOnlyEditor({ content: doc.content, includeImages: true })
-  const { tocHeadings, scrollToHeading, activeId } = useTocTracking({
+  const editor = useReadOnlyEditor({ content: doc.content, includeImages: doc.type === "resume" })
+  const { tocHeadings, activeId, scrollToHeading } = useTocTracking({
     editor,
     content: doc.content as JSONContent | undefined,
+    scrollOffset: 160,
   })
 
   return (
     <PortfolioPostLayout
       content={
         <div className="pr-linked-doc">
-          <div className="pr-linked-doc__content">
-            <EditorContent editor={editor} className="simple-editor-content" />
+          <div className="pr-linked-doc__header">
+            <span className={`pr-linked-doc__badge pr-linked-doc__badge--${doc.type}`}>
+              {doc.type === "resume" ? "이력서" : "자기소개서"}
+            </span>
+            <span className={`pr-linked-doc__vis pr-linked-doc__vis--${doc.visibility}`}>
+              {doc.visibility === "public" ? "공개" : "비공개"}
+            </span>
           </div>
+          <h2 className="pr-linked-doc__title">{doc.title}</h2>
+          {doc.interestFields.length > 0 && (
+            <div className="pr-linked-doc__interests">
+              {doc.interestFields.map((f) => <span key={f} className="pr-linked-doc__interest-chip">{f}</span>)}
+            </div>
+          )}
+          {doc.tags.length > 0 && (
+            <div className="pr-linked-doc__tags">
+              {doc.tags.map((t) => <span key={t} className="pr-linked-doc__tag">#{t}</span>)}
+            </div>
+          )}
+          <div className="pr-linked-doc__divider" />
+          <EditorContent editor={editor} className="simple-editor-content pr-linked-doc__content" />
         </div>
       }
       toc={
         tocHeadings.length > 0 ? (
-          <PortfolioTocSidebar
-            headings={tocHeadings}
-            activeId={activeId}
-            onClickHeading={scrollToHeading}
-          />
+          <PortfolioTocSidebar headings={tocHeadings} activeId={activeId} onClickHeading={scrollToHeading} />
         ) : undefined
       }
     />
   )
 }
 
-
-// ── 다른 포트폴리오 섹션 ───────────────────────────────────────────
+/* ── 다른 포트폴리오 카드 ── */
 function OtherPortfoliosSection({ currentId, authorName }: { currentId: string; authorName: string }) {
-  const allPortfolios = usePortfolioList()
-  const others = allPortfolios.filter((p) => p.id !== currentId)
-  if (!others.length) return null
-
+  const others = usePortfolioList().filter((p) => p.id !== currentId).slice(0, 6)
+  if (others.length === 0) return null
   return (
     <section className="pr-others">
-      <div className="pr-others__head">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <circle cx="12" cy="8" r="4" stroke="currentColor" strokeWidth="1.6" />
-          <path d="M4 20c0-4 3.582-7 8-7s8 3 8 7" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+      <h2 className="pr-others__head">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden>
+          <rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.6"/>
+          <path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
         </svg>
-        <span>{authorName}님의 다른 포트폴리오</span>
-      </div>
-
+        {authorName}님의 다른 포트폴리오
+      </h2>
       <div className="pr-others__grid">
         {others.map((p) => {
           const c0 = p.title.charCodeAt(0) || 65
@@ -100,34 +102,34 @@ function OtherPortfoliosSection({ currentId, authorName }: { currentId: string; 
             <Link key={p.id} href={USER_ROUTES.portfolio.detail(p.id)} className="pr-other-card">
               <div
                 className="pr-other-card__thumb"
-                style={{ background: `linear-gradient(140deg, hsl(${hue} 68% 52%), hsl(${hue2} 72% 38%))` }}
-                aria-hidden
+                style={p.thumbnailUrl ? undefined : { background: `linear-gradient(135deg, hsl(${hue} 60% 55%), hsl(${hue2} 65% 40%))` }}
               >
-                {p.title.slice(0, 1)}
+                {p.thumbnailUrl
+                  // eslint-disable-next-line @next/next/no-img-element
+                  ? <img src={p.thumbnailUrl} alt="" className="pr-other-card__thumb-img" />
+                  : <span className="pr-other-card__thumb-letter">{p.title.slice(0, 1)}</span>
+                }
               </div>
               <div className="pr-other-card__body">
-                <div className="pr-other-card__cat-row">
-                  <span className="pr-other-card__cat">{getCategoryName(p.categoryCode) || p.customCategory || ""}</span>
-                  {p.visibility === "private" && (
-                    <span className="pr-other-card__private">비공개</span>
-                  )}
-                </div>
+                <span className="pr-other-card__cat">{getCategoryName(p.categoryCode)}</span>
                 <p className="pr-other-card__title">{p.title}</p>
-                {p.tags.length > 0 && (
-                  <div className="pr-other-card__tags">
-                    {p.tags.slice(0, 3).map((t) => (
-                      <span key={t} className="pr-other-card__tag">#{t}</span>
-                    ))}
-                  </div>
-                )}
                 <div className="pr-other-card__meta">
-                  <span className="pr-other-card__like">
-                    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" aria-hidden>
-                      <path d="M12 21C12 21 3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" />
-                    </svg>
-                    {p.likeCount.toLocaleString()}
-                  </span>
                   <span className="pr-other-card__date">{dateStr}</span>
+                  <span className="pr-other-card__stats">
+                    <span className="pr-other-card__stat">
+                      <svg width="10" height="10" viewBox="0 0 12 12" fill="none" aria-hidden>
+                        <ellipse cx="6" cy="6" rx="4.5" ry="3" stroke="currentColor" strokeWidth="1.1" />
+                        <circle cx="6" cy="6" r="1.2" fill="currentColor" />
+                      </svg>
+                      {p.viewCount}
+                    </span>
+                    <span className="pr-other-card__stat">
+                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none" aria-hidden>
+                        <path d="M5 8.5S1 6 1 3.5a2 2 0 0 1 4-.5A2 2 0 0 1 9 3.5C9 6 5 8.5 5 8.5Z" stroke="currentColor" strokeWidth="1" />
+                      </svg>
+                      {p.likeCount}
+                    </span>
+                  </span>
                 </div>
               </div>
             </Link>
@@ -138,7 +140,12 @@ function OtherPortfoliosSection({ currentId, authorName }: { currentId: string; 
   )
 }
 
-// ── Props ─────────────────────────────────────────────────────────
+const TABS: { id: ActiveTab; label: string }[] = [
+  { id: "portfolio", label: "포트폴리오" },
+  { id: "resume", label: "이력서" },
+  { id: "coverletter", label: "자기소개서" },
+]
+
 interface Props { id: string }
 
 export function PortfolioReadView({ id }: Props) {
@@ -157,141 +164,116 @@ export function PortfolioReadView({ id }: Props) {
 
   if (!data) return null
 
-  // 3-level 카테고리 → L1 라벨 / L2-L3 경로 (또는 customCategory)
   const path = getCategoryPath(data.categoryCode)
   const majorLabel = path[0]?.name ?? ""
   const useCustom = isCustomInputCategory(data.categoryCode) && data.customCategory
   const subLabel = useCustom
     ? data.customCategory!
     : path.slice(1).map((n) => n.name).join(" › ")
-  const updatedAt  = new Date(data.updatedAt).toLocaleDateString("ko-KR", {
+  const updatedAt = new Date(data.updatedAt).toLocaleDateString("ko-KR", {
     year: "numeric", month: "2-digit", day: "2-digit",
   }).replace(/\. /g, ".").replace(/\.$/, "")
 
   return (
     <div className="pr-root">
 
-      {/* ── 포트폴리오 메타 카드 ── */}
-      <PageContainer width="wide">
-        <div className="pr-top-bar">
-          <button type="button" className="pr-back-btn" onClick={() => router.back()}>
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-              <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-            돌아가기
-          </button>
-          {isOwner && (
-            <div className="pr-owner-actions">
-              <button type="button" className="pr-edit-btn" onClick={() => router.push(`${USER_ROUTES.portfolio.write}?editId=${data.id}`)}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
-                  <path d="M11.5 2.5l2 2-7 7H4.5v-2l7-7Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
-                  <path d="M9.5 4.5l2 2" stroke="currentColor" strokeWidth="1.3" />
-                </svg>
-                편집하기
-              </button>
-              <button type="button" className="pr-delete-btn" onClick={() => setShowDeleteModal(true)}>
-                <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
-                  <path d="M5 6h6M5.5 6V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 10.5 5v1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-                  <path d="M5.5 6l.4 7a1 1 0 0 0 1 1h2.2a1 1 0 0 0 1-1l.4-7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
-                </svg>
-                삭제
-              </button>
-            </div>
-          )}
-        </div>
-        {showDeleteModal && (
-          <DeleteConfirmModal
-            docTypeName="포트폴리오"
-            notice="포트폴리오만 삭제되며, 연결된 이력서와 자기소개서는 그대로 유지됩니다."
-            onConfirm={() => {
-              setShowDeleteModal(false)
-              // TODO: API 호출 — DELETE /api/portfolios/{id}
-              router.push(USER_ROUTES.mypage)
-            }}
-            onCancel={() => setShowDeleteModal(false)}
-          />
-        )}
-        <PortfolioMetaCard
-          majorLabel={majorLabel}
-          subCategory={subLabel}
-          projectType={data.projectType}
-          visibility={data.visibility}
-          title={data.title}
-          thumbnailUrl={data.thumbnailUrl}
-          tags={data.tags}
-          externalLinks={data.externalLinks}
-          liked={liked}
-          likeCount={data.likeCount + (liked ? 1 : 0)}
-          onLikeToggle={() => setLiked((v) => !v)}
+      {showDeleteModal && (
+        <DeleteConfirmModal
+          docTypeName="포트폴리오"
+          notice="포트폴리오만 삭제되며, 연결된 이력서와 자기소개서는 그대로 유지됩니다."
+          onConfirm={() => {
+            setShowDeleteModal(false)
+            router.push(USER_ROUTES.mypage)
+          }}
+          onCancel={() => setShowDeleteModal(false)}
         />
-      </PageContainer>
-
-      {/* sentinel */}
-      <div ref={tabsSentinelRef} aria-hidden />
-
-      {/* ── 탭 ── */}
-      <PortfolioTabBar
-        tabs={TABS}
-        activeTab={tab}
-        isSticky={tabsSticky}
-        onTabChange={setTab}
-      />
-
-      {/* ── 이력서 탭 — 본문 + TOC + "다른 포트폴리오" (모든 탭 일관) ── */}
-      {tab === "resume" && (
-        <>
-          <div className="pr-post-area">
-            <PageContainer width="wide">
-              {data.linkedResume
-                ? <LinkedDocPanel doc={data.linkedResume} />
-                : (
-                  <PortfolioPostLayout
-                    content={<PortfolioLinkedDocsTab type="resume" docs={[]} isOwner={isOwner} />}
-                  />
-                )
-              }
-            </PageContainer>
-          </div>
-
-          <div className="pr-others-wrap">
-            <PageContainer width="wide">
-              <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
-            </PageContainer>
-          </div>
-        </>
       )}
 
-      {/* ── 자기소개서 탭 — 본문 + TOC + "다른 포트폴리오" (모든 탭 일관) ── */}
-      {tab === "coverletter" && (
-        <>
-          <div className="pr-post-area">
-            <PageContainer width="wide">
-              {data.linkedCoverletter
-                ? <LinkedDocPanel doc={data.linkedCoverletter} />
-                : (
-                  <PortfolioPostLayout
-                    content={<PortfolioLinkedDocsTab type="coverletter" docs={[]} isOwner={isOwner} />}
-                  />
-                )
-              }
-            </PageContainer>
-          </div>
+      <PageContainer width="wide">
+        <DetailPageLayout
+          header={
+            <>
+              <div className="pr-top-bar">
+                <button type="button" className="pr-back-btn" onClick={() => router.back()}>
+                  <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                    <path d="M9 2L4 7l5 5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                  돌아가기
+                </button>
+                {isOwner && (
+                  <div className="pr-owner-actions">
+                    <button type="button" className="pr-edit-btn" onClick={() => router.push(`${USER_ROUTES.portfolio.write}?editId=${data.id}`)}>
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
+                        <path d="M11.5 2.5l2 2-7 7H4.5v-2l7-7Z" stroke="currentColor" strokeWidth="1.3" strokeLinejoin="round" />
+                        <path d="M9.5 4.5l2 2" stroke="currentColor" strokeWidth="1.3" />
+                      </svg>
+                      편집하기
+                    </button>
+                    <button type="button" className="pr-delete-btn" onClick={() => setShowDeleteModal(true)}>
+                      <svg width="13" height="13" viewBox="0 0 16 16" fill="none" aria-hidden>
+                        <path d="M5 6h6M5.5 6V5a1.5 1.5 0 0 1 1.5-1.5h2A1.5 1.5 0 0 1 10.5 5v1" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                        <path d="M5.5 6l.4 7a1 1 0 0 0 1 1h2.2a1 1 0 0 0 1-1l.4-7" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round" />
+                      </svg>
+                      삭제
+                    </button>
+                  </div>
+                )}
+              </div>
 
-          <div className="pr-others-wrap">
-            <PageContainer width="wide">
-              <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
-            </PageContainer>
-          </div>
-        </>
-      )}
+              <PortfolioMetaCard
+                majorLabel={majorLabel}
+                subCategory={subLabel}
+                projectType={data.projectType}
+                visibility={data.visibility}
+                title={data.title}
+                thumbnailUrl={data.thumbnailUrl}
+                tags={data.tags}
+                externalLinks={data.externalLinks}
+                liked={liked}
+                likeCount={data.likeCount + (liked ? 1 : 0)}
+                onLikeToggle={() => setLiked((v) => !v)}
+              />
 
-      {/* ── 포트폴리오 본문 탭 ── */}
-      {tab === "portfolio" && (
-        <>
-          <div className="pr-post-area">
-            <PageContainer width="wide">
-              <PortfolioPostLayout
-                content={
+              {/* sentinel */}
+              <div ref={tabsSentinelRef} aria-hidden />
+
+              {/* 탭 */}
+              <PortfolioTabBar
+                tabs={TABS}
+                activeTab={tab}
+                isSticky={tabsSticky}
+                onTabChange={setTab}
+                bare
+              />
+            </>
+          }
+          main={
+            <>
+              {/* 이력서 탭 */}
+              {tab === "resume" && (
+                <div className="pr-post-area">
+                  {data.linkedResume
+                    ? <LinkedDocPanel doc={data.linkedResume} />
+                    : <PortfolioLinkedDocsTab type="resume" docs={[]} isOwner={isOwner} />
+                  }
+                  <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
+                </div>
+              )}
+
+              {/* 자기소개서 탭 */}
+              {tab === "coverletter" && (
+                <div className="pr-post-area">
+                  {data.linkedCoverletter
+                    ? <LinkedDocPanel doc={data.linkedCoverletter} />
+                    : <PortfolioLinkedDocsTab type="coverletter" docs={[]} isOwner={isOwner} />
+                  }
+                  <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
+                </div>
+              )}
+
+              {/* 포트폴리오 본문 탭 */}
+              {tab === "portfolio" && (
+                <div className="pr-post-area">
                   <div className="pr-post-content">
                     <div className="pr-post-meta-bar">
                       <span className="pr-post-meta-bar__updated">
@@ -303,28 +285,22 @@ export function PortfolioReadView({ id }: Props) {
                       className="simple-editor-content pr-editor-content"
                     />
                   </div>
-                }
-                toc={
-                  tocHeadings.length > 0 ? (
-                    <PortfolioTocSidebar
-                      headings={tocHeadings}
-                      activeId={activeId}
-                      onClickHeading={scrollToHeading}
-                    />
-                  ) : undefined
-                }
+                  <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
+                </div>
+              )}
+            </>
+          }
+          sideBottom={
+            tab === "portfolio" && tocHeadings.length > 0 ? (
+              <PortfolioTocSidebar
+                headings={tocHeadings}
+                activeId={activeId}
+                onClickHeading={scrollToHeading}
               />
-            </PageContainer>
-          </div>
-
-          {/* ── 다른 포트폴리오 ── */}
-          <div className="pr-others-wrap">
-            <PageContainer width="wide">
-              <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
-            </PageContainer>
-          </div>
-        </>
-      )}
+            ) : undefined
+          }
+        />
+      </PageContainer>
 
     </div>
   )
