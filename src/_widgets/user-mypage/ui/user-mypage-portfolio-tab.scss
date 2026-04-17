@@ -1,0 +1,22 @@
+@use "@/_shared/styles/manage-card-mixins" as mc;
+
+.umpt-root {
+  --tab-accent-rgb: 59, 130, 246; /* 포트폴리오 — 파란색 */
+  @include mc.tab-root;
+}
+
+/* ── 목록 섹션 ── */
+.umpt-list-section { @include mc.tab-list-section; }
+
+/* ── 검색 바 ── */
+.umpt-search {
+  display: flex;
+  gap: 0.625rem;
+  @media (max-width: 540px) { flex-direction: column; }
+}
+
+/* ── 카드 목록 ── */
+.umpt-list { @include mc.tab-list; }
+
+/* ── 빈 상태 ── */
+.umpt-empty { @include mc.tab-empty; }

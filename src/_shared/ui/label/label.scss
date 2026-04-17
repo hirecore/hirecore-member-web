@@ -1,0 +1,13 @@
+.lb {
+  line-height: 1;
+  font-size: 0.875rem;
+  font-weight: 700;
+  color: #111827;
+  &--error { color: #ef4444; }
+}
+
+.lb-required-mark {
+  margin-left: 0.25rem;
+  color: #ef4444;
+  display: inline-block;
+}

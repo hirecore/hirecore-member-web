@@ -1,0 +1,37 @@
+// ============================================================
+// 전역 레이아웃 공유 토큰 — CSS 출력 없음 (변수 전용)
+// 사용법: @use "@/_shared/styles/portfolio-layout" as layout;
+// TODO: 파일명 _portfolio-layout.scss → _layout-tokens.scss 로 변경 예정
+//       (현재 17개 scss 파일이 @use 중 — 일괄 rename 시 진행)
+// ============================================================
+
+// ── 컨테이너 ──────────────────────────────────────────────────
+$container-max-width:    1100px;
+// $container-min-width 제거 — 사용처 없는 dead token (2025-03 확인)
+$container-padding-x:    3rem;
+$container-padding-x-md: 1.5rem;
+$container-padding-x-sm: 1rem;
+
+// ── 사이트 헤더 ───────────────────────────────────────────────
+//$header-min-width: 720px;
+$header-height: 5rem;
+$header-z:      100;
+
+// ── 작성 뷰 (에디터 포커스 너비) ─────────────────────────────
+$write-max-width: 860px;
+
+// ── 결과 뷰 포스트 레이아웃 ──────────────────────────────────
+$toc-width:       200px;
+$content-toc-gap: 2.5rem;
+// content-col-max ≈ 1100 − 2×3rem − 200px(TOC) − 2.5rem(gap) ≈ 756px
+$content-col-max: 756px;
+
+// ── 브레이크포인트 ────────────────────────────────────────────
+$bp-lg: 960px;   // TOC 숨김, 레이아웃 단일 컬럼
+$bp-md: 700px;   // 리스트 그리드 2→1열
+$bp-sm: 760px;   // 모바일 패딩
+$bp-xs: 400px;   // 최소 지원 viewport — 320px+ 완전 보장, 미만은 graceful degradation
+
+// ── 탭 바 ─────────────────────────────────────────────────────
+$tab-bar-height: 3rem;
+$tab-bar-z:      15;

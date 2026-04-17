@@ -1,0 +1,18 @@
+/* ── OAuth 콜백 로딩 화면 ── */
+@keyframes soc-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.5; }
+}
+
+.soc-root {
+  display: flex;
+  height: 100vh;
+  align-items: center;
+  justify-content: center;
+}
+
+.soc-text {
+  font-size: 1.125rem;
+  font-weight: 500;
+  animation: soc-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}

@@ -1,0 +1,66 @@
+@use "@/_shared/styles/portfolio-layout" as layout;
+
+.ump-root {
+  min-height: calc(100vh - layout.$header-height);
+  background: #f8fafc;
+  padding: 2.5rem 0 5rem;
+  .dark & { background: #0F131A; }
+}
+
+/* ── 모바일 섹션명 + 메뉴 버튼 바 — 데스크톱에서 숨김 ── */
+.ump-mobile-bar {
+  display: none;
+  margin-bottom: 1.25rem;
+  @media (max-width: layout.$bp-md) { display: block; }
+}
+
+.ump-mobile-bar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-block: 0.25rem;
+}
+
+.ump-mobile-bar__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #111827;
+  .dark & { color: #f9fafb; }
+}
+
+.ump-mobile-bar__menu-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  color: #374151;
+  border-radius: 0.5rem;
+  transition: background 0.13s;
+
+  &:hover { background: rgba(0, 0, 0, 0.05); }
+  .dark & {
+    color: #d1d5db;
+    &:hover { background: rgba(255, 255, 255, 0.06); }
+  }
+}
+
+
+.ump-layout {
+  display: grid;
+  grid-template-columns: 232px 1fr;
+  gap: 1.75rem;
+  align-items: start;
+
+  /* 모바일: 사이드바는 fixed drawer로 흐름 이탈 → 본문만 1열로 */
+  @media (max-width: layout.$bp-md) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.ump-content {
+  min-width: 0;
+}

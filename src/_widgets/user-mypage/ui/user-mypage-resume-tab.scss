@@ -1,0 +1,6 @@
+@use "@/_shared/styles/manage-card-mixins" as mc;
+
+.umrt-root {
+  --tab-accent-rgb: 16, 185, 129; /* 이력서 — 녹색 */
+  @include mc.tab-root;
+}

@@ -1,0 +1,6 @@
+@use "@/_shared/styles/manage-card-mixins" as mc;
+
+.umct-root {
+  --tab-accent-rgb: 217, 119, 6; /* 자기소개서 — 황색 */
+  @include mc.tab-root;
+}

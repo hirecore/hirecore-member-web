@@ -1,0 +1,95 @@
+.draft-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+
+  &__panel {
+    background: #fff;
+    border-radius: 1rem;
+    padding: 2rem;
+    max-width: 28rem;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+
+    .dark & {
+      background: #151A22;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+  }
+
+  &__icon {
+    width: 3.5rem;
+    height: 3.5rem;
+    margin: 0 auto 1rem;
+    border-radius: 50%;
+    background: #f0f9ff;
+    color: #0284c7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .dark & { background: rgba(2, 132, 199, 0.15); color: #38bdf8; }
+  }
+
+  &__title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.5rem;
+
+    .dark & { color: #f9fafb; }
+  }
+
+  &__desc {
+    font-size: 0.875rem;
+    color: #6b7280;
+    line-height: 1.6;
+    margin: 0 0 1.25rem;
+
+    .dark & { color: #9ca3af; }
+  }
+
+  &__preview {
+    background: #f9fafb;
+    border: 1px solid #f0f0f0;
+    border-radius: 0.5rem;
+    padding: 0.625rem 0.875rem;
+    margin-bottom: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-align: left;
+
+    .dark & { background: rgba(255, 255, 255, 0.05); border-color: rgba(255, 255, 255, 0.08); }
+
+    &-label {
+      font-size: 0.8125rem;
+      color: #9ca3af;
+      flex-shrink: 0;
+
+      .dark & { color: #6b7280; }
+    }
+
+    &-val {
+      font-size: 0.875rem;
+      color: #374151;
+      font-weight: 500;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      .dark & { color: #e5e7eb; }
+    }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.625rem;
+  }
+}

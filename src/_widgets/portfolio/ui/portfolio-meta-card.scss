@@ -1,0 +1,263 @@
+@use "@/_shared/styles/portfolio-layout" as layout;
+
+/* ── 메타 카드 ── */
+.pr-meta-card {
+  margin-top: 0.75rem;
+  padding: 1.625rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.07);
+  border-radius: 1rem;
+  background: rgba(0, 0, 0, 0.012);
+  max-width: layout.$content-col-max;
+
+  @media (max-width: layout.$bp-lg) { max-width: none; }
+
+  .dark & { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.08); }
+
+  &__thumb {
+    width: 100%;
+    border-radius: 0.625rem;
+    overflow: hidden;
+    margin-bottom: 1.25rem;
+    max-height: 280px;
+  }
+
+  &__thumb-img {
+    display: block;
+    width: 100%;
+    max-height: 280px;
+    object-fit: cover;
+  }
+
+  &__top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    margin-bottom: 0.875rem;
+  }
+
+  &__cats {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    color: #9ca3af;
+  }
+
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+  }
+
+  &__title {
+    font-size: 1.75rem;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+    color: #111827;
+    margin: 0 0 0.875rem;
+    line-height: 1.35;
+    .dark & { color: #f9fafb; }
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem;
+    margin-bottom: 1.125rem;
+  }
+
+  &__divider {
+    height: 1px;
+    background: rgba(0, 0, 0, 0.06);
+    margin-bottom: 1.125rem;
+    .dark & { background: rgba(255, 255, 255, 0.07); }
+  }
+
+  &__author {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.875rem;
+    margin-bottom: 1rem;
+  }
+
+  &__author-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.35rem;
+    flex: 1;       // 남은 폭 채우며 성장
+    min-width: 0;  // flex child shrink 허용 — 없으면 URL이 카드 밖으로 overflow
+  }
+
+  &__author-name {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #111827;
+    letter-spacing: -0.01em;
+    .dark & { color: #f9fafb; }
+  }
+
+  &__links {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  &__stats {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+}
+
+/* ── 소셜 링크 ── */
+.pr-meta-link {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.875rem;
+  min-width: 0;  // flex child로서 shrink 허용
+
+  &__label {
+    flex-shrink: 0;
+    font-weight: 600;
+    color: #9ca3af;
+    min-width: 3.5rem;
+    .dark & { color: #6b7280; }
+  }
+
+  &__val {
+    min-width: 0;          // 긴 URL이 flex child를 늘리지 않도록
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;   // 단일 행 ellipsis — href는 항상 전체 URL 유지
+    color: #3b82f6;
+    text-decoration: none;
+    &:hover { text-decoration: underline; }
+
+    &--empty {
+      color: #c4c9d2;
+      font-style: italic;
+      .dark & { color: #4b5563; }
+    }
+  }
+}
+
+/* ── 아바타 플레이스홀더 ── */
+.pr-avatar-placeholder {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+/* ── 관심 버튼 ── */
+.pr-like-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.32rem 0.75rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  background: transparent;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: #9ca3af;
+  cursor: pointer;
+  transition: all 0.14s;
+  letter-spacing: -0.01em;
+
+  &:hover { border-color: #f43f5e; color: #f43f5e; background: rgba(244, 63, 94, 0.05); }
+
+  &--active {
+    border-color: #f43f5e;
+    color: #f43f5e;
+    background: rgba(244, 63, 94, 0.06);
+  }
+
+  .dark & {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #6b7280;
+    &:hover, &.pr-like-btn--active {
+      border-color: #fb7185;
+      color: #fb7185;
+      background: rgba(244, 63, 94, 0.1);
+    }
+  }
+}
+
+/* ── 통계 ── */
+.pr-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: #9ca3af;
+  letter-spacing: -0.01em;
+  .dark & { color: #6b7280; }
+}
+
+/* ── 배지 ── */
+.pr-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.84rem;
+  font-weight: 600;
+
+  &--major {
+    background: rgba(0, 0, 0, 0.06);
+    color: #374151;
+    .dark & { background: rgba(255, 255, 255, 0.08); color: #d1d5db; }
+  }
+
+  &--sub {
+    background: rgba(59, 130, 246, 0.1);
+    color: #2563eb;
+    .dark & { background: rgba(59, 130, 246, 0.18); color: #93c5fd; }
+  }
+
+  &--type {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    font-size: 0.81rem;
+    .dark & { background: rgba(34, 197, 94, 0.14); color: #4ade80; }
+  }
+
+  &--team {
+    background: rgba(168, 85, 247, 0.1);
+    color: #7c3aed;
+    .dark & { background: rgba(168, 85, 247, 0.14); color: #c084fc; }
+  }
+
+  &--vis {
+    background: rgba(34, 197, 94, 0.1);
+    color: #16a34a;
+    font-size: 0.78rem;
+    .dark & { background: rgba(34, 197, 94, 0.14); color: #4ade80; }
+  }
+
+  &--private {
+    background: rgba(107, 114, 128, 0.1);
+    color: #6b7280;
+    .dark & { background: rgba(107, 114, 128, 0.14); color: #9ca3af; }
+  }
+}
+
+/* ── 태그 ── */
+.pr-tag {
+  display: inline-flex;
+  padding: 0.25rem 0.65rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.08);
+  color: #2563eb;
+  font-size: 0.84rem;
+  font-weight: 500;
+  .dark & { background: rgba(59, 130, 246, 0.15); color: #93c5fd; }
+}

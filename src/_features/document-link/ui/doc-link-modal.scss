@@ -1,0 +1,378 @@
+/* ============================================================
+   DocLinkModal — 포트폴리오 ↔ 이력서/자기소개서 연결 모달
+   _features/document-link 소유 — entity scss(portfolio-manage-card)에서 이동
+   ============================================================ */
+
+.dlm-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 400;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  backdrop-filter: blur(4px);
+  animation: dlm-fade 0.15s ease;
+}
+
+@keyframes dlm-fade {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.dlm-modal {
+  background: #fff;
+  border-radius: 1.25rem;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  animation: dlm-slide-up 0.18s ease;
+
+  .dark & {
+    background: #151A22;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+}
+
+@keyframes dlm-slide-up {
+  from { transform: translateY(10px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+
+.dlm-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.25rem 1.25rem 0;
+  gap: 0.75rem;
+}
+
+.dlm-modal__header-left {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.dlm-modal__badge {
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  flex-shrink: 0;
+
+  &--resume      { background: rgba(16, 185, 129, 0.1); color: #059669; .dark & { background: rgba(16, 185, 129, 0.12); color: #34d399; } }
+  &--coverletter { background: rgba(245, 158, 11, 0.1); color: #d97706; .dark & { background: rgba(245, 158, 11, 0.12); color: #fbbf24; } }
+}
+
+.dlm-modal__title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  .dark & { color: #f3f4f6; }
+}
+
+.dlm-modal__close {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.4rem;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover { background: rgba(0, 0, 0, 0.06); color: #374151; }
+  .dark &:hover { background: rgba(255, 255, 255, 0.08); color: #d1d5db; }
+}
+
+.dlm-modal__empty {
+  padding: 2rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0.5rem;
+}
+
+.dlm-modal__empty-icon {
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 1rem;
+  background: #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #94a3b8;
+  margin-bottom: 0.25rem;
+  .dark & { background: #1A2130; color: #4b5563; }
+}
+
+.dlm-modal__empty-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #111827;
+  .dark & { color: #f3f4f6; }
+}
+
+.dlm-modal__empty-desc {
+  font-size: 0.8rem;
+  color: #6b7280;
+  line-height: 1.6;
+  .dark & { color: #9ca3af; }
+}
+
+.dlm-modal__footer {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.75rem 1.25rem 1.25rem;
+  justify-content: flex-end;
+}
+
+.dlm-modal__btn {
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.12s;
+  border: 1px solid transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  &--cancel {
+    background: transparent;
+    border-color: rgba(0, 0, 0, 0.1);
+    color: #6b7280;
+    &:hover { background: rgba(0, 0, 0, 0.04); }
+    .dark & { border-color: rgba(255, 255, 255, 0.1); color: #9ca3af; &:hover { background: rgba(255, 255, 255, 0.05); } }
+  }
+
+  &--primary { color: #fff; }
+  &--primary.dlm-modal__btn--resume     { background: #059669; &:hover { background: #047857; } }
+  &--primary.dlm-modal__btn--coverletter { background: #d97706; &:hover { background: #b45309; } }
+
+  &--unlink {
+    background: transparent;
+    border-color: rgba(239, 68, 68, 0.2);
+    color: #ef4444;
+    &:hover { background: rgba(239, 68, 68, 0.05); border-color: #ef4444; }
+    .dark & { border-color: rgba(248, 113, 113, 0.2); color: #f87171; &:hover { background: rgba(239, 68, 68, 0.08); border-color: #f87171; } }
+  }
+}
+
+/* ── 연결된 문서 실제 내용 미리보기 ── */
+.dlm-modal__doc-preview {
+  padding: 1rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+}
+
+.dlm-modal__doc-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  flex-wrap: wrap;
+}
+
+.dlm-modal__doc-badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.65rem;
+  font-weight: 600;
+  padding: 0.13rem 0.45rem;
+  border-radius: 999px;
+
+  &--public  { background: rgba(16, 185, 129, 0.1); color: #059669; .dark & { background: rgba(16, 185, 129, 0.12); color: #34d399; } }
+  &--private { background: rgba(107, 114, 128, 0.1); color: #6b7280; .dark & { background: rgba(107, 114, 128, 0.12); color: #9ca3af; } }
+}
+
+.dlm-modal__doc-date {
+  font-size: 0.65rem;
+  color: #9ca3af;
+  margin-left: auto;
+  .dark & { color: #6b7280; }
+}
+
+.dlm-modal__doc-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.28rem;
+}
+
+.dlm-modal__doc-tag {
+  font-size: 0.65rem;
+  font-weight: 500;
+  color: #6b7280;
+  background: #f1f5f9;
+  padding: 0.13rem 0.45rem;
+  border-radius: 999px;
+  .dark & { background: #1A2130; color: #9ca3af; }
+}
+
+/* ── 모달 검색창 ── */
+.dlm-modal__search {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.75rem 1.25rem 0;
+  padding: 0.5rem 0.75rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.625rem;
+  background: #f8fafc;
+  transition: border-color 0.12s;
+
+  &:focus-within {
+    border-color: rgba(59, 130, 246, 0.4);
+    background: #fff;
+  }
+
+  .dark & {
+    background: #1A2130;
+    border-color: rgba(255, 255, 255, 0.08);
+    &:focus-within { border-color: rgba(59, 130, 246, 0.5); background: #151A22; }
+  }
+}
+
+.dlm-modal__search-icon {
+  flex-shrink: 0;
+  color: #9ca3af;
+  .dark & { color: #6b7280; }
+}
+
+.dlm-modal__search-input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 0.8rem;
+  color: #111827;
+  outline: none;
+  min-width: 0;
+
+  &::placeholder { color: #9ca3af; }
+  .dark & { color: #f3f4f6; &::placeholder { color: #6b7280; } }
+}
+
+.dlm-modal__search-clear {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 999px;
+  transition: background 0.1s, color 0.1s;
+
+  &:hover { background: rgba(0, 0, 0, 0.06); color: #374151; }
+  .dark & { &:hover { background: rgba(255, 255, 255, 0.08); color: #d1d5db; } }
+}
+
+.dlm-modal__search-empty {
+  font-size: 0.78rem;
+  color: #9ca3af;
+  text-align: center;
+  padding: 1.5rem 0;
+  .dark & { color: #6b7280; }
+}
+
+/* ── 문서 선택 리스트 ── */
+.dlm-modal__desc {
+  font-size: 0.78rem;
+  color: #6b7280;
+  padding: 0.5rem 1.25rem 0;
+  .dark & { color: #9ca3af; }
+}
+
+.dlm-modal__doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  padding: 0.75rem 1.25rem;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.dlm-modal__doc-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 0.875rem;
+  border-radius: 0.625rem;
+  border: 1px solid rgba(0, 0, 0, 0.07);
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  width: 100%;
+  transition: background 0.12s, border-color 0.12s;
+
+  &:hover {
+    background: #f8fafc;
+    border-color: rgba(59, 130, 246, 0.2);
+  }
+
+  .dark & {
+    border-color: rgba(255, 255, 255, 0.07);
+    &:hover { background: rgba(255, 255, 255, 0.04); border-color: rgba(59, 130, 246, 0.3); }
+  }
+
+  &__info {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+  }
+
+  &__title {
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #111827;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    .dark & { color: #f3f4f6; }
+  }
+
+  &__date {
+    font-size: 0.65rem;
+    color: #9ca3af;
+    .dark & { color: #6b7280; }
+  }
+
+  &__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.2rem;
+    margin-top: 0.1rem;
+
+    span {
+      font-size: 0.62rem;
+      color: #6b7280;
+      background: #f1f5f9;
+      padding: 0.1rem 0.35rem;
+      border-radius: 999px;
+      .dark & { background: #1A2130; color: #9ca3af; }
+    }
+  }
+
+  &__arrow {
+    flex-shrink: 0;
+    color: #9ca3af;
+  }
+}

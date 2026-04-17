@@ -1,0 +1,50 @@
+/* ── TabSearchField — 검색 입력 필드 ──
+   부모 .xxx-root에서 --tab-accent-rgb 변수를 설정해야 합니다.
+   예) --tab-accent-rgb: 59, 130, 246;  (파란색)
+   ─────────────────────────────────────────────── */
+
+.doc-tab-search-field {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: #fff;
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  transition: border-color 0.13s;
+
+  &:focus-within {
+    border-color: rgba(var(--tab-accent-rgb, 59, 130, 246), 0.5);
+  }
+
+  .dark & {
+    background: #151A22;
+    border-color: rgba(255, 255, 255, 0.08);
+
+    &:focus-within {
+      border-color: rgba(var(--tab-accent-rgb, 59, 130, 246), 0.4);
+    }
+  }
+
+  &__icon {
+    color: #9ca3af;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+  }
+
+  &__input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 0.8rem;
+    color: #111827;
+
+    .dark & { color: #f9fafb; }
+
+    &::placeholder { color: #d1d5db; }
+    .dark &::placeholder { color: #4b5563; }
+  }
+}

@@ -1,0 +1,250 @@
+/* =====================
+   CODE FORMATTING
+   ===================== */
+.tiptap.ProseMirror {
+  // Inline code
+  code {
+    background-color: #eff1f5;
+    color: #d73a49;
+    border: 1px solid #dde0e5;
+    font-family: "JetBrains Mono NL", "Fira Code", "Cascadia Code", monospace;
+    font-size: 0.85em;
+    font-weight: 500;
+    line-height: 1.5;
+    border-radius: 5px;
+    padding: 0.15em 0.4em;
+  }
+
+  .dark & code {
+    background-color: #2a2d35;
+    color: #ff7b72;
+    border-color: #3d4047;
+  }
+
+  // Fallback plain pre (when NodeView is not used)
+  > pre {
+    background-color: #1e1e2e;
+    color: #cdd6f4;
+    border: none;
+    margin-top: 1.75em;
+    margin-bottom: 1.75em;
+    padding: 1.25em 1.5em;
+    font-size: 0.9rem;
+    line-height: 1.75;
+    border-radius: 10px;
+    overflow-x: auto;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+
+    code {
+      background-color: transparent;
+      color: inherit;
+      border: none;
+      border-radius: 0;
+      font-size: inherit;
+      font-weight: 400;
+      padding: 0;
+    }
+  }
+
+  // ── Syntax Code Block (NodeView) ──────────────────────────────────────
+
+  .code-block-node {
+    margin: 1.75em 0;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+    background-color: #1e1e2e;
+
+    // Header: macOS-style dots + language selector
+    .code-block-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      background-color: #181825;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      user-select: none;
+
+      .code-block-lang-dot {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        flex-shrink: 0;
+
+        &:nth-child(1) { background-color: #f38ba8; }
+        &:nth-child(2) { background-color: #f9e2af; }
+        &:nth-child(3) { background-color: #a6e3a1; }
+      }
+
+      .code-block-lang-select {
+        margin-left: 8px;
+        background: transparent;
+        border: none;
+        color: #585b70;
+        font-family: "JetBrains Mono NL", "Fira Code", "Cascadia Code", monospace;
+        font-size: 0.78rem;
+        cursor: pointer;
+        outline: none;
+        padding: 2px 2px;
+        border-radius: 4px;
+        transition: color 0.15s;
+        appearance: none;
+        -webkit-appearance: none;
+
+        &:hover {
+          color: #a6adc8;
+        }
+
+        &:focus {
+          color: #cdd6f4;
+        }
+
+        option {
+          background-color: #1e1e2e;
+          color: #cdd6f4;
+          font-size: 0.85rem;
+        }
+      }
+
+      .code-block-lang-badge {
+        margin-left: 8px;
+        color: #585b70;
+        font-family: "JetBrains Mono NL", "Fira Code", monospace;
+        font-size: 0.78rem;
+      }
+    }
+
+    pre {
+      margin: 0;
+      padding: 1.25em 1.5em;
+      background-color: transparent;
+      border-radius: 0;
+      box-shadow: none;
+      font-size: 0.9rem;
+      line-height: 1.75;
+      overflow-x: auto;
+      color: #cdd6f4;
+
+      code {
+        background: transparent;
+        color: inherit;
+        border: none;
+        padding: 0;
+        border-radius: 0;
+        font-size: inherit;
+        font-weight: 400;
+        font-family: "JetBrains Mono NL", "Fira Code", "Cascadia Code", monospace;
+      }
+    }
+
+    // ── Syntax tokens (Catppuccin Mocha) ────────────────────────────────
+
+    .hljs-comment,
+    .hljs-quote {
+      color: #585b70;
+      font-style: italic;
+    }
+
+    .hljs-keyword,
+    .hljs-selector-tag,
+    .hljs-operator {
+      color: #cba6f7; // Mauve
+    }
+
+    .hljs-string,
+    .hljs-doctag,
+    .hljs-template-string,
+    .hljs-regexp {
+      color: #a6e3a1; // Green
+    }
+
+    .hljs-number,
+    .hljs-literal {
+      color: #fab387; // Peach
+    }
+
+    .hljs-function,
+    .hljs-title {
+      color: #89b4fa; // Blue
+    }
+
+    .hljs-type,
+    .hljs-class {
+      color: #f9e2af; // Yellow
+    }
+
+    .hljs-built_in,
+    .hljs-builtin-name,
+    .hljs-selector-pseudo {
+      color: #89dceb; // Sky
+    }
+
+    .hljs-tag {
+      color: #f38ba8; // Red
+    }
+
+    .hljs-name,
+    .hljs-selector-id,
+    .hljs-selector-class {
+      color: #89b4fa; // Blue
+    }
+
+    .hljs-attr {
+      color: #89dceb; // Sky
+    }
+
+    .hljs-variable,
+    .hljs-template-variable {
+      color: #cdd6f4; // Text
+    }
+
+    .hljs-params {
+      color: #cdd6f4; // Text
+    }
+
+    .hljs-meta {
+      color: #f5c2e7; // Pink
+    }
+
+    .hljs-emphasis {
+      font-style: italic;
+    }
+
+    .hljs-strong {
+      font-weight: 700;
+    }
+
+    .hljs-addition {
+      color: #a6e3a1;
+      background: rgba(166, 227, 161, 0.12);
+    }
+
+    .hljs-deletion {
+      color: #f38ba8;
+      background: rgba(243, 139, 168, 0.12);
+    }
+
+    .hljs-punctuation,
+    .hljs-subst {
+      color: #9399b2; // Overlay2
+    }
+
+    .hljs-link {
+      color: #89b4fa;
+      text-decoration: underline;
+    }
+
+    .hljs-section {
+      color: #89b4fa;
+      font-weight: 700;
+    }
+
+    .hljs-bullet {
+      color: #fab387;
+    }
+
+    .hljs-symbol {
+      color: #cba6f7;
+    }
+  }
+}

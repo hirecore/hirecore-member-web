@@ -1,0 +1,30 @@
+@use "@/_shared/styles/portfolio-layout" as layout;
+
+.write-action-bar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(8px);
+  border-top: 1px solid #f0f0f0;
+
+  .dark & {
+    background: rgba(15, 19, 26, 0.95);
+    border-top-color: rgba(255, 255, 255, 0.08);
+  }
+
+  /* inner: page-container--write 와 동일한 수평 기준선 */
+  &__inner {
+    max-width: layout.$write-max-width;  // 860px — page-container--write 토큰 통일
+    margin: 0 auto;
+    padding-block: 0.875rem;
+    padding-inline: layout.$container-padding-x-sm;   // 1rem — mobile
+    @media (min-width: layout.$bp-sm) { padding-inline: layout.$container-padding-x-md; }  // 540px+: 1.5rem
+    @media (min-width: layout.$bp-lg) { padding-inline: layout.$container-padding-x; }     // 960px+: 3rem
+    display: flex;
+    justify-content: flex-end;
+    gap: 0.625rem;
+  }
+}

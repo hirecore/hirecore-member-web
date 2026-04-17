@@ -1,0 +1,1 @@
+export { TabDocCTA } from "./TabDocCTA"

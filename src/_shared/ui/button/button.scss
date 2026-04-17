@@ -1,0 +1,129 @@
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  white-space: nowrap;
+  border-radius: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1;
+  cursor: pointer;
+  transition: background-color 0.15s, color 0.15s, border-color 0.15s;
+  border: 1px solid transparent;
+  text-decoration: none;
+
+  &:focus-visible {
+    outline: none;
+    /* 라이트: 흰색 오프셋 + 파란 링 */
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px rgba(59, 130, 246, 0.5);
+
+    /* 다크: 어두운 오프셋 + 밝은 파란 링 */
+    .dark & { box-shadow: 0 0 0 2px #0F131A, 0 0 0 4px rgba(96, 165, 250, 0.65); }
+  }
+
+  &:disabled {
+    pointer-events: none;
+    opacity: 0.5;
+  }
+
+  // ── 크기 ──
+  &--sm   { height: 2rem;   padding: 0 0.75rem; font-size: 0.8125rem; }
+  &--md   { height: 2.5rem; padding: 0 1rem; }
+  &--lg   { height: 3rem;   padding: 0 2rem; font-size: 1rem; font-weight: 700; border-radius: 0.5rem; }
+  &--icon { height: 2.5rem; width: 2.5rem; padding: 0; }
+
+  // ── 전체 너비 ──
+  &--full { width: 100%; display: flex; }
+
+  // ── 색상 variants ──
+  &--default {
+    background: #0f172a;
+    color: #fff;
+    &:hover:not(:disabled)  { background: #1e293b; }
+    &:active:not(:disabled) { background: #334155; }
+
+    /* 다크: 명도 반전 — 어두운 배경에 밝은 버튼 */
+    .dark & {
+      background: #f1f5f9;
+      color: #0f172a;
+      &:hover:not(:disabled)  { background: #e2e8f0; }
+      &:active:not(:disabled) { background: #cbd5e1; }
+    }
+  }
+
+  &--primary {
+    background: #3b82f6;
+    color: #fff;
+    &:hover:not(:disabled)  { background: #2563eb; }
+    &:active:not(:disabled) { background: #1d4ed8; }
+
+    /* 다크: 기본 색조 동일, hover 시 밝은 방향(#60a5fa)으로 이동 — 어두운 배경에서 가시성 확보 */
+    .dark & {
+      &:hover:not(:disabled)  { background: #60a5fa; }
+      &:active:not(:disabled) { background: #93c5fd; }
+    }
+  }
+
+  &--outline {
+    background: transparent;
+    border-color: #d1d5db;
+    color: #374151;
+    &:hover:not(:disabled)  { background: #f9fafb; }
+    &:active:not(:disabled) { background: #f3f4f6; }
+
+    .dark & {
+      border-color: rgba(255, 255, 255, 0.15);
+      color: #e5e7eb;
+      &:hover:not(:disabled)  { background: rgba(255, 255, 255, 0.06); border-color: rgba(255, 255, 255, 0.25); }
+      &:active:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+    }
+  }
+
+  &--ghost {
+    background: transparent;
+    border-color: transparent;
+    color: #374151;
+    &:hover:not(:disabled)  { background: #f3f4f6; }
+    &:active:not(:disabled) { background: #e5e7eb; }
+
+    /* 다크: 라이트 텍스트로 반전, hover 시 흰색 반투명 배경으로 구분 */
+    .dark & {
+      color: #9ca3af;
+      &:hover:not(:disabled)  { background: rgba(255, 255, 255, 0.08); color: #e5e7eb; }
+      &:active:not(:disabled) { background: rgba(255, 255, 255, 0.12); }
+    }
+  }
+
+  &--softblue {
+    background: #e0e7ff;
+    color: #4338ca;
+    &:hover:not(:disabled) { background: #c7d2fe; }
+  }
+
+  // ── OAuth ──
+  &--kakao {
+    background: #fee500;
+    color: #000;
+    &:hover:not(:disabled) { background: #fdd835; }
+  }
+
+  &--google {
+    background: #fff;
+    color: #000;
+    border-color: #e2e8f0;
+    &:hover:not(:disabled) { background: #f8fafc; }
+  }
+
+  &--apple {
+    background: #000;
+    color: #fff;
+    &:hover:not(:disabled) { background: #1a1a1a; }
+  }
+
+  &--github {
+    background: #24292f;
+    color: #fff;
+    &:hover:not(:disabled) { background: #2f363d; }
+  }
+}

@@ -1,0 +1,56 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "textAlign": null,
+        "level": 3
+      },
+      "content": [
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "textStyle",
+              "attrs": {
+                "color": "rgb(107, 114, 128)"
+              }
+            },
+            {
+              "type": "highlight",
+              "attrs": {
+                "color": "var(--tt-color-highlight-gray)"
+              }
+            }
+          ],
+          "text": "🌱 "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "textStyle",
+              "attrs": {
+                "color": "#6b7280"
+              }
+            },
+            {
+              "type": "highlight",
+              "attrs": {
+                "color": "var(--tt-color-highlight-gray)"
+              }
+            }
+          ],
+          "text": "Hirecore는 여러분의 내일을 응원합니다. 🌱"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "textAlign": null
+      }
+    }
+  ]
+}

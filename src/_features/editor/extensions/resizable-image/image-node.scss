@@ -1,0 +1,164 @@
+/* ── 단일 이미지 라이트박스 ──────────────────────────────────────────
+   읽기 모드에서 이미지 클릭 시 전체화면으로 표시.
+   캐러셀 라이트박스와 동일한 시각적 스타일, 단 내비게이션(화살표·점) 없음.
+────────────────────────────────────────────────────────────────── */
+@keyframes image-lb-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes image-lb-img-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.image-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 5rem;
+  animation: image-lb-in 0.18s ease;
+
+  &__img-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
+    animation: image-lb-img-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+
+    img {
+      max-width: min(90vw, 1200px);
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      border-radius: 0.625rem;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 32px 96px rgba(0, 0, 0, 0.65);
+      cursor: default;
+    }
+  }
+
+  &__close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(255, 255, 255, 0.2); }
+  }
+}
+
+/* ── ResizableImage NodeView ──────────────────────────────────── */
+
+/* NodeViewWrapper: block + 상하 여백 */
+.ri-wrapper {
+  display: block;
+  margin: 2rem 0;
+}
+
+/* 이미지 컨테이너 */
+.ri-container {
+  position: relative;
+  display: inline-block;
+  max-width: 100%;
+  border-radius: var(--tt-radius-xs, 0.25rem);
+  transition: box-shadow 0.15s ease-in-out;
+
+  /* 편집 모드 선택 시 브랜드 컬러 링 */
+  &--selected {
+    outline: 2.5px solid var(--tt-brand-color-500, #3b82f6);
+    outline-offset: 0;
+  }
+}
+
+/* 이미지 자체 */
+.ri-img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--tt-radius-xs, 0.25rem);
+  transition: opacity 0.15s;
+
+  /* 편집 모드 선택 시 dim */
+  &--selected { opacity: 0.5; }
+
+  /* 읽기 모드: 클릭 가능 커서 */
+  &--zoomable { cursor: zoom-in; }
+}
+
+/* 리사이즈 핸들 */
+.ri-handle {
+  position: absolute;
+  right: -4px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 6px;
+  height: 2.25rem;       // h-9 = 2.25rem
+  background: #fff;
+  border-radius: 999px;
+  z-index: 10;
+  cursor: ew-resize;
+  box-shadow: 0 1px 6px rgba(0, 0, 0, 0.25);
+  transition: transform 0.1s;
+
+  &:hover { transform: translateY(-50%) scale(1.1); }
+
+  .dark & { background: #e5e7eb; }
+}
+
+/* ── TipTap ProseMirror 이미지 기본 스타일 ─────────────────────── */
+.tiptap.ProseMirror {
+  img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+  }
+
+  p > img {
+    display: inline-block;
+  }
+
+  > img:not([data-type="emoji"] img) {
+    margin: 2rem 0;
+    outline: 0.125rem solid transparent;
+    border-radius: var(--tt-radius-xs, 0.25rem);
+  }
+
+  img:not([data-type="emoji"] img).ProseMirror-selectednode {
+    outline-color: var(--tt-brand-color-500);
+  }
+
+  // Thread image handling
+  .tiptap-thread:has(> img) {
+    margin: 2rem 0;
+
+    img {
+      outline: 0.125rem solid transparent;
+      border-radius: var(--tt-radius-xs, 0.25rem);
+    }
+  }
+
+  .tiptap-thread img {
+    margin: 0;
+  }
+}

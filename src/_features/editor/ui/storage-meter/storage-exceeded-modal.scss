@@ -1,0 +1,254 @@
+/* ============================================================
+   Storage Exceeded Modal — 저장 공간 초과 팝업
+   ============================================================ */
+
+@keyframes se-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes se-modal-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.storage-exceeded-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: se-backdrop-in 0.18s ease;
+}
+
+.storage-exceeded-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 1.5rem;
+  padding: 2rem 1.875rem 1.75rem;
+  width: 100%;
+  max-width: 400px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 24px 64px rgba(0, 0, 0, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: se-modal-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .dark & {
+    background: #151A22;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 24px 64px rgba(0, 0, 0, 0.55),
+      0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ── 닫기 버튼 ── */
+  &__close {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--tt-gray-light-a-500, #6b7280);
+    transition: background 0.15s;
+
+    &:hover { background: rgba(0, 0, 0, 0.09); }
+
+    .dark & {
+      background: rgba(255, 255, 255, 0.07);
+      color: #9ca3af;
+      &:hover { background: rgba(255, 255, 255, 0.12); }
+    }
+  }
+
+  /* ── 아이콘 ── */
+  &__icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(239, 68, 68, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    color: #ef4444;
+
+    .dark & { background: rgba(239, 68, 68, 0.14); }
+  }
+
+  /* ── 제목 ── */
+  &__title {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    color: #111827;
+    text-align: center;
+    margin: 0 0 0.45rem;
+    letter-spacing: -0.015em;
+
+    .dark & { color: #f9fafb; }
+  }
+
+  /* ── 부제목 ── */
+  &__subtitle {
+    font-size: 0.875rem;
+    color: var(--tt-gray-light-a-500, #6b7280);
+    text-align: center;
+    line-height: 1.65;
+    margin: 0 0 1.5rem;
+
+    .dark & { color: #9ca3af; }
+  }
+
+  /* ── 사용량 박스 ── */
+  &__usage {
+    background: rgba(0, 0, 0, 0.025);
+    border: 1px solid rgba(0, 0, 0, 0.06);
+    border-radius: 1rem;
+    padding: 0.9rem 1rem;
+    margin-bottom: 1.5rem;
+
+    .dark & {
+      background: rgba(255, 255, 255, 0.04);
+      border-color: rgba(255, 255, 255, 0.07);
+    }
+  }
+
+  &__usage-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.65rem;
+  }
+
+  &__usage-label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--tt-gray-light-a-500, #6b7280);
+
+    .dark & { color: #9ca3af; }
+  }
+
+  /* 티어 뱃지 */
+  &__tier {
+    padding: 0.1rem 0.44rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+
+    &--gold {
+      background: linear-gradient(135deg, #fef9c3, #fde68a);
+      color: #92400e;
+    }
+
+    &--platinum {
+      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+      color: #3730a3;
+
+      .dark & {
+        background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(129,140,248,0.15));
+        color: #a5b4fc;
+      }
+    }
+  }
+
+  /* 진행 바 (font-size override done above) */
+  &__track {
+    height: 6px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.06);
+    overflow: hidden;
+    margin-bottom: 0.45rem;
+
+    .dark & { background: rgba(255, 255, 255, 0.1); }
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 999px;
+    background: linear-gradient(90deg, #ef4444, #f43f5e);
+    transition: width 0.4s ease;
+  }
+
+  /* 수치 */
+  &__stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  &__stat-used {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: #ef4444;
+  }
+
+  &__stat-total {
+    font-size: 0.8125rem;
+    color: var(--tt-gray-light-a-400, #9ca3af);
+
+    .dark & { color: #6b7280; }
+  }
+
+  /* ── 액션 버튼 ── */
+  &__actions {
+    display: flex;
+    gap: 0.55rem;
+  }
+
+  &__cancel {
+    flex: 1;
+    padding: 0.65rem 1rem;
+    border-radius: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    background: transparent;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--tt-gray-light-a-500, #6b7280);
+    cursor: pointer;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(0, 0, 0, 0.04); }
+
+    .dark & {
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #9ca3af;
+      &:hover { background: rgba(255, 255, 255, 0.05); }
+    }
+  }
+
+  &__upgrade {
+    flex: 2;
+    padding: 0.65rem 1rem;
+    border-radius: 0.75rem;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    text-decoration: none;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.35rem;
+    border: none;
+    cursor: pointer;
+    transition: opacity 0.15s, transform 0.12s;
+
+    &:hover  { opacity: 0.88; }
+    &:active { transform: scale(0.98); }
+  }
+}

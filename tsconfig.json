@@ -1,0 +1,62 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    // --- 👇 여기를 수정했습니다 ---
+    "baseUrl": ".",
+    "paths": {
+      "@/_app/*": [
+        "src/_app/*"
+      ],
+      "@/_pages/*": [
+        "src/_pages/*"
+      ],
+      "@/_widgets/*": [
+        "src/_widgets/*"
+      ],
+      "@/_features/*": [
+        "src/_features/*"
+      ],
+      "@/_entities/*": [
+        "src/_entities/*"
+      ],
+      "@/_shared/*": [
+        "src/_shared/*"
+      ],
+      "@/_views/*": [
+        "src/_views/*"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    "src/_features/auth-by-social/model/use-user-social-login.mutation.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

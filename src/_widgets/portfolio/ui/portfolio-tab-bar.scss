@@ -1,0 +1,65 @@
+@use "@/_shared/styles/portfolio-layout" as layout;
+
+/* ── 탭 래퍼 (sticky) ── */
+.pr-tabs-wrap {
+  position: sticky;
+  top: layout.$header-height;
+  z-index: layout.$tab-bar-z;
+  margin-top: 1.75rem;
+  background: var(--tt-toolbar-bg-color, #fff);
+  .dark & { background: var(--black, #0F131A); }
+
+  &--sticky {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+    .dark & { box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3); }
+  }
+}
+
+/* ── 탭 목록 ── */
+.pr-tabs {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  &::-webkit-scrollbar { display: none; }
+}
+
+.pr-tab {
+  padding: 0.7rem 1.25rem;
+  border: none;
+  background: transparent;
+  font-size: 0.925rem;
+  font-weight: 500;
+  white-space: nowrap;
+  flex-shrink: 0;
+  color: #9ca3af;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: color 0.14s, border-color 0.14s;
+  letter-spacing: -0.01em;
+
+  &:hover { color: #374151; }
+
+  &--active {
+    color: #3b82f6;
+    border-bottom-color: #3b82f6;
+    font-weight: 600;
+  }
+
+  .dark & {
+    color: #6b7280;
+    &:hover { color: #d1d5db; }
+    &.pr-tab--active { color: #60a5fa; border-bottom-color: #60a5fa; }
+  }
+}
+
+/* ── 탭 구분선 — 전용 엘리먼트 (::after 해킹 제거) ── */
+.pr-tab-separator {
+  max-width: layout.$content-col-max;
+  height: 1.5px;
+  background: rgba(0, 0, 0, 0.12);
+  .dark & { background: rgba(255, 255, 255, 0.1); }
+
+  @media (max-width: layout.$bp-lg) { max-width: none; }
+}

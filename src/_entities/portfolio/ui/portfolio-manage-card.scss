@@ -1,0 +1,49 @@
+/* ============================================================
+   PortfolioManageCard — 포트폴리오 전용 스타일 (DocLinkChip)
+   공통 카드 레이아웃은 @/_shared/ui/manage-card 에서 제공
+   ============================================================ */
+
+/* ── 문서 연결 칩 컨테이너 ── */
+.pmc-links {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding-top: 0.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  .dark & { border-top-color: rgba(255, 255, 255, 0.05); }
+}
+
+/* ── 문서 연결 칩 ── */
+.pmc-link-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.68rem;
+  font-weight: 500;
+  padding: 0.15rem 0.45rem;
+  border-radius: 999px;
+  max-width: 100%;
+  min-width: 0;
+  cursor: pointer;
+  border: none;
+  text-align: left;
+  transition: opacity 0.12s;
+
+  &--on  { color: #2563eb; background: rgba(37, 99, 235, 0.07); }
+  &--off { color: #9ca3af; background: rgba(0, 0, 0, 0.04); }
+
+  .dark &--on  { color: #60a5fa; background: rgba(59, 130, 246, 0.1); }
+  .dark &--off { color: #4b5563; background: rgba(255, 255, 255, 0.04); }
+
+  &:hover { opacity: 0.75; }
+
+  &__label { flex-shrink: 0; }
+  &__sep { flex-shrink: 0; opacity: 0.5; }
+  &__title {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    min-width: 0;
+    opacity: 0.85;
+  }
+}

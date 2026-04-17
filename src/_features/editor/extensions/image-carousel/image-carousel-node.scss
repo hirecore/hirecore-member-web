@@ -1,0 +1,527 @@
+/* ============================================================
+   Image Carousel Node View
+   ============================================================ */
+
+.image-carousel-wrapper {
+  display: block;
+  margin: 2rem 0;
+}
+
+/* ── Main slide area ── */
+.image-carousel {
+  position: relative;
+  overflow: hidden;
+  border-radius: 0.75rem;
+  background: var(--tt-gray-light-950, #f3f4f6);
+  aspect-ratio: 4 / 3;
+  cursor: default;
+  user-select: none;
+  transition: box-shadow 0.15s;
+
+  // 편집 모드에서 ProseMirror 노드 선택 시 — 파란 링으로 "블록이 잡혔음"을 명확히 표시
+  &--selected {
+    box-shadow: 0 0 0 2.5px var(--tt-brand-color-500, #3b82f6);
+  }
+
+  .dark & {
+    background: var(--tt-gray-dark-950, #1e2023);
+  }
+
+  &__track {
+    display: flex;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.36s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  &__slide {
+    flex: 0 0 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem 1rem 2.5rem;  /* 하단: dots 높이(~0.75rem) + 여백 확보 */
+    img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      display: block;
+      border-radius: 0.5rem;
+      cursor: zoom-in;
+      transition: opacity 0.15s;
+
+      &:hover { opacity: 0.9; }
+
+      // 마우스를 누르는 순간 즉각적인 시각 피드백 (이미지 영역 클릭 시에만 발동)
+      // → transition 0s: 딜레이 없이 바로 어두워짐
+      &:active {
+        opacity: 0.55;
+        transition: opacity 0s;
+      }
+    }
+
+    // 라이트박스 닫은 후에도 dim 유지 — 어떤 슬라이드를 클릭했는지 직관적으로 인지
+    &--selected img {
+      opacity: 0.5;
+    }
+  }
+
+  /* Navigation arrows */
+  &__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 50%;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 2;
+    color: #374151;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(6px);
+    box-shadow: 0 1px 10px rgba(0, 0, 0, 0.14);
+    transition: background 0.15s, transform 0.1s;
+
+    .dark & {
+      background: rgba(30, 32, 36, 0.88);
+      color: #e5e7eb;
+    }
+
+    &:hover {
+      background: rgba(255, 255, 255, 1);
+      transform: translateY(-50%) scale(1.06);
+
+      .dark & {
+        background: rgba(50, 52, 58, 1);
+      }
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.96);
+    }
+
+    &--prev { left: 0.75rem; }
+    &--next { right: 0.75rem; }
+  }
+
+  /* Counter badge */
+  &__counter {
+    position: absolute;
+    top: 0.75rem;
+    right: 0.75rem;
+    background: rgba(0, 0, 0, 0.46);
+    color: #fff;
+    font-size: 0.72rem;
+    font-weight: 600;
+    line-height: 1;
+    padding: 0.28rem 0.58rem;
+    border-radius: 999px;
+    backdrop-filter: blur(6px);
+    letter-spacing: 0.03em;
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  /* Dots (read-only) */
+  &__dots {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.38rem;
+    align-items: center;
+    z-index: 2;
+    padding: 0.25rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.22);
+    backdrop-filter: blur(4px);
+  }
+
+  &__dot {
+    width: 0.44rem;
+    height: 0.44rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.5);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.18s, transform 0.18s;
+
+    &--active {
+      background: #fff;
+      transform: scale(1.4);
+    }
+  }
+
+  /* Split button */
+  &__split-btn {
+    position: absolute;
+    bottom: 0.75rem;
+    right: 0.75rem;
+    display: inline-flex;
+    align-items: center;
+    background: rgba(0, 0, 0, 0.46);
+    color: #fff;
+    font-size: 0.7rem;
+    font-weight: 500;
+    line-height: 1;
+    padding: 0.3rem 0.65rem 0.3rem 0.5rem;
+    border-radius: 0.375rem;
+    border: none;
+    cursor: pointer;
+    backdrop-filter: blur(6px);
+    letter-spacing: -0.01em;
+    z-index: 2;
+    opacity: 0;
+    transition: opacity 0.18s, background 0.15s;
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.68);
+    }
+  }
+
+  &:hover &__split-btn {
+    opacity: 1;
+  }
+}
+
+.image-carousel-wrapper--selected .image-carousel__split-btn {
+  opacity: 1;
+}
+
+/* ── Thumbnail strip (edit mode) ── */
+.image-carousel__thumb-section {
+  margin-top: 0.5rem;
+}
+
+.image-carousel__thumbs {
+  display: flex;
+  gap: 0.5rem;
+  padding: 0.25rem 0;
+  overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.15) transparent;
+
+  &::-webkit-scrollbar { height: 3px; }
+  &::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 999px;
+  }
+}
+
+.image-carousel__thumb {
+  position: relative;
+  flex: 0 0 5rem;
+  height: 3.75rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  // 기본: pointer (읽기 모드 — 클릭 내비게이션)
+  cursor: pointer;
+  border: 2px solid transparent;
+  outline: none; // 브라우저 기본 포커스 링 제거
+  transition: border-color 0.15s, opacity 0.15s, transform 0.15s;
+  background: var(--tt-gray-light-950, #f3f4f6);
+
+  // 편집 모드: grab 커서 (--editable 클래스가 thumb-section에 있을 때)
+  .image-carousel__thumb-section--editable & {
+    cursor: grab;
+  }
+
+  .dark & {
+    background: var(--tt-gray-dark-950, #1e2023);
+  }
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    pointer-events: none;
+  }
+
+  // 현재 슬라이드에 해당하는 썸네일 강조
+  // 브랜드 컬러(파란색) 대신 흰색 테두리 + 그림자로 은은하게 표시
+  &--active {
+    border-color: rgba(255, 255, 255, 0.85);
+    box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.12);
+
+    .dark & {
+      border-color: rgba(255, 255, 255, 0.5);
+      box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.08);
+    }
+  }
+
+  /* 드래그 중인 썸네일 (편집 모드에서만 발생) */
+  &--dragging {
+    opacity: 0.35;
+    .image-carousel__thumb-section--editable & { cursor: grabbing; }
+    transform: scale(0.95);
+  }
+
+  /* 드롭 대상 위치 표시 */
+  &--dragover {
+    border-color: var(--tt-brand-color-500, #3b82f6);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.25);
+    transform: scale(1.05);
+  }
+
+  /* Controls overlay */
+  &-controls {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
+    background: rgba(0, 0, 0, 0);
+    transition: background 0.15s;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  &--hovered &-controls,
+  &--active &-controls {
+    opacity: 1;
+    background: rgba(0, 0, 0, 0.45);
+    pointer-events: auto;
+  }
+
+  &-move {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.9);
+    color: #111827;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.12s, transform 0.1s, opacity 0.12s;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+      background: #fff;
+      transform: scale(1.1);
+    }
+
+    &:disabled {
+      opacity: 0.25;
+      cursor: default;
+    }
+  }
+
+  &-index {
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: #fff;
+    min-width: 1rem;
+    text-align: center;
+    line-height: 1;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+}
+
+/* Hint text */
+.image-carousel__hint-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  margin-top: 0.45rem;
+}
+
+.image-carousel__hint {
+  display: flex;
+  align-items: flex-start;  /* 아이콘을 텍스트 수직 중앙이 아닌 첫 줄에 맞춤 */
+  gap: 0.35rem;
+  margin: 0;
+  padding: 0;
+  // 에디터 p/div 스타일 완전 차단
+  font-family: inherit !important;
+  font-size: 0.78rem !important;
+  font-weight: 400 !important;
+  font-style: normal !important;
+  line-height: 1.5 !important;
+  word-break: keep-all;     /* 한국어 어절 단위 줄바꿈 — 음절 중간 분리 방지 */
+  color: var(--tt-gray-light-a-400, #9ca3af);
+  user-select: none;
+
+  .dark & {
+    color: var(--tt-gray-dark-a-400, #6b7280);
+  }
+
+  /* 아이콘(12px)이 텍스트 line-height(1.5×0.78rem≈19.9px) 첫 줄 시각 중심과 맞도록 보정 */
+  > svg { margin-top: 0.2rem; flex-shrink: 0; }
+
+  &--sub {
+    padding-left: calc(12px + 0.35rem);
+  }
+
+  &-em {
+    font-family: inherit !important;
+    font-size: 0.78rem !important;
+    font-weight: 600 !important;
+    font-style: normal !important;
+    color: var(--tt-gray-light-a-700, #4b5563);
+
+    .dark & {
+      color: var(--tt-gray-dark-a-500, #9ca3af);
+
+    }
+  }
+}
+
+/* ── Carousel Lightbox ── */
+@keyframes carousel-lb-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes carousel-lb-img-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+.carousel-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.9);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 5rem;
+  animation: carousel-lb-in 0.18s ease;
+
+  /* ── 이미지 래퍼 ── */
+  &__img-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    max-width: 100%;
+    max-height: 100%;
+    animation: carousel-lb-img-in 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+
+    img {
+      max-width: min(90vw, 1200px);
+      max-height: 80vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      display: block;
+      border-radius: 0.625rem;
+      box-shadow:
+        0 0 0 1px rgba(255, 255, 255, 0.06),
+        0 32px 96px rgba(0, 0, 0, 0.65);
+      cursor: default;
+    }
+  }
+
+  /* ── 닫기 버튼 ── */
+  &__close {
+    position: absolute;
+    top: 1.25rem;
+    right: 1.25rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    cursor: pointer;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(255, 255, 255, 0.2); }
+  }
+
+  /* ── 카운터 ── */
+  &__counter {
+    position: absolute;
+    top: 1.4rem;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    font-size: 0.78rem;
+    font-weight: 600;
+    padding: 0.32rem 0.8rem;
+    border-radius: 999px;
+    pointer-events: none;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+  }
+
+  /* ── 좌우 화살표 ── */
+  &__arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 3.25rem;
+    height: 3.25rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    color: #fff;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s, transform 0.12s;
+
+    &:hover {
+      background: rgba(255, 255, 255, 0.18);
+      transform: translateY(-50%) scale(1.06);
+    }
+
+    &:active { transform: translateY(-50%) scale(0.96); }
+
+    &--prev { left: 1.25rem; }
+    &--next { right: 1.25rem; }
+  }
+
+  /* ── 하단 점 ── */
+  &__dots {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    padding: 0.35rem 0.7rem;
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.08);
+  }
+
+  &__dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.35);
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.18s, transform 0.18s;
+
+    &--active {
+      background: #fff;
+      transform: scale(1.5);
+    }
+
+    &:hover:not(&--active) {
+      background: rgba(255, 255, 255, 0.6);
+    }
+  }
+}

@@ -1,0 +1,39 @@
+/* ── TabDocHeader — 탭 헤더 (제목 + 카운트 배지) ──
+   부모 .xxx-root에서 --tab-accent-rgb 변수를 설정해야 합니다.
+   예) --tab-accent-rgb: 59, 130, 246;  (파란색)
+   ─────────────────────────────────────────────── */
+
+.doc-tab-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 0.125rem;
+
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  &__title {
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.03em;
+    .dark & { color: #f9fafb; }
+  }
+
+  &__count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 1.4rem;
+    height: 1.4rem;
+    padding: 0 0.35rem;
+    border-radius: 999px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+    background: rgb(var(--tab-accent-rgb, 59, 130, 246));
+  }
+}

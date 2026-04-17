@@ -1,0 +1,14 @@
+/**
+ * _features/editor Public SCSS API
+ * WriteView에서 이 파일 하나만 import하면 에디터 노드 스타일 전체가 포함된다.
+ * 개별 노드 경로를 직접 import하지 않도록 배럴로 통합.
+ */
+@use './ui/simple-editor/simple-editor';
+@use './ui/blockquote-node/blockquote-node';
+@use './ui/code-block-node/code-block-node';
+@use './ui/heading-node/heading-node';
+@use './ui/list-node/list-node';
+@use './ui/paragraph-node/paragraph-node';
+@use './extensions/resizable-image/image-node';
+@use './extensions/horizontal-rule/horizontal-rule-node';
+@use './extensions/image-carousel/image-carousel-node';

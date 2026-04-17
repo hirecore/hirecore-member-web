@@ -1,0 +1,87 @@
+/* ============================================================
+   PreviewActionBar — 문서 미리보기 액션 바 (공용)
+   prefix: preview-ab-
+   포트폴리오 PortfolioPageActions와 동일한 시각 언어를 사용
+   ============================================================ */
+
+.preview-ab {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  padding-top: 1rem;
+  padding-bottom: 0.25rem;
+
+  &__badge {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #9ca3af;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.18rem 0.55rem;
+    border-radius: 999px;
+    margin-right: auto; /* badge를 왼쪽 끝에 */
+    .dark & { background: rgba(255, 255, 255, 0.08); color: #6b7280; }
+  }
+
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+
+  /* 편집하기 — 포트폴리오 pr-page-actions__edit 동일 스타일 */
+  &__edit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.42rem 0.95rem;
+    border-radius: 0.5rem;
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
+    background: transparent;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #374151;
+    cursor: pointer;
+    transition: all 0.14s;
+    letter-spacing: -0.01em;
+
+    &:hover  { border-color: #3b82f6; color: #2563eb; background: rgba(59, 130, 246, 0.05); }
+    &:active { transform: scale(0.97); }
+
+    .dark & {
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #d1d5db;
+      &:hover { border-color: #60a5fa; color: #93c5fd; background: rgba(96, 165, 250, 0.08); }
+    }
+  }
+
+  /* 등록하기 — 문서 타입별 accent color */
+  &__submit {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.45rem 1rem;
+    border-radius: 0.5rem;
+    border: none;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    transition: all 0.14s;
+    letter-spacing: -0.01em;
+
+    &:active { transform: scale(0.97); }
+
+    &--green {
+      background: #059669;
+      &:hover { background: #047857; }
+      .dark & { background: #34d399; color: #064e3b; &:hover { background: #6ee7b7; } }
+    }
+
+    &--amber {
+      background: #d97706;
+      &:hover { background: #b45309; }
+      .dark & { background: #fbbf24; color: #451a03; &:hover { background: #fcd34d; } }
+    }
+  }
+}

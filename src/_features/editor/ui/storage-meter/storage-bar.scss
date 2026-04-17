@@ -1,0 +1,239 @@
+/* ============================================================
+   Storage Bar — editor-card 내부 툴바 하단 저장 공간 보조 바
+   position: sticky → write view SCSS에서 position: static으로 override됨
+   ============================================================ */
+
+.storage-bar {
+  min-height: 30px;
+  position: sticky;
+  top: var(--tt-toolbar-height, 2.75rem);  /* 툴바 바로 아래 고정 */
+  z-index: 9;
+  border-bottom: 1px solid var(--tt-toolbar-border-color, rgba(0, 0, 0, 0.06));
+  background: var(--tt-toolbar-bg-color, #fff);
+  user-select: none;
+  flex-shrink: 0;
+
+  /* 에디터 콘텐츠 영역과 정렬 */
+  &__inner {
+    max-width: 860px;
+    width: 100%;
+    margin: 0.3rem auto;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0 3rem;   /* simple-editor-content 좌우 패딩과 동일 */
+
+    @media (max-width: 768px) {
+      padding: 0 1.5rem;
+    }
+  }
+
+  .dark & {
+    background: rgba(255, 255, 255, 0.02);
+    border-bottom-color: rgba(255, 255, 255, 0.05);
+  }
+
+  /* 경고 레벨별 배경 */
+  &--warning {
+    background: #fffbeb;                              /* amber-50 */
+    .dark & { background: rgba(251, 191, 36, 0.10); }
+  }
+  &--danger {
+    background: #fef2f2;                              /* red-50 */
+    .dark & { background: rgba(239, 68, 68, 0.12); }
+  }
+
+  /* ── 왼쪽 ── */
+  &__left {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    flex-shrink: 0;
+    color: var(--tt-gray-light-a-400, #9ca3af);
+    .dark & { color: var(--tt-gray-dark-a-400, #6b7280); }
+  }
+
+  &__label {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    white-space: nowrap;
+    color: var(--tt-gray-light-a-500, #6b7280);
+    .dark & { color: var(--tt-gray-dark-a-400, #6b7280); }
+  }
+
+  /* ── 가운데 ── */
+  &__center {
+    display: flex;
+    align-items: center;
+    gap: 0.32rem;
+    flex: 1;
+    min-width: 0;
+  }
+
+  &__track {
+    width: 120px;
+    height: 4px;
+    border-radius: 999px;
+    background: rgba(0, 0, 0, 0.07);
+    overflow: hidden;
+    flex-shrink: 0;
+
+    .dark & { background: rgba(255, 255, 255, 0.08); }
+  }
+
+  &__fill {
+    height: 100%;
+    border-radius: 999px;
+    transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+
+    &--normal  { background: linear-gradient(90deg, #3b82f6, #6366f1); }
+    &--warning { background: linear-gradient(90deg, #f59e0b, #fb923c); }
+    &--danger  { background: linear-gradient(90deg, #ef4444, #f43f5e); }
+  }
+
+  &__used {
+    font-size: 0.8125rem;
+    font-weight: 700;
+    color: var(--tt-gray-light-a-700, #374151);
+    .dark & { color: var(--tt-gray-dark-a-600, #d1d5db); }
+
+    &--warning { color: #d97706 !important; }
+    &--danger  { color: #ef4444 !important; }
+  }
+
+  &__sep {
+    font-size: 0.8125rem;
+    color: var(--tt-gray-light-a-300, #d1d5db);
+    .dark & { color: var(--tt-gray-dark-a-300, #374151); }
+  }
+
+  &__quota {
+    font-size: 0.8125rem;
+    color: var(--tt-gray-light-a-400, #9ca3af);
+    .dark & { color: var(--tt-gray-dark-a-400, #6b7280); }
+  }
+
+  /* 세션 추가량 */
+  &__session {
+    padding: 0.1rem 0.38rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: rgba(59, 130, 246, 0.08);
+    color: #3b82f6;
+    .dark & { background: rgba(96, 165, 250, 0.1); color: #60a5fa; }
+  }
+
+  /* 남은 공간 */
+  &__remaining {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    &--warning { color: #d97706; }
+    &--danger  { color: #ef4444; }
+  }
+
+  /* ── 오른쪽 ── */
+  &__right {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+    margin-left: auto;
+    flex-shrink: 0;
+  }
+
+  /* 업그레이드 버튼 */
+  &__upgrade {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #6366f1;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    transition: opacity 0.15s;
+    &:hover { opacity: 0.7; }
+    .dark & { color: #818cf8; }
+  }
+
+  /* 티어 뱃지 */
+  &__tier {
+    padding: 0.12rem 0.48rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+
+    &--gold {
+      background: linear-gradient(135deg, #fef9c3, #fde68a);
+      color: #92400e;
+    }
+
+    &--platinum {
+      background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+      color: #3730a3;
+      .dark & {
+        background: linear-gradient(135deg, rgba(99,102,241,0.2), rgba(129,140,248,0.15));
+        color: #a5b4fc;
+      }
+    }
+  }
+
+  /* 에러 */
+  &__error {
+    display: flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    background: rgba(239, 68, 68, 0.08);
+    color: #ef4444;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    .dark & { background: rgba(239, 68, 68, 0.12); }
+
+    // 3초 lifecycle: 빠른 페이드인 → 유지 → 서서히 페이드아웃
+    animation: storage-bar-error-lifecycle 3s ease forwards;
+  }
+}
+
+@keyframes storage-bar-error-lifecycle {
+  0%   { opacity: 0; }
+  8%   { opacity: 1; }   /* ~0.24s: 빠르게 나타남  */
+  80%  { opacity: 1; }   /* ~2.4s: 유지            */
+  100% { opacity: 0; }   /* 0.6s: 서서히 사라짐    */
+}
+
+/* ── 좁은 폭(< 500px): 2행 레이아웃
+   Row 1: [아이콘 + "이미지 저장 공간" ......] [Gold/Platinum 배지]
+   Row 2: [────────────── 바 ──────] 4.5 / 100 MB (+0.2MB)
+   ─────────────────────────────────────────────────────────────── */
+@media (max-width: 499px) {
+  .storage-bar {
+    height: auto;
+    padding: 0.35rem 0;
+
+    &__inner {
+      height: auto;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 0.3rem 0.5rem;
+    }
+
+    &__left {
+      flex: 1;           /* row 1: 남은 공간 채우며 __right를 우측으로 밀어냄 */
+    }
+
+    &__center {
+      flex: 0 0 100%;    /* row 2: 전체 폭 차지 */
+      min-width: 0;
+    }
+
+    &__track {
+      flex: 1;           /* row 2 내에서 가용 공간 채움 */
+      max-width: 140px;
+      width: auto;
+    }
+  }
+}

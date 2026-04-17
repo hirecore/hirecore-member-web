@@ -1,0 +1,191 @@
+/* ============================================================
+   LinksSection — 포트폴리오 링크 입력 섹션
+   prefix: pls-  (portfolio links section)
+   ============================================================ */
+
+/* ── 프리셋 버튼 행 ── */
+.pls-presets {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+  margin-bottom: 0.75rem;
+}
+
+.pls-preset-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 1.625rem;
+  padding: 0 0.625rem;
+  border-radius: 999px;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  background: #fff;
+  font-size: 0.72rem;
+  font-weight: 600;
+  color: #374151;
+  cursor: pointer;
+  transition: border-color 0.13s, background 0.13s, color 0.13s;
+
+  &:hover {
+    border-color: rgba(59, 130, 246, 0.45);
+    background: rgba(59, 130, 246, 0.04);
+    color: #2563eb;
+  }
+
+  .dark & {
+    background: #151A22;
+    border-color: rgba(255,255,255,0.1);
+    color: #d1d5db;
+    &:hover { border-color: rgba(96,165,250,0.4); background: rgba(96,165,250,0.06); color: #60a5fa; }
+  }
+}
+
+/* ── 입력 행 ── */
+.pls-input-row {
+  display: flex;
+  gap: 0.5rem;
+  align-items: stretch;
+
+  @media (max-width: 540px) {
+    flex-wrap: wrap;
+
+    .pls-input-wrap--label { flex: 0 0 100%; }
+    .pls-input-wrap--url   { flex: 1 1 0; }
+  }
+}
+
+.pls-input-wrap {
+  display: flex;
+  align-items: center;
+  background: #fff;
+  border: 1.5px solid rgba(0,0,0,0.08);
+  border-radius: 0.625rem;
+  padding: 0 0.75rem;
+  transition: border-color 0.13s;
+
+  &:focus-within { border-color: rgba(59, 130, 246, 0.5); }
+
+  &--label { flex: 0 0 140px; }
+  &--url   { flex: 1 1 0; min-width: 0; }
+
+  .dark & {
+    background: #151A22;
+    border-color: rgba(255,255,255,0.08);
+    &:focus-within { border-color: rgba(96,165,250,0.4); }
+  }
+}
+
+.pls-input {
+  width: 100%;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-size: 0.8rem;
+  color: #111827;
+  padding: 0.55rem 0;
+
+  &::placeholder { color: #d1d5db; }
+
+  .dark & {
+    color: #f9fafb;
+    &::placeholder { color: #4b5563; }
+  }
+}
+
+/* ── 추가 버튼 ── */
+.pls-add-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0 1rem;
+  border-radius: 0.625rem;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.13s, opacity 0.13s;
+
+  &:hover:not(:disabled) { background: #1d4ed8; }
+  &:disabled { opacity: 0.45; cursor: not-allowed; }
+
+  .dark & { background: #3b82f6; &:hover:not(:disabled) { background: #2563eb; } }
+}
+
+/* ── 에러 ── */
+.pls-error {
+  font-size: 0.75rem;
+  color: #ef4444;
+  margin-top: 0.375rem;
+  .dark & { color: #f87171; }
+}
+
+/* ── 추가된 링크 목록 ── */
+.pls-list {
+  list-style: none;
+  padding: 0;
+  margin: 0.75rem 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.pls-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  padding: 0.5rem 0.75rem;
+  background: #f9fafb;
+  border: 1px solid rgba(0,0,0,0.06);
+  border-radius: 0.5rem;
+
+  .dark & { background: #111; border-color: rgba(255,255,255,0.07); }
+
+  &__label {
+    flex-shrink: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: #2563eb;
+    background: rgba(37, 99, 235, 0.07);
+    padding: 0.15rem 0.5rem;
+    border-radius: 999px;
+    min-width: 3.5rem;
+    text-align: center;
+
+    .dark & { color: #60a5fa; background: rgba(96, 165, 250, 0.1); }
+  }
+
+  &__url {
+    flex: 1 1 0;
+    min-width: 0;
+    font-size: 0.77rem;
+    color: #6b7280;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    text-decoration: none;
+
+    &:hover { color: #2563eb; text-decoration: underline; }
+
+    .dark & { color: #9ca3af; &:hover { color: #60a5fa; } }
+  }
+
+  &__remove {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.375rem;
+    height: 1.375rem;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+
+    &:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
+    .dark & { color: #6b7280; &:hover { background: rgba(239,68,68,0.1); color: #f87171; } }
+  }
+}

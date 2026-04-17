@@ -1,0 +1,31 @@
+.view-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.15rem;
+  border-radius: 0.5rem;
+  padding: 0.2rem;
+  background: rgba(0, 0, 0, 0.05);
+
+  &__btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 0.35rem;
+    border: none;
+    background: transparent;
+    color: #9ca3af;
+    cursor: pointer;
+    padding: 0;
+    transition: background 0.13s, color 0.13s;
+
+    &:hover { color: #6b7280; }
+
+    &--active {
+      background: #fff;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      color: var(--vt-active, #374151);
+    }
+  }
+}

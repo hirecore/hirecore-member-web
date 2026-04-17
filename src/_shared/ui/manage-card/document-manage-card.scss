@@ -1,0 +1,351 @@
+@use "@/_shared/styles/manage-card-mixins" as mc;
+
+/* ============================================================
+   DocumentManageCard — 통합 관리 카드
+   prefix: mc-
+   color schemes: green (resume), amber (coverletter), blue (portfolio)
+   ============================================================ */
+
+/* ── Color Scheme Variables ──────────────────────────────────── */
+.mc-root--green {
+  --mc-rgb: 16, 185, 129;
+  --mc-color: #059669;
+  --mc-dk-rgb: 52, 211, 153;
+  --mc-secondary-rgb: 5, 150, 105;
+}
+.dark .mc-root--green { --mc-color: #34d399; }
+
+.mc-root--amber {
+  --mc-rgb: 245, 158, 11;
+  --mc-color: #d97706;
+  --mc-dk-rgb: 251, 191, 36;
+  --mc-secondary-rgb: 217, 119, 6;
+}
+.dark .mc-root--amber { --mc-color: #fbbf24; }
+
+.mc-root--blue {
+  --mc-rgb: 59, 130, 246;
+  --mc-color: #3b82f6;
+  --mc-dk-rgb: 59, 130, 246;
+  --mc-secondary-rgb: 59, 130, 246;
+}
+.dark .mc-root--blue { --mc-color: #60a5fa; }
+
+/* ── Card Root ───────────────────────────────────────────────── */
+.mc-root {
+  @include mc.card-base;
+
+  &:hover {
+    border-color: rgba(var(--mc-rgb), 0.25);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark &:hover {
+    border-color: rgba(var(--mc-rgb), 0.3);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  }
+}
+
+/* ── LIST Mode ───────────────────────────────────────────────── */
+.mc-root--list {
+  display: flex;
+  gap: 1rem;
+  padding: 1.25rem;
+}
+
+.mc-root--list .mc-body { @include mc.card-body; }
+.mc-root--list .mc-summary { gap: 0.3rem; }
+.mc-root--list .mc-summary__title-row { align-items: center; }
+
+/* ── GRID Mode ───────────────────────────────────────────────── */
+.mc-root--grid {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100%;
+}
+
+.mc-root--grid .mc-body {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.625rem;
+  padding: 1rem;
+}
+
+/* ── Info Top (가변 영역 — 태그/연결/버튼을 바닥으로 밀어냄) ── */
+.mc-info-top {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ── Summary ─────────────────────────────────────────────────── */
+.mc-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.mc-summary__title-row {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.mc-summary__meta {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  flex-wrap: wrap;
+}
+
+/* ── Title ────────────────────────────────────────────────────── */
+.mc-title { @include mc.card-title; }
+
+/* ── Category Row (제목 위 카테고리 단일 라인) ────────────────
+   L1(분야) · L3(직무) 미니멀 형식. 배지/separator 제거 — 시각 노이즈 최소화.
+   L3는 카드의 brand color (--mc-color)로 강조. */
+.mc-category-row {
+  display: flex;
+  align-items: baseline;
+  gap: 0.35rem;
+  margin-bottom: 0.3rem;
+  font-size: 0.7rem;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  word-break: keep-all;
+}
+
+.mc-cat-line {
+  &__field {
+    color: #9ca3af;
+    font-weight: 500;
+    white-space: nowrap;
+    flex-shrink: 0;
+    .dark & { color: #6b7280; }
+  }
+  &__sep {
+    color: #d1d5db;
+    flex-shrink: 0;
+    user-select: none;
+    .dark & { color: #4b5563; }
+  }
+  &__job {
+    color: var(--mc-color);
+    font-weight: 700;
+    min-width: 0;
+    .dark & { color: var(--mc-color); }
+  }
+}
+
+
+/* ── Date ─────────────────────────────────────────────────────── */
+.mc-date {
+  font-size: 0.65rem;
+  color: #9ca3af;
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+  white-space: nowrap;
+  .dark & { color: #6b7280; }
+}
+
+/* ── Badge ────────────────────────────────────────────────────── */
+.mc-badge {
+  @include mc.badge-base;
+
+  &--type {
+    background: rgba(99, 102, 241, 0.1);
+    color: #6366f1;
+    .dark & { background: rgba(99, 102, 241, 0.12); color: #818cf8; }
+  }
+
+  &--linked {
+    background: rgba(37, 99, 235, 0.08);
+    color: #2563eb;
+    .dark & { background: rgba(59, 130, 246, 0.12); color: #60a5fa; }
+  }
+
+  &--linked-btn {
+    align-self: flex-start;
+    border: none;
+    cursor: pointer;
+    transition: background 0.12s, box-shadow 0.12s;
+
+    &:hover {
+      background: rgba(37, 99, 235, 0.14);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+    .dark &:hover {
+      background: rgba(59, 130, 246, 0.18);
+      box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.2);
+    }
+  }
+
+  &--linked-active {
+    background: rgba(37, 99, 235, 0.1);
+    color: #2563eb;
+    .dark & { background: rgba(59, 130, 246, 0.14); color: #60a5fa; }
+  }
+}
+
+/* ── Actions ──────────────────────────────────────────────────── */
+.mc-actions {
+  @include mc.card-actions-base;
+
+  &__btn {
+    @include mc.card-actions-btn-base;
+
+    &--view {
+      border-color: rgba(var(--mc-rgb), 0.3);
+      color: var(--mc-color);
+      &:hover { background: rgba(var(--mc-rgb), 0.06); border-color: var(--mc-color); }
+    }
+
+    .dark & {
+      border-color: rgba(255, 255, 255, 0.1);
+      color: #9ca3af;
+      &:hover { background: rgba(255, 255, 255, 0.05); border-color: #d1d5db; color: #d1d5db; }
+      &.mc-actions__btn--view { border-color: rgba(var(--mc-dk-rgb), 0.3); color: var(--mc-color); &:hover { background: rgba(var(--mc-dk-rgb), 0.06); } }
+      &.mc-actions__btn--danger:hover { background: rgba(239, 68, 68, 0.08); border-color: #f87171; color: #f87171; }
+    }
+  }
+}
+
+/* ── Memo ─────────────────────────────────────────────────────── */
+.mc-memo { @include mc.memo-box; }
+
+/* ── Interest Chips ───────────────────────────────────────────── */
+.mc-interest-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.mc-interest-chip {
+  display: inline-flex;
+  align-items: center;
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 0.18rem 0.55rem;
+  border-radius: 999px;
+  background: rgba(var(--mc-rgb), 0.1);
+  color: var(--mc-color);
+  border: 1px solid rgba(var(--mc-rgb), 0.2);
+
+  .dark & {
+    background: rgba(var(--mc-rgb), 0.12);
+    border-color: rgba(var(--mc-dk-rgb), 0.2);
+  }
+}
+
+/* ── Tags ─────────────────────────────────────────────────────── */
+.mc-tags-section { display: flex; flex-direction: column; }
+.mc-tags { @include mc.tag-container; }
+
+.mc-tag {
+  @include mc.tag-base;
+
+  &--more {
+    color: var(--mc-color);
+    background: rgba(var(--mc-rgb), 0.08);
+    .dark & { background: rgba(var(--mc-rgb), 0.1); }
+  }
+}
+
+/* ── Card Footer ──────────────────────────────────────────────── */
+.mc-card-footer {
+  padding-top: 0.625rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  .dark & { border-top-color: rgba(255, 255, 255, 0.06); }
+}
+
+/* ── Like Count (포트폴리오) ──────────────────────────────────── */
+.mc-meta__like {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.2rem;
+  font-size: 0.7rem;
+  font-weight: 500;
+  color: #f43f5e;
+  svg { flex-shrink: 0; }
+}
+
+/* ── Icon Header (grid — 이력서, 자기소개서) ──────────────────── */
+.mc-icon-header {
+  height: 80px;
+  background: linear-gradient(135deg, rgba(var(--mc-rgb), 0.12), rgba(var(--mc-secondary-rgb), 0.2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--mc-color);
+  border-bottom: 1px solid rgba(var(--mc-rgb), 0.1);
+  flex-shrink: 0;
+
+  .dark & {
+    background: linear-gradient(135deg, rgba(var(--mc-rgb), 0.1), rgba(var(--mc-secondary-rgb), 0.18));
+    border-bottom-color: rgba(var(--mc-rgb), 0.12);
+  }
+}
+
+/* ── Icon Aside (list — 이력서, 자기소개서) ────────────────────── */
+.mc-icon-aside {
+  width: 56px;
+  height: 56px;
+  border-radius: 0.625rem;
+  background: rgba(var(--mc-rgb), 0.08);
+  color: var(--mc-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  .dark & { background: rgba(var(--mc-rgb), 0.12); }
+}
+
+/* ── Thumbnail Header (grid — 포트폴리오) ─────────────────────── */
+.mc-thumb-header {
+  height: 90px;
+  overflow: hidden;
+  position: relative;
+  background: #f1f5f9;
+  .dark & { background: #1A2130; }
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  &__default {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd5e1;
+    .dark & { color: #374151; }
+  }
+}
+
+/* ── Thumbnail Aside (list — 포트폴리오) ──────────────────────── */
+.mc-thumb-aside {
+  width: 72px;
+  height: 72px;
+  border-radius: 0.625rem;
+  overflow: hidden;
+  flex-shrink: 0;
+  background: #f1f5f9;
+  .dark & { background: #1A2130; }
+
+  img { width: 100%; height: 100%; object-fit: cover; }
+
+  &__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd5e1;
+    .dark & { color: #374151; }
+  }
+}

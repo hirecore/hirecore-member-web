@@ -1,0 +1,76 @@
+/* Pretendard Variable — 한국어/영문 통합 폰트 (dynamic subset, 성능 최적화) */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css");
+
+@import '../_features/editor/styles/_variables.scss';
+@import '../_features/editor/styles/_keyframe-animations.scss';
+
+@import "tailwindcss";
+@plugin "@tailwindcss/typography";
+
+@layer base {
+  body {
+    --tt-toolbar-height: 44px;
+    --tt-theme-text: var(--tt-gray-light-900);
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+      system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    color: var(--tt-theme-text);
+    font-weight: 400;
+    font-style: normal;
+    line-height: 1.65;
+    letter-spacing: -0.01em;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    padding: 0;
+    overscroll-behavior-y: none;
+    /* 최소 지원 viewport = 320px.
+       320px 미만에서는 body가 줄어들지 않고 가로 스크롤을 허용한다. */
+    min-width: 320px;
+  }
+
+  .dark body {
+    --tt-theme-text: var(--tt-gray-dark-900);
+  }
+
+  html,
+  body {
+    overscroll-behavior-x: none;
+  }
+
+  html {
+    height: 100%;
+    /* 기본 16px → 17px: 모든 rem 단위가 비례 증가 → 전체 서비스 가독성 향상 */
+    font-size: 106.25%;
+  }
+
+  body,
+  #root,
+  #app {
+    min-height: 100%;
+    background-color: var(--tt-bg-color);
+  }
+
+  ::-webkit-scrollbar {
+    width: 0.25rem;
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--tt-scrollbar-color) transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: var(--tt-scrollbar-color);
+    border-radius: 9999px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  /* 에디터도 Pretendard 통일 (일관성) */
+  .tiptap.ProseMirror {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont,
+      system-ui, 'Apple SD Gothic Neo', 'Noto Sans KR', sans-serif;
+    line-height: 1.7;
+  }
+}

@@ -1,0 +1,320 @@
+/* ============================================================
+   Portfolio Write — 공통 레이아웃 구조 + 에디터 카드 프레임
+   섹션별 스타일은 ui/write/ 각 .scss 파일 참조
+   ============================================================ */
+@use "@/_shared/styles/portfolio-layout" as layout;
+
+/* ── 루트 ── */
+.pw-root {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: var(--tt-bg-color, #fff);
+  color: var(--tt-gray-light-a-900, #111827);
+  .dark & { background: var(--black, #0F131A); color: var(--tt-gray-dark-a-900, #f9fafb); }
+}
+
+/* ── 페이지 헤더 ── */
+.pw-page-header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.75rem 0 0.25rem;
+}
+
+.pw-page-header__icon {
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.5rem;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  .dark & { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+}
+
+.pw-page-header__title {
+  font-size: 1.1875rem;
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  color: #111827;
+  .dark & { color: #f9fafb; }
+}
+
+.pw-page-header__badge {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  background: rgba(59, 130, 246, 0.1);
+  color: #3b82f6;
+  .dark & { background: rgba(59, 130, 246, 0.15); color: #60a5fa; }
+}
+
+
+/* ── 메인 스크롤 영역 ── */
+.pw-main {
+  flex: 1;
+  /* 하단 고정 액션 바(3.75rem) + 여유 공간 */
+  padding-bottom: calc(3.75rem + 4rem);
+}
+
+/* ── 섹션 공통 ── */
+.pw-section {
+  padding: 2.5rem 0 0;
+
+  & + & {
+    padding-top: 2.5rem;
+    margin-top: 2.5rem;
+    border-top: 1.5px dashed rgba(0, 0, 0, 0.08);
+    .dark & { border-top-color: rgba(255, 255, 255, 0.07); }
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+  }
+
+  &__label {
+    font-size: 1.0625rem;
+    font-weight: 700;
+    letter-spacing: -0.025em;
+    color: var(--tt-gray-light-a-900, #111827);
+    .dark & { color: #f9fafb; }
+  }
+
+  &__required {
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: #ea580c;
+    background: rgba(234, 88, 12, 0.08);
+    border: 1px solid rgba(234, 88, 12, 0.2);
+    padding: 0.1rem 0.38rem;
+    border-radius: 999px;
+    letter-spacing: 0.01em;
+  }
+
+  &__optional {
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: #9ca3af;
+    background: rgba(0, 0, 0, 0.05);
+    padding: 0.1rem 0.38rem;
+    border-radius: 999px;
+    .dark & { background: rgba(255, 255, 255, 0.08); color: #6b7280; }
+  }
+
+  &__hint {
+    font-size: 0.8125rem;
+    color: #9ca3af;
+    margin-left: 0.2rem;
+    .dark & { color: #6b7280; }
+
+    &--private {
+      color: #7c3aed;
+      .dark & { color: #a78bfa; }
+    }
+  }
+}
+
+/* ── 나만 보는 메모 입력 ── */
+.pw-memo-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid rgba(124, 58, 237, 0.2);
+  border-radius: 0.75rem;
+  background: rgba(124, 58, 237, 0.03);
+  font-size: 0.875rem;
+  color: #374151;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+  line-height: 1.6;
+
+  &:focus {
+    outline: none;
+    border-color: rgba(124, 58, 237, 0.45);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
+  }
+
+  &::placeholder { color: #c4b5fd; }
+
+  .dark & {
+    background: rgba(124, 58, 237, 0.05);
+    border-color: rgba(167, 139, 250, 0.2);
+    color: #e5e7eb;
+    &:focus { border-color: rgba(167, 139, 250, 0.45); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12); }
+    &::placeholder { color: #7c3aed; }
+  }
+}
+
+.pw-memo-count {
+  text-align: right;
+  font-size: 0.875rem;
+  color: #c4b5fd;
+  margin-top: 0.3rem;
+  .dark & { color: #7c3aed; }
+}
+
+/* ── 에러 메시지 ── */
+.pw-error {
+  font-size: 0.875rem;
+  color: #ef4444;
+  margin: 0.4rem 0 0;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+
+  &::before {
+    content: "";
+    display: inline-block;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: #ef4444;
+    flex-shrink: 0;
+  }
+}
+
+/* ── 에디터 카드 프레임 ── */
+.pw-editor-card {
+  border: 1.5px solid rgba(0, 0, 0, 0.08);
+  border-radius: 1rem;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  //overflow: hidden;
+
+  &--focused {
+    border-color: rgba(59, 130, 246, 0.35);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08), 0 4px 24px rgba(0, 0, 0, 0.06);
+  }
+
+  .dark & {
+    border-color: rgba(255, 255, 255, 0.09);
+    &.pw-editor-card--focused {
+      border-color: rgba(96, 165, 250, 0.4);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12);
+    }
+  }
+
+  /* ── 카드 내부 툴바 (sticky) ── */
+  &__toolbar {
+    position: sticky;
+    top: layout.$header-height;
+    z-index: 10;
+    background: var(--tt-toolbar-bg-color, #fff);
+    /* overflow:hidden 없이 카드 border-radius를 살리기 위해 top corner만 적용.
+       부모 border 1.5px를 차감한 inner radius(≈ 1rem - 1.5px)로 카드 곡선과 정렬. */
+    border-radius: calc(1rem - 1.5px) calc(1rem - 1.5px) 0 0;
+    border-top: 1.5px solid rgba(0, 0, 0, 0.08);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    touch-action: pan-x;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+    &::-webkit-scrollbar { height: 3px; }
+    &::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.12); border-radius: 999px; }
+
+    .dark & {
+      background: var(--black, #0F131A);
+      border-top-color: rgba(255, 255, 255, 0.09);
+      border-bottom-color: rgba(255, 255, 255, 0.07);
+      scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+      &::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.12); }
+    }
+
+    .tiptap-toolbar[data-variant="fixed"] {
+      position: static;
+      border: none;
+      background: transparent;
+      padding: 0 0.25rem;
+      min-width: max-content;
+      min-height: 2.25rem;
+    }
+
+    .tiptap-button {
+      height: 1.75rem;
+      min-width: 1.75rem;
+      padding: 0.25rem 0.3rem;
+      font-size: 0.8125rem;
+
+      .tiptap-button-icon,
+      .tiptap-button-icon-sub { width: 0.875rem; height: 0.875rem; }
+      .tiptap-button-dropdown-arrows { width: 0.625rem; height: 0.625rem; }
+      .tiptap-button-dropdown-small  { width: 0.5rem;   height: 0.5rem;   }
+    }
+  }
+}
+
+/* ── StorageBar 내부 배치 override ──
+   StorageBar가 __toolbar 바깥 editor-card 직속 sibling이므로
+   position: sticky를 static으로 재설정해 정상 문서 흐름에 배치 */
+.pw-editor-card .storage-bar {
+  position: static;
+  border-top: 1px solid rgba(0, 0, 0, 0.06);
+  border-bottom: none;
+  .dark & { border-top-color: rgba(255, 255, 255, 0.05); }
+}
+
+/* ── 저장 공간 최적화 힌트 래퍼 ── */
+.pw-storage-hint {
+  padding: 0.5rem 0.75rem 0;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  .dark & { border-top-color: rgba(255, 255, 255, 0.04); }
+}
+
+/* ── 에디터 영역 ── */
+.pw-editor-area {
+  position: relative;
+  display: flex;
+}
+
+.pw-editor-content {
+  width: 100%;
+  flex: 1;
+
+  .tiptap.ProseMirror.simple-editor {
+    flex: 1;
+    padding: 1.75rem layout.$container-padding-x 15vh;
+    min-height: 320px;
+  }
+
+  @media (max-width: layout.$bp-sm) {
+    .tiptap.ProseMirror.simple-editor {
+      padding: 1.25rem layout.$container-padding-x-md 15vh;
+    }
+  }
+
+  .tiptap.ProseMirror.portfolio-editor.is-editor-empty {
+    > p:first-child::before {
+      content: "'/' 를 입력하면 블록을 삽입할 수 있어요";
+      color: #d1d5db;
+      pointer-events: none;
+      float: left;
+      height: 0;
+      .dark & { color: #374151; }
+    }
+  }
+}
+
+/* ── 드래그 핸들 아이콘 ── */
+.pw-drag-handle-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--tt-gray-light-a-400, #9ca3af);
+  .dark & { color: var(--tt-gray-dark-a-400, #6b7280); }
+}
+
+/* ── 글자 수 카운터 ── */
+.pw-char-count {
+  font-size: 0.875rem;
+  color: #c4c9d2;
+  margin-left: auto;
+  .dark & { color: #4b5563; }
+}

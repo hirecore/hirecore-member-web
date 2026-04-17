@@ -1,0 +1,39 @@
+// Drag handle (TipTap 플러그인이 DOM에 직접 생성하므로 Tailwind로 타겟 불가)
+.drag-handle {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 24px;
+  border-radius: 4px;
+  cursor: grab;
+  transition: background-color 0.15s;
+  z-index: 50;
+
+  &:hover {
+    background-color: var(--tt-gray-light-a-100, #f3f4f6);
+  }
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dark .drag-handle {
+  &:hover {
+    background-color: var(--tt-gray-dark-a-100, #1f2937);
+  }
+}
+
+// .simple-editor-content is used as selector hook for TipTap editor padding
+.simple-editor-content .tiptap.ProseMirror.simple-editor {
+  flex: 1;
+  padding: 3rem 3rem 30vh;
+}
+
+@media screen and (max-width: 480px) {
+  .simple-editor-content .tiptap.ProseMirror.simple-editor {
+    padding: 1rem 1.5rem 30vh;
+  }
+}

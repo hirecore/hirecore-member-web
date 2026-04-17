@@ -1,0 +1,131 @@
+"use client"
+
+import type { PortfolioLink } from "@/_features/portfolio/lib"
+import "./portfolio-meta-card.scss"
+
+function AvatarPlaceholder({ name, size = 40 }: { name: string; size?: number }) {
+  const hue = (name.charCodeAt(0) * 43) % 360
+  return (
+    <div
+      className="pr-avatar-placeholder"
+      style={{ width: size, height: size, background: `hsl(${hue} 60% 55%)`, fontSize: size * 0.38 }}
+      aria-hidden
+    >
+      {name.slice(0, 1)}
+    </div>
+  )
+}
+
+interface Props {
+  majorLabel: string
+  subCategory: string
+  projectType: "personal" | "team"
+  visibility: "public" | "private"
+  title: string
+  thumbnailUrl: string | null
+  tags: string[]
+  liked: boolean
+  likeCount: number
+  onLikeToggle: () => void
+  externalLinks?: PortfolioLink[]
+}
+
+export function PortfolioMetaCard({
+  majorLabel, subCategory, projectType, visibility, title,
+  thumbnailUrl, tags, liked, likeCount, onLikeToggle, externalLinks = [],
+}: Props) {
+  return (
+    <div className="pr-meta-card">
+
+      {thumbnailUrl && (
+        <div className="pr-meta-card__thumb">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img src={thumbnailUrl} alt="썸네일" className="pr-meta-card__thumb-img" />
+        </div>
+      )}
+
+      <div className="pr-meta-card__top">
+        <div className="pr-meta-card__cats">
+          <span className="pr-badge pr-badge--major">{majorLabel}</span>
+          <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden>
+            <path d="M3.5 2L7.5 5.5 3.5 9" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+          </svg>
+          <span className="pr-badge pr-badge--sub">{subCategory}</span>
+        </div>
+        <div className="pr-meta-card__right">
+          <span className={`pr-badge pr-badge--type${projectType === "team" ? " pr-badge--team" : ""}`}>
+            {projectType === "personal" ? "개인 프로젝트" : "팀 프로젝트"}
+          </span>
+          <span className={`pr-badge pr-badge--vis${visibility === "private" ? " pr-badge--private" : ""}`}>
+            {visibility === "public" ? "공개" : "비공개"}
+          </span>
+          <button
+            type="button"
+            className={`pr-like-btn${liked ? " pr-like-btn--active" : ""}`}
+            onClick={onLikeToggle}
+            aria-label={liked ? "관심 취소" : "관심 포트폴리오 등록"}
+          >
+            <svg width="14" height="14" viewBox="0 0 14 14" fill={liked ? "currentColor" : "none"}>
+              <path
+                d="M7 11.5S1.5 8 1.5 4.5a2.5 2.5 0 0 1 5.5-0.5A2.5 2.5 0 0 1 12.5 4.5C12.5 8 7 11.5 7 11.5Z"
+                stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round"
+              />
+            </svg>
+            관심
+          </button>
+        </div>
+      </div>
+
+      <h1 className="pr-meta-card__title">{title}</h1>
+
+      {tags.length > 0 && (
+        <div className="pr-meta-card__tags">
+          {tags.map((t) => <span key={t} className="pr-tag">#{t}</span>)}
+        </div>
+      )}
+
+      <div className="pr-meta-card__divider" aria-hidden />
+
+      <div className="pr-meta-card__author">
+        <AvatarPlaceholder name="작성자" size={44} />
+        <div className="pr-meta-card__author-info">
+          <span className="pr-meta-card__author-name">작성자</span>
+          {externalLinks.length > 0 && (
+            <div className="pr-meta-card__links">
+              {externalLinks.map((link) => (
+                <span key={link.label} className="pr-meta-link">
+                  <span className="pr-meta-link__label">{link.label}</span>
+                  <a
+                    href={link.url}
+                    className="pr-meta-link__val"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    {link.url}
+                  </a>
+                </span>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+
+      <div className="pr-meta-card__stats">
+        <span className="pr-stat">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden>
+            <ellipse cx="6.5" cy="6.5" rx="5" ry="3.5" stroke="currentColor" strokeWidth="1.2" />
+            <circle cx="6.5" cy="6.5" r="1.5" fill="currentColor" />
+          </svg>
+          view · 0
+        </span>
+        <span className="pr-stat">
+          <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden>
+            <path d="M6.5 10.5S1.5 7.5 1.5 4.5a2.5 2.5 0 0 1 5-0.5A2.5 2.5 0 0 1 11.5 4.5c0 3-5 6-5 6Z" stroke="currentColor" strokeWidth="1.2" />
+          </svg>
+          관심 · {likeCount}
+        </span>
+      </div>
+
+    </div>
+  )
+}

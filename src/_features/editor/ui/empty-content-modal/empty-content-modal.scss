@@ -1,0 +1,136 @@
+/* ============================================================
+   EmptyContentModal — 빈 내용 등록 시도 방지 모달
+   ============================================================ */
+
+@keyframes ec-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes ec-modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.ec-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.42);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: ec-backdrop-in 0.18s ease;
+}
+
+.ec-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 1.5rem;
+  padding: 2rem 1.875rem 1.75rem;
+  width: 100%;
+  max-width: 360px;
+  text-align: center;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 24px 64px rgba(0, 0, 0, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: ec-modal-in 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .dark & {
+    background: #151A22;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 24px 64px rgba(0, 0, 0, 0.55),
+      0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  /* ── 닫기 버튼 ── */
+  &__close {
+    position: absolute;
+    top: 1.1rem;
+    right: 1.1rem;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: background 0.15s;
+
+    &:hover { background: rgba(0, 0, 0, 0.09); }
+
+    .dark & {
+      background: rgba(255, 255, 255, 0.07);
+      color: #9ca3af;
+      &:hover { background: rgba(255, 255, 255, 0.12); }
+    }
+  }
+
+  /* ── 아이콘 ── */
+  &__icon-wrap {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.25rem;
+    color: #3b82f6;
+
+    .dark & { background: rgba(59, 130, 246, 0.14); }
+  }
+
+  /* ── 제목 ── */
+  &__title {
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0 0 0.5rem;
+    letter-spacing: -0.015em;
+
+    .dark & { color: #f9fafb; }
+  }
+
+  /* ── 설명 ── */
+  &__desc {
+    font-size: 0.8rem;
+    color: #6b7280;
+    line-height: 1.7;
+    margin: 0 0 1.75rem;
+
+    .dark & { color: #9ca3af; }
+  }
+
+  /* ── 확인 버튼 ── */
+  &__confirm {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    border-radius: 0.875rem;
+    background: #3b82f6;
+    color: #fff;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    letter-spacing: -0.01em;
+
+    &:hover  { background: #2563eb; }
+    &:active { transform: scale(0.98); }
+
+    .dark & {
+      background: #2563eb;
+      &:hover { background: #1d4ed8; }
+    }
+  }
+}

@@ -1,0 +1,30 @@
+/* ============================================================
+   PageContainer — 공통 수평 제약 컨테이너
+   _shared/ui/layout 세그먼트
+   수평 패딩·max-width·중앙 정렬만 담당. 수직 패딩은 각 뷰에서 관리.
+   ============================================================ */
+@use "@/_shared/styles/portfolio-layout" as layout;
+
+.page-container {
+  width: 100%;
+  margin-inline: auto;
+  padding-inline: layout.$container-padding-x-sm;   // 1rem — mobile
+
+  @media (min-width: layout.$bp-sm) {
+    padding-inline: layout.$container-padding-x-md; // 1.5rem — tablet
+  }
+
+  @media (min-width: layout.$bp-lg) {
+    padding-inline: layout.$container-padding-x;    // 3rem — desktop
+  }
+
+  &--wide    { max-width: layout.$container-max-width; } // 1100px
+
+  // write 뷰: max-width 만 선언, 수평 패딩은 base(.page-container) 위임
+  // → header(sh-container)와 동일한 1rem/1.5rem/3rem 기준선 유지
+  &--write {
+    max-width: layout.$write-max-width; // 860px
+  }
+
+  &--content { max-width: 760px; }
+}

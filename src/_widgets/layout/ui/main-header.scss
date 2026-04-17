@@ -1,0 +1,383 @@
+/* ============================================================
+   MainHeader — 공유 헤더 위젯
+   ============================================================ */
+@use "@/_shared/styles/portfolio-layout" as layout;
+
+.sh-root {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+
+  .dark & { background: #0F131A; }
+}
+
+.sh-container {
+  max-width: layout.$container-max-width;
+  width: 100%;
+  margin: 0 auto;
+  /* page-container 와 동일한 mobile-first 패딩 체계 — 헤더·본문 좌측 기준선 통일 */
+  padding-inline: layout.$container-padding-x-sm;   // 1rem — mobile
+  @media (min-width: layout.$bp-sm) { padding-inline: layout.$container-padding-x-md; }  // 540px+: 1.5rem
+  @media (min-width: layout.$bp-lg) { padding-inline: layout.$container-padding-x; }     // 960px+: 3rem
+}
+
+.sh-inner {
+  height: layout.$header-height;
+  //width: layout.$header-min-width;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+
+  .dark & { border-bottom-color: rgba(255, 255, 255, 0.07); }
+}
+
+/* ── 왼쪽 ── */
+.sh-left {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+
+.sh-logo {
+  font-size: 2.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  color: #111827;
+  text-decoration: none;
+  transition: color 0.12s;
+  &:hover { color: #3b82f6; }
+  .dark & { color: #f9fafb; &:hover { color: #60a5fa; } }
+}
+
+.sh-back {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  color: #374151;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover { background: rgba(0, 0, 0, 0.05); }
+  .dark & { color: #d1d5db; &:hover { background: rgba(255, 255, 255, 0.08); } }
+}
+
+.sh-page-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #111827;
+  letter-spacing: -0.01em;
+  .dark & { color: #f9fafb; }
+}
+
+/* ── 오른쪽 ── */
+.sh-right {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+/* 구분선 */
+.sh-divider {
+  width: 1px;
+  height: 18px;
+  background: rgba(0, 0, 0, 0.1);
+  margin: 0 0.25rem;
+  flex-shrink: 0;
+
+  .dark & { background: rgba(255, 255, 255, 0.12); }
+}
+
+/* 다크 모드 토글 */
+.sh-theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 0.5rem;
+  border: none;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover { background: rgba(0, 0, 0, 0.05); color: #111827; }
+  .dark & { color: #9ca3af; &:hover { background: rgba(255, 255, 255, 0.08); color: #f9fafb; } }
+}
+
+/* 로그인 버튼 */
+.sh-login {
+  padding: 0.4rem 0.9rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  background: transparent;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #374151;
+  text-decoration: none;
+  transition: all 0.14s;
+  white-space: nowrap;
+
+  &:hover { border-color: #3b82f6; color: #2563eb; background: rgba(59, 130, 246, 0.05); }
+  .dark & {
+    border-color: rgba(255, 255, 255, 0.12);
+    color: #d1d5db;
+    &:hover { border-color: #60a5fa; color: #93c5fd; }
+  }
+}
+
+/* 로그인 상태 */
+.sh-user {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+}
+
+.sh-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.sh-username {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #374151;
+  white-space: nowrap;
+  .dark & { color: #d1d5db; }
+}
+
+.sh-mypage {
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #374151;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: all 0.13s;
+
+  &:hover { border-color: #3b82f6; color: #2563eb; background: rgba(59, 130, 246, 0.05); }
+  .dark & {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #d1d5db;
+    &:hover { border-color: #60a5fa; color: #93c5fd; }
+  }
+}
+
+.sh-logout {
+  padding: 0.3rem 0.65rem;
+  border-radius: 0.5rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.1);
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: #6b7280;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.13s;
+
+  &:hover { border-color: #f43f5e; color: #f43f5e; background: rgba(244, 63, 94, 0.04); }
+  .dark & {
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #9ca3af;
+    &:hover { border-color: #fb7185; color: #fb7185; }
+  }
+}
+
+/* ── 헤더 반응형 — account sheet 방식 ─────────────────────────
+   desktop (≥ $bp-sm = 540px): .sh-user--desktop 표시 / .sh-avatar-trigger 숨김
+   mobile  (< $bp-sm):         .sh-user--desktop 숨김 / .sh-avatar-trigger 표시
+
+   모바일 우측: avatar-trigger(28px) + divider(~10px) + theme(32px) + gap ≈ 87px
+   320px 기준: logo(1.5rem≈115px) + space(84px) + right(87px) = 286px ✓ (공간 충분)
+   ─────────────────────────────────────────────────────────────── */
+
+/* 데스크톱: 풀 계정 영역 — 540px 미만에서 숨김 */
+.sh-user--desktop {
+  @media (max-width: #{layout.$bp-sm - 1px}) { display: none; }
+}
+
+/* 모바일: 아바타 트리거 버튼 — 540px 이상에서 숨김
+   chevron을 추가해 "계정 메뉴를 여는 버튼"임을 명확히 표시 */
+.sh-avatar-trigger {
+  display: none;
+  border: none;
+  background: transparent;
+  padding: 2px 5px 2px 2px;  // avatar + chevron을 감싸는 pill 터치 영역
+  cursor: pointer;
+  border-radius: 999px;
+  align-items: center;
+  gap: 0.15rem;
+  color: #9ca3af;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover { background: rgba(0, 0, 0, 0.05); color: #374151; }
+  .dark & { color: #6b7280; &:hover { background: rgba(255, 255, 255, 0.08); color: #d1d5db; } }
+
+  @media (max-width: #{layout.$bp-sm - 1px}) { display: flex; }
+
+  &__chevron { flex-shrink: 0; }
+}
+
+/* 로고 collapse: 400~539px → 2rem, < 400px → 1.5rem */
+@media (min-width: layout.$bp-xs) and (max-width: #{layout.$bp-sm - 1px}) {
+  .sh-logo { font-size: 2rem; }
+}
+@media (max-width: #{layout.$bp-xs - 1px}) {
+  .sh-logo { font-size: 1.5rem; }
+}
+
+/* ── Account Sheet 애니메이션 ── */
+@keyframes sh-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes sh-sheet-in {
+  from { transform: translateX(100%); }
+  to   { transform: translateX(0); }
+}
+
+/* ── Account Sheet Backdrop ── */
+.sh-account-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 199;
+  background: rgba(0, 0, 0, 0.35);
+  animation: sh-backdrop-in 0.18s ease;
+
+  .dark & { background: rgba(0, 0, 0, 0.55); }
+}
+
+/* ── Account Sheet Panel ── */
+.sh-account-sheet {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  width: min(280px, 85vw);
+  background: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.12);
+  animation: sh-sheet-in 0.22s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  overflow: hidden;
+
+  .dark & { background: #111827; box-shadow: -4px 0 24px rgba(0, 0, 0, 0.4); }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 1.125rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+
+    .dark & { border-bottom-color: rgba(255, 255, 255, 0.07); }
+  }
+
+  &__label {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: #111827;
+    letter-spacing: -0.01em;
+    .dark & { color: #f9fafb; }
+  }
+
+  &__close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 30px;
+    height: 30px;
+    border-radius: 0.5rem;
+    border: none;
+    background: transparent;
+    color: #6b7280;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s;
+
+    &:hover { background: rgba(0, 0, 0, 0.05); color: #111827; }
+    .dark & { color: #9ca3af; &:hover { background: rgba(255, 255, 255, 0.08); color: #f9fafb; } }
+  }
+
+  &__identity {
+    display: flex;
+    align-items: center;
+    gap: 0.875rem;
+    padding: 1.25rem 1.125rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
+
+    .dark & { border-bottom-color: rgba(255, 255, 255, 0.07); }
+  }
+
+  &__name {
+    font-size: 0.925rem;
+    font-weight: 600;
+    color: #111827;
+    letter-spacing: -0.01em;
+    .dark & { color: #f9fafb; }
+  }
+
+  &__nav {
+    display: flex;
+    flex-direction: column;
+    padding: 0.5rem;
+    flex: 1;
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 0.875rem;
+    border-radius: 0.625rem;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: #374151;
+    text-decoration: none;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    text-align: left;
+    transition: background 0.12s, color 0.12s;
+    width: 100%;
+
+    &:hover { background: rgba(0, 0, 0, 0.04); color: #111827; }
+    .dark & { color: #d1d5db; &:hover { background: rgba(255, 255, 255, 0.06); color: #f9fafb; } }
+
+    &--danger {
+      color: #f43f5e;
+      &:hover { background: rgba(244, 63, 94, 0.06); color: #e11d48; }
+      .dark & { color: #fb7185; &:hover { background: rgba(244, 63, 94, 0.1); color: #fda4af; } }
+    }
+  }
+}
+
+/* ── 아바타 크기 변형 ── */
+.sh-avatar--lg {
+  width: 44px;
+  height: 44px;
+  font-size: 1.1rem;
+}

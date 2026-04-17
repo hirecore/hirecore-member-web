@@ -1,0 +1,1 @@
+export { TabDocHeader } from "./TabDocHeader"
