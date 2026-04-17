@@ -1,20 +1,8 @@
 "use client"
 
 import type { PortfolioLink } from "@/_features/portfolio/lib"
+import { AvatarPlaceholder } from "@/_shared/ui/avatar-placeholder"
 import "./portfolio-meta-card.scss"
-
-function AvatarPlaceholder({ name, size = 40 }: { name: string; size?: number }) {
-  const hue = (name.charCodeAt(0) * 43) % 360
-  return (
-    <div
-      className="pr-avatar-placeholder"
-      style={{ width: size, height: size, background: `hsl(${hue} 60% 55%)`, fontSize: size * 0.38 }}
-      aria-hidden
-    >
-      {name.slice(0, 1)}
-    </div>
-  )
-}
 
 interface Props {
   majorLabel: string

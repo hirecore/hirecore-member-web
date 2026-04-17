@@ -8,6 +8,8 @@
 
 import Link from "next/link"
 import { USER_ROUTES } from "@/_shared/config"
+import { AvatarPlaceholder } from "@/_shared/ui/avatar-placeholder"
+import { formatDate } from "@/_shared/lib"
 import "./portfolio-linked-docs-tab.scss"
 
 export interface LinkedDoc {
@@ -24,27 +26,6 @@ interface Props {
   docs: LinkedDoc[]
   /** 현재 로그인 사용자가 이 포트폴리오의 소유자인지 여부 */
   isOwner?: boolean
-}
-
-function AvatarPlaceholder({ name }: { name: string }) {
-  const hue = (name.charCodeAt(0) * 37) % 360
-  return (
-    <div
-      className="pldt-card__avatar"
-      style={{ background: `hsl(${hue} 65% 55%)` }}
-      aria-hidden
-    >
-      {name.slice(0, 1)}
-    </div>
-  )
-}
-
-function formatDate(iso: string) {
-  return new Date(iso).toLocaleDateString("ko-KR", {
-    year: "numeric",
-    month: "long",
-    day: "2-digit",
-  })
 }
 
 const CONFIG = {

@@ -25,7 +25,7 @@ import {
 } from "@/_shared/config"
 import type { StorageInfo, Visibility } from "@/_shared/model"
 import { previewSizesSave, previewSizesRestore } from "@/_shared/lib"
-import type { PortfolioLink } from "@/_features/portfolio/lib"
+import type { ExternalLink } from "@/_shared/model"
 import { useAuthGuard } from "@/_features/auth"
 import { useResumeDraftStore } from "@/_features/resume"
 import { useStorageInfo } from "@/_entities/user"
@@ -48,7 +48,7 @@ export function useResumeWriteView() {
   const [interestFields,  setInterestFields]  = useState<string[]>([])
   const [tags,            setTags]            = useState<string[]>([])
   const [linkedIds,       setLinkedIds]       = useState<string[]>([])
-  const [externalLinks,   setExternalLinks]   = useState<PortfolioLink[]>([])
+  const [externalLinks,   setExternalLinks]   = useState<ExternalLink[]>([])
   const [errors,          setErrors]          = useState<Partial<Record<string, string>>>({})
 
   // ── 스토리지 & 업로드 상태 ───────────────────────────────────────

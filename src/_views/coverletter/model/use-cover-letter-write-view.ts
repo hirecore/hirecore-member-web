@@ -13,7 +13,7 @@ import {
 } from "@/_features/editor"
 import { USER_ROUTES } from "@/_shared/config"
 import type { Visibility } from "@/_shared/model"
-import type { PortfolioLink } from "@/_features/portfolio/lib"
+import type { ExternalLink } from "@/_shared/model"
 import { useAuthGuard } from "@/_features/auth"
 import { useCoverLetterDraftStore } from "@/_features/coverletter"
 import { useMyPortfolios } from "@/_entities/portfolio"
@@ -34,7 +34,7 @@ export function useCoverLetterWriteView() {
   const [interestFields,  setInterestFields]  = useState<string[]>([])
   const [tags,            setTags]            = useState<string[]>([])
   const [linkedIds,       setLinkedIds]       = useState<string[]>([])
-  const [externalLinks,   setExternalLinks]   = useState<PortfolioLink[]>([])
+  const [externalLinks,   setExternalLinks]   = useState<ExternalLink[]>([])
   const [errors,          setErrors]          = useState<Partial<Record<string, string>>>({})
 
   // 미리보기 복귀 후 editor가 준비되면 콘텐츠 복원을 허용하는 플래그

@@ -3,6 +3,7 @@
 import Link from "next/link"
 import { Tags2Row } from "@/_shared/ui/tags-row"
 import { USER_ROUTES } from "@/_shared/config"
+import { AvatarPlaceholder } from "@/_shared/ui/avatar-placeholder"
 import { getCategoryPath, isCustomInputCategory } from "@/_features/portfolio/lib"
 import type { Portfolio, PortfolioCardLink } from "../model/types"
 
@@ -62,19 +63,6 @@ function DefaultThumbnail({ title }: { title: string }) {
       aria-hidden
     >
       <span className="pl-card__thumb-letter">{title.slice(0, 1)}</span>
-    </div>
-  )
-}
-
-function AvatarPlaceholder({ name }: { name: string }) {
-  const hue = (name.charCodeAt(0) * 37) % 360
-  return (
-    <div
-      className="pl-avatar-placeholder"
-      style={{ background: `hsl(${hue} 65% 55%)` }}
-      aria-hidden
-    >
-      {name.slice(0, 1)}
     </div>
   )
 }
