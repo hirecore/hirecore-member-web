@@ -5,7 +5,7 @@ import Link from "next/link"
 import { USER_ROUTES } from "@/_shared/config"
 import { useBodyLock } from "@/_shared/model"
 import { useSelectablePortfolios, type SelectablePortfolio } from "@/_entities/portfolio"
-import { getCategoryPath, isCustomInputCategory } from "@/_features/portfolio/lib"
+import { getCategoryPath, isCustomInputCategory } from "@/_shared/lib"
 import "./link-portfolio-modal.scss"
 
 /** 3-level 카테고리 코드 → "L1 · L3" 형태 라벨 (또는 customCategory) */

@@ -4,7 +4,7 @@ import Link from "next/link"
 import { Tags2Row } from "@/_shared/ui/tags-row"
 import { USER_ROUTES } from "@/_shared/config"
 import { AvatarPlaceholder } from "@/_shared/ui/avatar-placeholder"
-import { getCategoryPath, isCustomInputCategory } from "@/_features/portfolio/lib"
+import { getCategoryPath, isCustomInputCategory } from "@/_shared/lib"
 import type { Portfolio, PortfolioCardLink } from "../model/types"
 
 export type { Portfolio, PortfolioCardLink }

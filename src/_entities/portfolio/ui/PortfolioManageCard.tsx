@@ -5,7 +5,7 @@
 // 카드는 onDocLinkClick 콜백으로 클릭 이벤트를 상위(Widget)에 위임한다
 
 import { DocumentManageCard } from "@/_shared/ui/manage-card"
-import { getCategoryPath, isCustomInputCategory } from "@/_features/portfolio/lib"
+import { getCategoryPath, isCustomInputCategory } from "@/_shared/lib"
 import type { LinkedDoc, DocType, ManagedPortfolio } from "../model/types"
 import "./portfolio-manage-card.scss"
 
