@@ -1,4 +1,3 @@
-export { DraftRestoreModal }       from "./DraftRestoreModal"
 export { WriteActionBar }          from "./WriteActionBar"
 export { JobCategorySection } from "./JobCategorySection"
 export { ProjectTypeSection, type ProjectType } from "./ProjectTypeSection"

@@ -28,7 +28,7 @@ import {
 } from "@/_features/editor"
 
 import { LinkedPortfoliosSection } from "@/_features/document-link"
-import { DraftRestoreModal, WriteActionBar } from "@/_widgets/portfolio-editor"
+import { WriteActionBar } from "@/_widgets/portfolio-editor"
 import { useResumeWriteView } from "../model/use-resume-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
 import type { Visibility } from "@/_shared/model"
@@ -111,11 +111,9 @@ export function ResumeWriteView() {
     myPortfolios,
     storageInfo, sessionBytes, uploadError, uploadErrorKey,
     exceededModal, setExceededModal,
-    pendingDraft, draftContentTruncated, draftImagesDropped,
     editor, editorFocused,
     isDraggingRef, getVirtualElement,
-    handleRestoreConfirm, handleRestoreCancel,
-    handlePreview, handleSubmit,
+    handlePreview, handleSubmit, handleDraftSave,
   } = useResumeWriteView()
 
   // 순수 UI 임시 상태
@@ -141,18 +139,6 @@ export function ResumeWriteView() {
 
   return (
     <EditorContext.Provider value={{ editor }}>
-
-      {/* 드래프트 복원 모달 */}
-      {pendingDraft && (
-        <DraftRestoreModal
-          docTypeName="이력서"
-          draftTitle={pendingDraft.title || undefined}
-          contentTruncated={draftContentTruncated}
-          imagesDropped={draftImagesDropped}
-          onConfirm={handleRestoreConfirm}
-          onCancel={handleRestoreCancel}
-        />
-      )}
 
       {/* 저장 공간 초과 모달 */}
       {exceededModal && (
@@ -413,7 +399,7 @@ export function ResumeWriteView() {
         </main>
 
         {/* 하단 액션 바 */}
-        <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} />
+        <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} onDraftSave={handleDraftSave} />
       </div>
     </EditorContext.Provider>
   )

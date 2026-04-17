@@ -25,7 +25,7 @@ import {
 } from "@/_features/editor"
 
 import { LinkedPortfoliosSection } from "@/_features/document-link"
-import { DraftRestoreModal, WriteActionBar } from "@/_widgets/portfolio-editor"
+import { WriteActionBar } from "@/_widgets/portfolio-editor"
 import { useCoverLetterWriteView } from "../model/use-cover-letter-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
 import type { Visibility } from "@/_shared/model"
@@ -103,11 +103,9 @@ export function CoverLetterWriteView() {
     linkedIds, setLinkedIds,
     errors, setErrors,
     myPortfolios,
-    pendingDraft,
     editor, editorFocused,
     isDraggingRef, getVirtualElement,
-    handleRestoreConfirm, handleRestoreCancel,
-    handlePreview, handleSubmit,
+    handlePreview, handleSubmit, handleDraftSave,
   } = useCoverLetterWriteView()
 
   // 순수 UI 임시 상태
@@ -133,16 +131,6 @@ export function CoverLetterWriteView() {
 
   return (
     <EditorContext.Provider value={{ editor }}>
-
-      {/* 드래프트 복원 모달 */}
-      {pendingDraft && (
-        <DraftRestoreModal
-          docTypeName="자기소개서"
-          draftTitle={pendingDraft.title || undefined}
-          onConfirm={handleRestoreConfirm}
-          onCancel={handleRestoreCancel}
-        />
-      )}
 
       {/* 버블 툴바 */}
       {editor && (
@@ -387,7 +375,7 @@ export function CoverLetterWriteView() {
         </main>
 
         {/* 하단 액션 바 */}
-        <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} />
+        <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} onDraftSave={handleDraftSave} />
       </div>
     </EditorContext.Provider>
   )

@@ -6,10 +6,11 @@ import "./write-action-bar.scss"
 interface WriteActionBarProps {
   onPreview: () => void
   onSubmit: () => void
+  onDraftSave?: () => void
   submitLabel?: string
 }
 
-export function WriteActionBar({ onPreview, onSubmit, submitLabel = "등록하기" }: WriteActionBarProps) {
+export function WriteActionBar({ onPreview, onSubmit, onDraftSave, submitLabel = "등록하기" }: WriteActionBarProps) {
   return (
     <div className="write-action-bar">
       <div className="write-action-bar__inner">
@@ -20,12 +21,23 @@ export function WriteActionBar({ onPreview, onSubmit, submitLabel = "등록하�
           </svg>
           미리보기
         </Button>
-        <Button variant="primary" size="md" onClick={onSubmit}>
-          {submitLabel}
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
-            <path d="M3 7h8M7.5 3.5L11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </Button>
+        <div className="write-action-bar__right">
+          {onDraftSave && (
+            <Button variant="outline" size="md" onClick={onDraftSave}>
+              <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+                <path d="M11.5 8.5v2a1 1 0 0 1-1 1h-7a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h2" stroke="currentColor" strokeWidth="1.3" strokeLinecap="round" strokeLinejoin="round" />
+                <path d="M10 2v4M8 4h4" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+              </svg>
+              임시저장
+            </Button>
+          )}
+          <Button variant="primary" size="md" onClick={onSubmit}>
+            {submitLabel}
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
+              <path d="M3 7h8M7.5 3.5L11 7l-3.5 3.5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </Button>
+        </div>
       </div>
     </div>
   )

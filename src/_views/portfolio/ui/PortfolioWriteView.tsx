@@ -30,7 +30,6 @@ import {
 
 import {
   ConfirmPanel,
-  DraftRestoreModal,
   JobCategorySection,
   ProjectTypeSection,
   VisibilitySection,
@@ -99,13 +98,11 @@ export default function PortfolioWriteView() {
     exceededModal, setExceededModal,
     emptyModal, setEmptyModal,
     confirmData, setConfirmData, categoryLabel,
-    pendingDraft, draftContentTruncated, draftImagesDropped,
     editor, editorFocused,
     isDraggingRef, getVirtualElement,
     handleThumbnailFile, removeThumbnail,
     removeTag,
-    handleSubmit, handleConfirm, handlePreview,
-    handleRestoreConfirm, handleRestoreCancel,
+    handleSubmit, handleConfirm, handlePreview, handleDraftSave,
   } = usePortfolioWriteView()
 
   // 썸네일 드래그 오버 — 순수 UI 상태
@@ -147,16 +144,6 @@ export default function PortfolioWriteView() {
     <EditorContext.Provider value={{ editor }}>
 
       {/* ── 모달 ── */}
-      {pendingDraft && (
-        <DraftRestoreModal
-          docTypeName="포트폴리오"
-          draftTitle={pendingDraft.title || undefined}
-          contentTruncated={draftContentTruncated}
-          imagesDropped={draftImagesDropped}
-          onConfirm={handleRestoreConfirm}
-          onCancel={handleRestoreCancel}
-        />
-      )}
       {emptyModal    && <EmptyContentModal onClose={() => setEmptyModal(false)} />}
       {exceededModal && (
         <StorageExceededModal
@@ -340,7 +327,7 @@ export default function PortfolioWriteView() {
         </main>
 
         {/* 하단 액션 바 */}
-        <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} />
+        <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} onDraftSave={handleDraftSave} />
 
         {/* 등록 확인 오버레이 */}
         {confirmData && (

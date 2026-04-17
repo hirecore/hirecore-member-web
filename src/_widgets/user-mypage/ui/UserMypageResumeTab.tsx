@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import { USER_ROUTES, LOCAL_STORAGE_KEYS } from "@/_shared/config"
 import { TabDocHeader } from "@/_shared/ui/tab-doc-header"
 import { TabDocCTA } from "@/_shared/ui/tab-doc-cta"
-import { useManagedResumes } from "@/_entities/resume"
+import { useManagedResumes, useDraftResumes } from "@/_entities/resume"
+import { DraftSection } from "@/_shared/ui/draft-section"
 import { ResumeList } from "./ResumeList"
 import { useTabViewMode } from "../model/use-tab-view-mode"
 import "./user-mypage-resume-tab.scss"
@@ -13,6 +14,7 @@ import "./user-mypage-resume-tab.scss"
 export function UserMypageResumeTab() {
   const router = useRouter()
   const resumes = useManagedResumes()
+  const draftResumes = useDraftResumes()
   const [search, setSearch] = useState("")
   const { viewMode, handleViewMode } = useTabViewMode(LOCAL_STORAGE_KEYS.MYPAGE_RESUME_VIEW_MODE)
 
@@ -33,6 +35,11 @@ export function UserMypageResumeTab() {
         label="새 이력서 작성하기"
         sub="나의 경력과 역량을 이력서로 정리해보세요"
         onClick={() => router.push(USER_ROUTES.resume.write)}
+      />
+      <DraftSection
+        items={draftResumes}
+        onEdit={(id) => router.push(`${USER_ROUTES.resume.write}?editId=${id}`)}
+        onDelete={(id) => { if (window.confirm("임시저장을 삭제하시겠습니까?")) { /* TODO: API 호출 */ } }}
       />
       <ResumeList
         resumes={filtered}

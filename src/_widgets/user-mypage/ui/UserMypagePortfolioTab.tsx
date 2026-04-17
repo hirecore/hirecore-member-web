@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation"
 import { USER_ROUTES, LOCAL_STORAGE_KEYS } from "@/_shared/config"
 import { TabDocHeader } from "@/_shared/ui/tab-doc-header"
 import { TabDocCTA } from "@/_shared/ui/tab-doc-cta"
-import { useManagedPortfolios, type AvailableDoc, type DocType, type ManagedPortfolio } from "@/_entities/portfolio"
+import { useManagedPortfolios, useDraftPortfolios, type AvailableDoc, type DocType, type ManagedPortfolio } from "@/_entities/portfolio"
+import { DraftSection } from "@/_shared/ui/draft-section"
 import { PortfolioList } from "./PortfolioList"
 import { useTabViewMode } from "../model/use-tab-view-mode"
 import "./user-mypage-portfolio-tab.scss"
@@ -13,6 +14,7 @@ import "./user-mypage-portfolio-tab.scss"
 export function UserMypagePortfolioTab() {
   const router = useRouter()
   const { portfolios: initialPortfolios, availableResumes, availableCoverletters } = useManagedPortfolios()
+  const draftPortfolios = useDraftPortfolios()
   const [portfolios, setPortfolios] = useState<ManagedPortfolio[]>(initialPortfolios)
   const [search,    setSearch]    = useState("")
   const [tagSearch, setTagSearch] = useState("")
@@ -53,6 +55,11 @@ export function UserMypagePortfolioTab() {
         label="새 포트폴리오 만들기"
         sub="지금까지의 경험과 작업물을 기록해보세요"
         onClick={() => router.push(USER_ROUTES.portfolio.write)}
+      />
+      <DraftSection
+        items={draftPortfolios}
+        onEdit={(id) => router.push(`${USER_ROUTES.portfolio.write}?editId=${id}`)}
+        onDelete={(id) => { if (window.confirm("임시저장��� 삭제하시겠습니까?")) { /* TODO: API 호출 */ } }}
       />
       <PortfolioList
         portfolios={filtered}

@@ -24,7 +24,13 @@
     @media (min-width: layout.$bp-sm) { padding-inline: layout.$container-padding-x-md; }  // 540px+: 1.5rem
     @media (min-width: layout.$bp-lg) { padding-inline: layout.$container-padding-x; }     // 960px+: 3rem
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.625rem;
+  }
+
+  &__right {
+    display: flex;
     gap: 0.625rem;
   }
 }
