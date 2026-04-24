@@ -2,7 +2,7 @@
 
 // _views/portfolio/model | 포트폴리오 작성 뷰 비즈니스 로직
 // 폼 상태, 스토리지 추적, 이미지 업로드, 유효성 검사, 제출 — UI 렌더와 무관하므로 model에 분리
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEditor } from "@tiptap/react"
 import {
@@ -25,6 +25,8 @@ import {
   AUTHORING_IMAGE_UPLOAD_LIMIT,
 } from "@/_shared/config"
 import { previewSizesSave, previewSizesRestore } from "@/_shared/lib"
+import { batchUploadImages, requestPresignedUrls, uploadToS3, getImageDimensions } from "@/_shared/api"
+import { toWebP } from "@/_features/editor"
 import { useAuthGuard } from "@/_features/auth"
 import {
   usePortfolioDraftStore,
@@ -58,6 +60,7 @@ export function usePortfolioWriteView() {
   const [errors,        setErrors]        = useState<Partial<Record<string, string>>>({})
   const [confirmData,   setConfirmData]   = useState<ConfirmData | null>(null)
   const [thumbnailUrl,  setThumbnailUrl]  = useState<string | null>(null)
+  const thumbnailFileRef = useRef<File | null>(null)
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
 
   // ── 스토리지 & 업로드 상태 ───────────────────────────────────────
@@ -66,6 +69,7 @@ export function usePortfolioWriteView() {
   const uploadedSizesRef        = useRef<Map<string, number>>(new Map())
   const pendingUploadBytesRef   = useRef(0)
   const [emptyModal,            setEmptyModal]      = useState(false)
+  const [uploading,             setUploading]       = useState(false)
   const editorRestoreAllowedRef = useRef(false)
   const storageInfoRef          = useRef<StorageInfo | undefined>(storageInfo)
 
@@ -177,14 +181,13 @@ export function usePortfolioWriteView() {
   // ── 썸네일 핸들러 ────────────────────────────────────────────────
   const handleThumbnailFile = (file: File) => {
     if (!file.type.startsWith("image/")) return
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      const result = e.target?.result
-      if (typeof result === "string") setThumbnailUrl(result)
-    }
-    reader.readAsDataURL(file)
+    thumbnailFileRef.current = file
+    const url = URL.createObjectURL(file)
+    setThumbnailUrl(url)
   }
   const removeThumbnail = () => {
+    if (thumbnailUrl?.startsWith("blob:")) URL.revokeObjectURL(thumbnailUrl)
+    thumbnailFileRef.current = null
     setThumbnailUrl(null)
     if (thumbnailInputRef.current) thumbnailInputRef.current.value = ""
   }
@@ -211,8 +214,48 @@ export function usePortfolioWriteView() {
     return newErrors
   }
 
+  // ── 썸네일 S3 업로드 ─────────────────────────────────────────────
+  const uploadThumbnail = useCallback(async (): Promise<string | null> => {
+    const file = thumbnailFileRef.current
+    if (!file) return thumbnailUrl // 파일 변경 없으면 기존 URL 유지
+    const webpFile = await toWebP(file)
+    const { width, height } = await getImageDimensions(webpFile)
+    const { files } = await requestPresignedUrls([{
+      purpose: "thumbnailImage",
+      mimeType: "image/webp",
+      originalFileName: file.name,
+      width, height,
+      fileExtension: "webp",
+      domainType: "portfolio",
+      clientFileId: 0,
+      fileSizeBytes: webpFile.size,
+    }])
+    await uploadToS3(files[0].presignedUrl, webpFile)
+    return files[0].publicUrl
+  }, [thumbnailUrl])
+
+  // ── 이미지 일괄 업로드 (등록/임시저장 공통) ──────────────────────
+  const uploadAndGetContent = useCallback(async () => {
+    if (!editor) return null
+    const rawContent = editor.getJSON()
+    try {
+      setUploading(true)
+      const [{ content }, uploadedThumbnailUrl] = await Promise.all([
+        batchUploadImages({ content: rawContent, domainType: "portfolio", toWebP }),
+        uploadThumbnail(),
+      ])
+      if (uploadedThumbnailUrl) setThumbnailUrl(uploadedThumbnailUrl)
+      return { content, thumbnailUrl: uploadedThumbnailUrl }
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "이미지 업로드에 실패했습니다.")
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }, [editor, uploadThumbnail])
+
   // ── 제출 유효성 검사 ─────────────────────────────────────────────
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -221,16 +264,21 @@ export function usePortfolioWriteView() {
       return
     }
     if (!editor || editor.isEmpty) { setEmptyModal(true); return }
+
+    const result = await uploadAndGetContent()
+    if (!result) return
+
     setConfirmData({
       category: category!,
       projectType: projectType!, visibility: visibility!,
-      title: title.trim(), privateMemo: privateMemo || undefined, thumbnailUrl, tags, externalLinks,
-      content: editor!.getJSON(),
+      title: title.trim(), privateMemo: privateMemo || undefined,
+      thumbnailUrl: result.thumbnailUrl, tags, externalLinks,
+      content: result.content,
     })
   }
 
   // ── 임시저장 ────────────────────────────────────────────────────
-  const handleDraftSave = () => {
+  const handleDraftSave = async () => {
     const newErrors = validate()
     if (!editor || editor.isEmpty) newErrors.content = "내용을 입력해주세요"
     if (Object.keys(newErrors).length > 0) {
@@ -239,7 +287,11 @@ export function usePortfolioWriteView() {
       document.getElementById(`field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
-    // TODO: API 호출 — POST /api/posts/draft
+
+    const result = await uploadAndGetContent()
+    if (!result) return
+
+    // TODO: API 호출 — POST /api/portfolios/drafts (content에 publicUrl 포함)
     alert("임시저장되었습니다.")
   }
 
@@ -296,8 +348,8 @@ export function usePortfolioWriteView() {
     // storage
     storageInfo, sessionBytes, uploadError, uploadErrorKey,
     exceededModal, setExceededModal,
-    // modals
-    emptyModal, setEmptyModal,
+    // modals & state
+    emptyModal, setEmptyModal, uploading,
     confirmData, setConfirmData, categoryLabel,
     // editor
     editor, trackedUpload, editorFocused,

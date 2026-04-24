@@ -2,7 +2,7 @@
 
 // _views/resume/model | 이력서 작성 뷰 비즈니스 로직
 // 폼 상태, 스토리지 추적, 이미지 업로드, 유효성 검사, 제출 — UI 렌더와 무관하므로 model에 분리
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEditor } from "@tiptap/react"
 import {
@@ -17,7 +17,9 @@ import {
   useStableImageUpload,
   useEditorUploadFeedback,
   calcEditorSessionBytes,
+  toWebP,
 } from "@/_features/editor"
+import { batchUploadImages } from "@/_shared/api"
 import {
   USER_ROUTES,
   RESUME_PREVIEW_SIZES_KEY,
@@ -50,6 +52,7 @@ export function useResumeWriteView() {
   const [linkedIds,       setLinkedIds]       = useState<string[]>([])
   const [externalLinks,   setExternalLinks]   = useState<ExternalLink[]>([])
   const [errors,          setErrors]          = useState<Partial<Record<string, string>>>({})
+  const [uploading,       setUploading]       = useState(false)
 
   // ── 스토리지 & 업로드 상태 ───────────────────────────────────────
   const sessionBytesRef       = useRef(0)
@@ -149,6 +152,26 @@ export function useResumeWriteView() {
     onRestored: () => editor && calcEditorSessionBytes(editor, uploadedSizesRef, sessionBytesRef, setSessionBytes),
   })
 
+  // ── 이미지 일괄 업로드 후 콘텐츠 반환 ────────────────────────────
+  const uploadAndGetContent = useCallback(async () => {
+    if (!editor) return null
+    const rawContent = editor.getJSON()
+    try {
+      setUploading(true)
+      const { content } = await batchUploadImages({
+        content: rawContent,
+        domainType: "resume",
+        toWebP,
+      })
+      return content
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "이미지 업로드에 실패했습니다.")
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }, [editor])
+
   // ── 필수값 유효성 검사 (등록 & 임시저장 & 미리보기 공통) ─────────
   const validate = (): typeof errors => {
     const newErrors: typeof errors = {}
@@ -159,7 +182,7 @@ export function useResumeWriteView() {
   }
 
   // ── 제출 유효성 검사 ─────────────────────────────────────────────
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -167,19 +190,21 @@ export function useResumeWriteView() {
       document.getElementById(`rw-field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
+    const content = await uploadAndGetContent()
+    if (!content) return
     const sizesRecord: Record<string, number> = {}
     uploadedSizesRef.current.forEach((size, url) => { sizesRecord[url] = size })
     previewSizesSave(RESUME_PREVIEW_SIZES_KEY, sizesRecord)
     useResumeDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
       memo, interestFields, tags, linkedIds, externalLinks,
-      content: editor!.getJSON(),
+      content,
     })
     router.push(USER_ROUTES.resume.preview)
   }
 
   // ── 미리보기 이동 ────────────────────────────────────────────────
-  const handlePreview = () => {
+  const handlePreview = async () => {
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -187,19 +212,21 @@ export function useResumeWriteView() {
       document.getElementById(`rw-field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
+    const content = await uploadAndGetContent()
+    if (!content) return
     const sizesRecord: Record<string, number> = {}
     uploadedSizesRef.current.forEach((size, url) => { sizesRecord[url] = size })
     previewSizesSave(RESUME_PREVIEW_SIZES_KEY, sizesRecord)
     useResumeDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
       memo, interestFields, tags, linkedIds, externalLinks,
-      content: editor!.getJSON(),
+      content,
     })
     router.push(USER_ROUTES.resume.preview)
   }
 
   // ── 임시저장 ────────────────────────────────────────────────────
-  const handleDraftSave = () => {
+  const handleDraftSave = async () => {
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -207,6 +234,8 @@ export function useResumeWriteView() {
       document.getElementById(`rw-field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
+    const content = await uploadAndGetContent()
+    if (!content) return
     // TODO: API 호출 — POST /api/posts/draft
     alert("임시저장되었습니다.")
   }
@@ -228,7 +257,7 @@ export function useResumeWriteView() {
     storageInfo, sessionBytes, uploadError, uploadErrorKey,
     exceededModal, setExceededModal,
     // editor
-    editor, trackedUpload, editorFocused,
+    editor, trackedUpload, editorFocused, uploading,
     // bubble menu
     isDraggingRef, getVirtualElement,
     // handlers

@@ -2,7 +2,7 @@
 
 // _views/coverletter/model | 자기소개서 작성 뷰 비즈니스 로직
 // 폼 상태, 유효성 검사, 제출 — 이미지 없음(텍스트 전용), UI 렌더와 무관하므로 model에 분리
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { useEditor } from "@tiptap/react"
 import {
@@ -10,7 +10,9 @@ import {
   useEditorFocusState,
   useBubbleMenuAnchor,
   useEditorContentRestore,
+  toWebP,
 } from "@/_features/editor"
+import { batchUploadImages } from "@/_shared/api"
 import { USER_ROUTES } from "@/_shared/config"
 import type { Visibility } from "@/_shared/model"
 import type { ExternalLink } from "@/_shared/model"
@@ -36,6 +38,7 @@ export function useCoverLetterWriteView() {
   const [linkedIds,       setLinkedIds]       = useState<string[]>([])
   const [externalLinks,   setExternalLinks]   = useState<ExternalLink[]>([])
   const [errors,          setErrors]          = useState<Partial<Record<string, string>>>({})
+  const [uploading,       setUploading]       = useState(false)
 
   // 미리보기 복귀 후 editor가 준비되면 콘텐츠 복원을 허용하는 플래그
   const editorRestoreAllowedRef = useRef(false)
@@ -85,6 +88,26 @@ export function useCoverLetterWriteView() {
     getPreviewContent: () => useCoverLetterDraftStore.getState().previewData?.content,
   })
 
+  // ── 이미지 일괄 업로드 후 콘텐츠 반환 ────────────────────────────
+  const uploadAndGetContent = useCallback(async () => {
+    if (!editor) return null
+    const rawContent = editor.getJSON()
+    try {
+      setUploading(true)
+      const { content } = await batchUploadImages({
+        content: rawContent,
+        domainType: "resume",
+        toWebP,
+      })
+      return content
+    } catch (e) {
+      alert(e instanceof Error ? e.message : "이미지 업로드에 실패했습니다.")
+      return null
+    } finally {
+      setUploading(false)
+    }
+  }, [editor])
+
   // ── 필수값 유효성 검사 (등록 & 임시저장 & 미리보기 공통) ─────────
   const validate = (): typeof errors => {
     const newErrors: typeof errors = {}
@@ -95,7 +118,7 @@ export function useCoverLetterWriteView() {
   }
 
   // ── 제출 유효성 검사 ─────────────────────────────────────────────
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -103,16 +126,18 @@ export function useCoverLetterWriteView() {
       document.getElementById(`clw-field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
+    const content = await uploadAndGetContent()
+    if (!content) return
     useCoverLetterDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
       memo, interestFields, tags, linkedIds, externalLinks,
-      content: editor!.getJSON(),
+      content,
     })
     router.push(USER_ROUTES.coverletter.preview)
   }
 
   // ── 미리보기 이동 ────────────────────────────────────────────────
-  const handlePreview = () => {
+  const handlePreview = async () => {
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -120,16 +145,18 @@ export function useCoverLetterWriteView() {
       document.getElementById(`clw-field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
+    const content = await uploadAndGetContent()
+    if (!content) return
     useCoverLetterDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
       memo, interestFields, tags, linkedIds, externalLinks,
-      content: editor!.getJSON(),
+      content,
     })
     router.push(USER_ROUTES.coverletter.preview)
   }
 
   // ── 임시저장 ────────────────────────────────────────────────────
-  const handleDraftSave = () => {
+  const handleDraftSave = async () => {
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -137,6 +164,8 @@ export function useCoverLetterWriteView() {
       document.getElementById(`clw-field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
       return
     }
+    const content = await uploadAndGetContent()
+    if (!content) return
     // TODO: API 호출 — POST /api/posts/draft
     alert("임시저장되었습니다.")
   }
@@ -155,7 +184,7 @@ export function useCoverLetterWriteView() {
     errors, setErrors,
     myPortfolios,
     // editor
-    editor, editorFocused,
+    editor, editorFocused, uploading,
     // bubble menu
     isDraggingRef, getVirtualElement,
     // handlers

@@ -362,8 +362,11 @@ export function selectionWithinConvertibleTypes(
  */
 export async function toWebP(file: File, quality = 0.85): Promise<File> {
   if (file.type === "image/webp")    return file   // 이미 WebP
-  if (file.type === "image/svg+xml") return file   // SVG 래스터화 미지원
-  if (file.type === "image/gif")     return file   // GIF 애니메이션 손실
+
+  // SVG는 createImageBitmap이 불안정하므로 Image + Canvas로 래스터화
+  if (file.type === "image/svg+xml") {
+    return await svgToWebP(file, quality)
+  }
 
   try {
     const bitmap = await createImageBitmap(file)
@@ -390,13 +393,49 @@ export async function toWebP(file: File, quality = 0.85): Promise<File> {
 }
 
 /**
- * 이미지 파일을 Object URL로 변환한다.
+ * SVG → WebP 변환 (Image + Canvas 방식)
+ * createImageBitmap이 SVG에서 불안정하므로 별도 처리
+ */
+async function svgToWebP(file: File, quality: number): Promise<File> {
+  const url = URL.createObjectURL(file)
+  try {
+    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const el = new Image()
+      el.onload = () => resolve(el)
+      el.onerror = () => reject(new Error("SVG 로드 실패"))
+      el.src = url
+    })
+
+    const w = img.naturalWidth  || 800
+    const h = img.naturalHeight || 600
+    const canvas = document.createElement("canvas")
+    canvas.width  = w
+    canvas.height = h
+    canvas.getContext("2d")!.drawImage(img, 0, 0, w, h)
+
+    return await new Promise<File>((resolve) => {
+      canvas.toBlob(
+        (blob) => {
+          if (!blob) { resolve(file); return }
+          const name = file.name.replace(/\.[^/.]+$/, "") + ".webp"
+          resolve(new File([blob], name, { type: "image/webp" }))
+        },
+        "image/webp",
+        quality
+      )
+    })
+  } catch {
+    return file
+  } finally {
+    URL.revokeObjectURL(url)
+  }
+}
+
+/**
+ * 이미지 파일을 blob URL로 변환한다 (작성 중 로컬 미리보기용).
  *
- * FileReader.readAsDataURL(base64) 대신 URL.createObjectURL을 사용해
- * 에디터 JSON에 수 MB짜리 base64 문자열이 축적되는 문제를 방지한다.
- * Object URL은 현재 브라우저 탭 세션 동안 유효하며 페이지 언로드 시 자동 해제된다.
- *
- * TODO: 프로덕션에서는 presignedUrl → S3 직접 업로드로 교체할 것
+ * 실제 S3 업로드는 등록하기/임시저장 시점에 일괄 처리한다.
+ * blob URL은 현재 브라우저 탭 세션 동안 유효하며 페이지 언로드 시 자동 해제된다.
  */
 export const handleImageUpload = async (
   file: File,
