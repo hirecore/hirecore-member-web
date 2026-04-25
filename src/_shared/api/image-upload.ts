@@ -31,10 +31,20 @@ export async function requestPresignedUrls(
   files: PresignedFileRequest[]
 ): Promise<PresignedUrlResult> {
   const { data } = await httpClient.post<PresignedUrlResult>(
-    "/api/users/files/images/presigned-url",
+    "/api/users/files/images/presigned-put-url",
     { files }
   )
+  data.files = data.files.map((f) => ({
+    ...f,
+    publicUrl: ensureAbsoluteUrl(f.publicUrl),
+  }))
   return data
+}
+
+/** publicUrl에 프로토콜이 없으면 https://를 붙인다 */
+function ensureAbsoluteUrl(url: string): string {
+  if (/^https?:\/\//.test(url)) return url
+  return `https://${url}`
 }
 
 /**
