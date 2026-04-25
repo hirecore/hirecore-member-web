@@ -231,6 +231,7 @@ export function usePortfolioWriteView() {
       fileSizeBytes: webpFile.size,
     }])
     await uploadToS3(files[0].presignedUrl, webpFile)
+    thumbnailFileRef.current = null
     return files[0].publicUrl
   }, [thumbnailUrl])
 
@@ -244,6 +245,7 @@ export function usePortfolioWriteView() {
         batchUploadImages({ content: rawContent, domainType: "portfolio", toWebP }),
         uploadThumbnail(),
       ])
+      editor.commands.setContent(content)
       if (uploadedThumbnailUrl) setThumbnailUrl(uploadedThumbnailUrl)
       return { content, thumbnailUrl: uploadedThumbnailUrl }
     } catch (e) {
@@ -254,8 +256,8 @@ export function usePortfolioWriteView() {
     }
   }, [editor, uploadThumbnail])
 
-  // ── 제출 유효성 검사 ─────────────────────────────────────────────
-  const handleSubmit = async () => {
+  // ── 제출 유효성 검사 → 확인 팝업 표시 (S3 업로드 없음) ──────────
+  const handleSubmit = () => {
     const newErrors = validate()
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors)
@@ -265,15 +267,11 @@ export function usePortfolioWriteView() {
     }
     if (!editor || editor.isEmpty) { setEmptyModal(true); return }
 
-    const result = await uploadAndGetContent()
-    if (!result) return
-
     setConfirmData({
       category: category!,
       projectType: projectType!, visibility: visibility!,
-      title: title.trim(), privateMemo: privateMemo || undefined,
-      thumbnailUrl: result.thumbnailUrl, tags, externalLinks,
-      content: result.content,
+      title: title.trim(), privateMemo: privateMemo || undefined, thumbnailUrl, tags, externalLinks,
+      content: editor.getJSON(),
     })
   }
 
@@ -295,13 +293,18 @@ export function usePortfolioWriteView() {
     alert("임시저장되었습니다.")
   }
 
-  // ── 등록 확인 → 미리보기 이동 ───────────────────────────────────
-  const handleConfirm = () => {
+  // ── 등록 확인 → S3 업로드 → 미리보기 이동 ───────────────────────
+  const handleConfirm = async () => {
     if (!confirmData) return
+
+    const result = await uploadAndGetContent()
+    if (!result) return
+
+    const finalData = { ...confirmData, content: result.content, thumbnailUrl: result.thumbnailUrl }
     const sizesRecord: Record<string, number> = {}
     uploadedSizesRef.current.forEach((size, url) => { sizesRecord[url] = size })
     previewSizesSave(PORTFOLIO_PREVIEW_SIZES_KEY, sizesRecord)
-    usePortfolioDraftStore.getState().setPreviewData(confirmData)
+    usePortfolioDraftStore.getState().setPreviewData(finalData)
     router.push(USER_ROUTES.portfolio.preview)
   }
 
