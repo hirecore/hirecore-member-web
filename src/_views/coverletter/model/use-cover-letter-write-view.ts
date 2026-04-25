@@ -99,7 +99,7 @@ export function useCoverLetterWriteView() {
         domainType: "resume",
         toWebP,
       })
-ㅗ      editor.commands.setContent(content)
+      editor.commands.setContent(content)
       return content
     } catch (e) {
       alert(e instanceof Error ? e.message : "이미지 업로드에 실패했습니다.")
