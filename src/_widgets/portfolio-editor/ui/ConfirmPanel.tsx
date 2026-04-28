@@ -1,6 +1,6 @@
 "use client"
 
-import { type ConfirmData, getCategoryPath, isCustomInputCategory } from "@/_features/portfolio/lib"
+import { type ConfirmData, useJobCategories, getCategoryPath, isCustomInputCategory } from "@/_features/portfolio/lib"
 import "./confirm-panel.scss"
 
 interface Props {
@@ -12,9 +12,10 @@ interface Props {
 }
 
 export function ConfirmPanel({ data, categoryLabel, onBack, onConfirm }: Props) {
+  const { data: categories = [] } = useJobCategories(3)
   // L1 / L2 / L3 경로 — "기타(직접입력)"이면 직접입력 텍스트 표시
-  const path = getCategoryPath(data.category.categoryCode)
-  const useCustom = isCustomInputCategory(data.category.categoryCode) && data.category.customCategory
+  const path = getCategoryPath(categories, data.category.categoryCode)
+  const useCustom = isCustomInputCategory(categories, data.category.categoryCode) && data.category.customCategory
 
   const rows: { label: string; value: React.ReactNode }[] = [
     {

@@ -7,7 +7,7 @@
 
 import { useMemo, useState, useEffect, useRef } from "react"
 import {
-  getCategoryByCode,
+  useJobCategories,
   getCategoryPath,
   getLevel1Categories,
   getLevel2Categories,
@@ -28,10 +28,15 @@ interface Props {
 }
 
 export function JobCategorySection({ value, error, onChange }: Props) {
+  const { data: categories = [] } = useJobCategories(3)
+
   // ── 선택 경로 산출 ────────────────────────────────────────
   // value(L3 코드)로부터 L1/L2를 lookup.
   // 사용자가 L1/L2까지만 펼쳐놓은 중간 상태도 표현하기 위해 별도 state로 관리.
-  const selectedPath = useMemo(() => getCategoryPath(value?.categoryCode), [value])
+  const selectedPath = useMemo(
+    () => getCategoryPath(categories, value?.categoryCode),
+    [categories, value]
+  )
   const selectedL3 = selectedPath[2]
   const selectedL2 = selectedPath[1]
   const selectedL1 = selectedPath[0]
@@ -48,13 +53,16 @@ export function JobCategorySection({ value, error, onChange }: Props) {
 
   // ── 검색 ─────────────────────────────────────────────────
   const [query, setQuery] = useState("")
-  const searchResults = useMemo(() => searchAssignableCategories(query, 12), [query])
+  const searchResults = useMemo(
+    () => searchAssignableCategories(categories, query, 12),
+    [categories, query]
+  )
   const showSearchResults = query.trim().length > 0
 
   // ── 직접입력 텍스트 ──────────────────────────────────────
   const [customInput, setCustomInput] = useState(value?.customCategory ?? "")
   const customInputRef = useRef<HTMLInputElement>(null)
-  const requireCustomInput = isCustomInputCategory(value?.categoryCode)
+  const requireCustomInput = isCustomInputCategory(categories, value?.categoryCode)
 
   // 직접입력 카테고리 선택 시 input에 자동 포커스
   useEffect(() => {
@@ -98,9 +106,9 @@ export function JobCategorySection({ value, error, onChange }: Props) {
   }
 
   // ── 렌더 ─────────────────────────────────────────────────
-  const l1List = getLevel1Categories()
-  const l2List = openL1 ? getLevel2Categories(openL1) : []
-  const l3List = openL2 ? getLevel3Categories(openL2) : []
+  const l1List = getLevel1Categories(categories)
+  const l2List = openL1 ? getLevel2Categories(categories, openL1) : []
+  const l3List = openL2 ? getLevel3Categories(categories, openL2) : []
 
   return (
     <section className="pw-section" id="field-category">
@@ -135,7 +143,7 @@ export function JobCategorySection({ value, error, onChange }: Props) {
             <div className="jcs-search-results__empty">검색 결과가 없습니다</div>
           ) : (
             searchResults.map((node) => {
-              const path = getCategoryPath(node.code)
+              const path = getCategoryPath(categories, node.code)
               const breadcrumb = path.slice(0, -1).map((n) => n.name).join(" › ")
               return (
                 <button
@@ -266,5 +274,3 @@ export function JobCategorySection({ value, error, onChange }: Props) {
   )
 }
 
-// 외부 호환을 위해 헬퍼 재export — _features/portfolio/lib에 있음
-export { getCategoryByCode, getCategoryPath, getCategoryName } from "@/_features/portfolio/lib"

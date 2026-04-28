@@ -5,8 +5,8 @@
 
 import { useMemo, useState } from "react"
 import {
+  useJobCategories,
   getCategoryPath,
-  getCategoryName,
   getLevel1Categories,
   getLevel2Categories,
   getLevel3Categories,
@@ -34,7 +34,11 @@ export function MultiJobCategorySection({
   const [openL2, setOpenL2] = useState<string | null>(null)
   const [query, setQuery]   = useState("")
 
-  const searchResults = useMemo(() => searchAssignableCategories(query, 12), [query])
+  const { data: categories = [] } = useJobCategories(3)
+  const searchResults = useMemo(
+    () => searchAssignableCategories(categories, query, 12),
+    [categories, query]
+  )
   const showSearchResults = query.trim().length > 0
   const isFull = value.length >= maxCount
 
@@ -55,9 +59,9 @@ export function MultiJobCategorySection({
     onChange(value.filter((c) => c !== code))
   }
 
-  const l1List = getLevel1Categories()
-  const l2List = openL1 ? getLevel2Categories(openL1) : []
-  const l3List = openL2 ? getLevel3Categories(openL2) : []
+  const l1List = getLevel1Categories(categories)
+  const l2List = openL1 ? getLevel2Categories(categories, openL1) : []
+  const l3List = openL2 ? getLevel3Categories(categories, openL2) : []
 
   return (
     <section className={`${classPrefix}-section`}>
@@ -71,7 +75,7 @@ export function MultiJobCategorySection({
       {value.length > 0 && (
         <div className="mjcs-selected-list">
           {value.map((code) => {
-            const path = getCategoryPath(code)
+            const path = getCategoryPath(categories, code)
             const jobName = path[path.length - 1]?.name ?? code
             const fieldName = path[0]?.name ?? ""
             return (
@@ -122,7 +126,7 @@ export function MultiJobCategorySection({
             <div className="mjcs-search-results__empty">검색 결과가 없습니다</div>
           ) : (
             searchResults.map((node) => {
-              const path = getCategoryPath(node.code)
+              const path = getCategoryPath(categories, node.code)
               const breadcrumb = path.slice(0, -1).map((n) => n.name).join(" › ")
               const isSelected = value.includes(node.code)
               return (

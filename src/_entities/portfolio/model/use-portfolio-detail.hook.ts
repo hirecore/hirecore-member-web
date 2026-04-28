@@ -3,12 +3,17 @@
 import { MOCK_PORTFOLIO_DETAIL_DATA } from "../api/mock-portfolio-data"
 import type { ExternalLink } from "@/_shared/model"
 
+export interface InterestField {
+  code: string
+  name: string
+}
+
 export interface LinkedDocEmbed {
   id: string
   type: "resume" | "coverletter"
   title: string
   visibility: "public" | "private"
-  interestFields: string[]
+  interestFields: InterestField[]
   tags: string[]
   author: { name: string; profileImageUrl: string | null }
   updatedAt: string
@@ -23,6 +28,10 @@ export interface PortfolioDetail {
   authorId: string
   /** L3 직무 코드 (assignable=true 인 노드) */
   categoryCode: string
+  /** L3 직무명 (또는 customCategory) — 표시용 */
+  categoryName: string
+  /** L1 분야명 — 표시용 */
+  majorCategoryName: string
   /** "기타(직접입력)" 선택 시 사용자 입력 텍스트 */
   customCategory?: string
   projectType: "personal" | "team"
@@ -44,6 +53,10 @@ export interface OtherPortfolio {
   id: string
   /** L3 직무 코드 */
   categoryCode: string
+  /** L3 직무명 (또는 customCategory) — 표시용 */
+  categoryName: string
+  /** L1 분야명 — 표시용 */
+  majorCategoryName: string
   customCategory?: string
   title: string
   tags: string[]

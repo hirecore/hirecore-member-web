@@ -10,6 +10,10 @@ export interface Portfolio {
   id: string
   /** L3 직무 코드 (assignable=true 인 노드) */
   categoryCode: string
+  /** L3 직무명 (또는 customCategory). 카드 표시용 — 서버에서 미리 해석해 내려준다 */
+  categoryName: string
+  /** L1 분야명. 카드 표시용 */
+  majorCategoryName: string
   /** "기타(직접입력)" 선택 시 사용자 입력 텍스트 */
   customCategory?: string
   projectType: "personal" | "team"
@@ -56,6 +60,10 @@ export interface ManagedPortfolio {
   projectType: "personal" | "team"
   /** L3 직무 코드 — 카드에 카테고리 경로 표시용 */
   categoryCode: string
+  /** L3 직무명 (또는 customCategory) — 표시용 */
+  categoryName: string
+  /** L1 분야명 — 표시용 */
+  majorCategoryName: string
   /** "기타(직접입력)" 선택 시 사용자 입력 텍스트 */
   customCategory?: string
   thumbnailUrl: string | null

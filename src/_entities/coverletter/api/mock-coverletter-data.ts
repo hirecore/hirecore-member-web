@@ -4,6 +4,19 @@ import { MOCK_DEFAULT_AUTHOR, mockDoc, mockHeading, mockParagraph, mockBulletLis
 import type { CoverLetterDetail } from "../model/use-coverletter-detail.hook"
 import type { ManagedCoverLetter } from "../model/types"
 
+// 목업 전용 코드→직무명 매핑. 실제 API 연결 시 서버가 직접 응답에 포함한다.
+const MOCK_FIELD_NAMES: Record<string, string> = {
+  FRONTEND_ENGINEER: "프론트엔드 개발",
+  BACKEND_ENGINEER:  "백엔드 개발",
+  UI_UX_DESIGNER:    "UI·UX 디자이너",
+  SERVER_DEVELOPER:  "서버 개발자",
+  SERVICE_PLANNER:   "서비스 기획자",
+  SYSTEM_ARCHITECT:  "시스템 아키텍트",
+}
+function fields(codes: string[]) {
+  return codes.map((c) => ({ code: c, name: MOCK_FIELD_NAMES[c] ?? c }))
+}
+
 // ── 자기소개서 본문 콘텐츠 ───────────────────────────────────────────
 export const MOCK_CL_CONTENT = mockDoc(
   mockHeading(2, "지원 동기"),
@@ -26,7 +39,7 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
     company: "카카오",
     position: "프론트엔드 개발자",
     visibility: "public",
-    interestFields: ["FRONTEND_ENGINEER", "UI_UX_DESIGNER"],
+    interestFields: fields(["FRONTEND_ENGINEER", "UI_UX_DESIGNER"]),
     tags: ["React", "성장동기", "협업"],
     externalLinks: [
       { label: "GitHub", url: "https://github.com/example" },
@@ -45,7 +58,7 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
     company: "라인 플러스",
     position: "백엔드 개발자",
     visibility: "private",
-    interestFields: ["BACKEND_ENGINEER", "SERVER_DEVELOPER"],
+    interestFields: fields(["BACKEND_ENGINEER", "SERVER_DEVELOPER"]),
     tags: ["Java", "Spring Boot", "MSA"],
     externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,
@@ -60,7 +73,7 @@ export const MOCK_COVERLETTER_DETAIL_DATA: Record<string, CoverLetterDetail> = {
     company: "토스",
     position: "서버 개발자",
     visibility: "private",
-    interestFields: ["BACKEND_ENGINEER", "SERVER_DEVELOPER"],
+    interestFields: fields(["BACKEND_ENGINEER", "SERVER_DEVELOPER"]),
     tags: ["Kotlin", "MSA", "결제시스템"],
     externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,

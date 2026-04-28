@@ -30,6 +30,7 @@ import { toWebP } from "@/_features/editor"
 import { useAuthGuard } from "@/_features/auth"
 import {
   usePortfolioDraftStore,
+  useJobCategories,
   getCategoryPathLabel,
   isCustomInputCategory,
   type CategorySelection,
@@ -47,6 +48,7 @@ export function usePortfolioWriteView() {
 
   const { isLoading: authLoading, user } = useAuthGuard()
   const storageInfo = useStorageInfo()
+  const { data: categories = [] } = useJobCategories(3)
 
   // ── 폼 상태 ──────────────────────────────────────────────────────
   // 직무 카테고리 — 3-level 통합 (L3 코드 + 옵션 customCategory)
@@ -197,7 +199,7 @@ export function usePortfolioWriteView() {
   // - "기타(직접입력)" 선택 시 customCategory 필수
   const validateCategory = (cat: CategorySelection | null): string | null => {
     if (!cat?.categoryCode) return "직무 카테고리를 선택해주세요"
-    if (isCustomInputCategory(cat.categoryCode) && !cat.customCategory?.trim()) {
+    if (isCustomInputCategory(categories, cat.categoryCode) && !cat.customCategory?.trim()) {
       return "직접 입력란에 직무를 입력해주세요"
     }
     return null
@@ -333,9 +335,9 @@ export function usePortfolioWriteView() {
 
   // 카테고리 표시용 라벨 — "기타(직접입력)"은 customCategory 우선
   const categoryLabel = category?.categoryCode
-    ? (isCustomInputCategory(category.categoryCode) && category.customCategory
+    ? (isCustomInputCategory(categories, category.categoryCode) && category.customCategory
        ? category.customCategory
-       : getCategoryPathLabel(category.categoryCode))
+       : getCategoryPathLabel(categories, category.categoryCode))
     : ""
 
   return {

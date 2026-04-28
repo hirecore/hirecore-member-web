@@ -11,7 +11,7 @@ import { DeleteConfirmModal } from "@/_shared/ui/delete-confirm-modal"
 import { PortfolioTocSidebar } from "@/_widgets/portfolio"
 import { AvatarPlaceholder } from "@/_shared/ui/avatar-placeholder"
 import { LinkedPortfolioChip } from "@/_shared/ui/linked-portfolio-chip"
-import { formatDate, getCategoryName } from "@/_shared/lib"
+import { formatDate } from "@/_shared/lib"
 
 import "@/_features/editor/editor.scss"
 import "./coverletter-read-view.scss"
@@ -97,7 +97,7 @@ export function CoverLetterReadView({ id }: Props) {
                 <h1 className="cld-header-card__title">{data.title}</h1>
                 {data.interestFields.length > 0 && (
                   <div className="cld-header-card__interests">
-                    {data.interestFields.map((f) => <span key={f} className="cld-interest-tag">{getCategoryName(f) || f}</span>)}
+                    {data.interestFields.map((f) => <span key={f.code} className="cld-interest-tag">{f.name}</span>)}
                   </div>
                 )}
                 {data.tags.length > 0 && (

@@ -11,7 +11,7 @@ import {
   PortfolioPostLayout,
   PortfolioLinkedDocsTab,
 } from "@/_widgets/portfolio"
-import { getCategoryPath, isCustomInputCategory, type ActiveTab } from "@/_features/portfolio/lib"
+import { useJobCategories, getCategoryPath, isCustomInputCategory, type ActiveTab } from "@/_features/portfolio/lib"
 import { usePortfolioPreviewView } from "../model/use-portfolio-preview-view"
 
 import { PageContainer } from "@/_shared/ui/layout"
@@ -34,14 +34,15 @@ export default function PortfolioPreviewView() {
     scrollToHeading,
     handleEdit,
   } = usePortfolioPreviewView()
+  const { data: categories = [] } = useJobCategories(3)
 
   if (!data) return null
 
   // 3-level 카테고리 → L1 라벨 / L2-L3 경로
   // "기타(직접입력)" 직무는 L3 이름 대신 사용자가 입력한 customCategory 표시
-  const path = getCategoryPath(data.category.categoryCode)
+  const path = getCategoryPath(categories, data.category.categoryCode)
   const majorLabel = path[0]?.name ?? ""
-  const useCustom = isCustomInputCategory(data.category.categoryCode) && data.category.customCategory
+  const useCustom = isCustomInputCategory(categories, data.category.categoryCode) && data.category.customCategory
   const subLabel = useCustom
     ? data.category.customCategory!
     : path.slice(1).map((n) => n.name).join(" › ")

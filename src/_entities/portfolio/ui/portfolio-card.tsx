@@ -4,24 +4,9 @@ import Link from "next/link"
 import { Tags2Row } from "@/_shared/ui/tags-row"
 import { USER_ROUTES } from "@/_shared/config"
 import { AvatarPlaceholder } from "@/_shared/ui/avatar-placeholder"
-import { getCategoryPath, isCustomInputCategory } from "@/_shared/lib"
 import type { Portfolio, PortfolioCardLink } from "../model/types"
 
 export type { Portfolio, PortfolioCardLink }
-
-/** 3-level 카테고리 코드 → { l1, l2, l3 } 라벨로 변환.
- *  "기타(직접입력)"이면 l3 자리에 customCategory 표시.
- */
-function resolveCategoryLabels(categoryCode: string, customCategory?: string) {
-  const path = getCategoryPath(categoryCode)
-  const l1 = path[0]?.name ?? ""
-  const l2 = path[1]?.name ?? ""
-  if (isCustomInputCategory(categoryCode) && customCategory) {
-    return { l1, l2, l3: customCategory }
-  }
-  const l3 = path[2]?.name ?? ""
-  return { l1, l2, l3 }
-}
 
 /** 카테고리 표시 — L1(분야) 배지 + L3(직무) 강조 배지.
  *  L2는 카드에서 생략 (상세 페이지에서 전체 경로 노출).
@@ -75,7 +60,8 @@ interface PortfolioCardProps {
 
 /* ── 리스트 뷰 카드 (가로형) ── */
 export function PortfolioRowCard({ item, liked, onLike }: PortfolioCardProps) {
-  const { l1, l3 } = resolveCategoryLabels(item.categoryCode, item.customCategory)
+  const l1 = item.majorCategoryName
+  const l3 = item.customCategory || item.categoryName
   return (
     <article className="pl-row-card">
 
@@ -191,7 +177,8 @@ export function PortfolioRowCard({ item, liked, onLike }: PortfolioCardProps) {
 }
 
 export function PortfolioCard({ item, liked, onLike }: PortfolioCardProps) {
-  const { l1, l3 } = resolveCategoryLabels(item.categoryCode, item.customCategory)
+  const l1 = item.majorCategoryName
+  const l3 = item.customCategory || item.categoryName
   return (
     <article className="pl-card">
 

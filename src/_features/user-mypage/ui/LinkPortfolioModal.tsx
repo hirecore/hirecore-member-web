@@ -5,19 +5,15 @@ import Link from "next/link"
 import { USER_ROUTES } from "@/_shared/config"
 import { useBodyLock } from "@/_shared/model"
 import { useSelectablePortfolios, type SelectablePortfolio } from "@/_entities/portfolio"
-import { getCategoryPath, isCustomInputCategory } from "@/_shared/lib"
 import "./link-portfolio-modal.scss"
 
-/** 3-level 카테고리 코드 → "L1 · L3" 형태 라벨 (또는 customCategory) */
-function formatCategoryLabel(categoryCode: string, customCategory?: string): string {
-  if (isCustomInputCategory(categoryCode) && customCategory) {
-    const path = getCategoryPath(categoryCode)
-    return `${path[0]?.name ?? ""} · ${customCategory}`
-  }
-  const path = getCategoryPath(categoryCode)
-  if (path.length === 0) return ""
-  const major = path[0]?.name ?? ""
-  const leaf = path[path.length - 1]?.name ?? ""
+/** "L1 · L3" 형태 라벨 — 표시용 라벨은 데이터에 미리 포함됨 */
+function formatCategoryLabel(p: SelectablePortfolio): string {
+  const major = p.majorCategoryName
+  const leaf = p.customCategory || p.categoryName
+  if (!major && !leaf) return ""
+  if (!major) return leaf
+  if (!leaf) return major
   return major === leaf ? major : `${major} · ${leaf}`
 }
 
@@ -106,7 +102,7 @@ export function LinkPortfolioModal({ linkedIds, onClose, onSave }: Props) {
                       <div className="lpm-item__info">
                         <span className="lpm-item__title">{p.title}</span>
                         <div className="lpm-item__meta">
-                          <span className="lpm-item__cat">{formatCategoryLabel(p.categoryCode, p.customCategory)}</span>
+                          <span className="lpm-item__cat">{formatCategoryLabel(p)}</span>
                           <div className="lpm-item__tags">
                             {p.tags.slice(0, 2).map((t) => (
                               <span key={t} className="lpm-item__tag">#{t}</span>
@@ -170,7 +166,7 @@ export function LinkPortfolioModal({ linkedIds, onClose, onSave }: Props) {
                           <div className="lpm-item__info">
                             <span className="lpm-item__title">{p.title}</span>
                             <div className="lpm-item__meta">
-                              <span className="lpm-item__cat">{formatCategoryLabel(p.categoryCode, p.customCategory)}</span>
+                              <span className="lpm-item__cat">{formatCategoryLabel(p)}</span>
                               <div className="lpm-item__tags">
                                 {p.tags.slice(0, 2).map((t) => (
                                   <span key={t} className="lpm-item__tag">#{t}</span>

@@ -16,6 +16,7 @@ import "./portfolio-list-view.scss"
 import { useCurrentUser } from "@/_features/auth"
 import { PageContainer } from "@/_shared/ui/layout"
 import {
+  useJobCategories,
   getCategoryPath,
   getLevel1Categories,
   getLevel2Categories,
@@ -38,10 +39,11 @@ export default function PortfolioListView() {
   const [searchQuery, setSearchQuery] = useState("")
   const [viewMode, setViewMode] = useState<ViewMode>("grid")
 
-  const l1Categories = useMemo(() => getLevel1Categories(), [])
+  const { data: categories = [] } = useJobCategories(2)
+  const l1Categories = useMemo(() => getLevel1Categories(categories), [categories])
   const l2Categories = useMemo(
-    () => (activeL1 === ALL_FILTER ? [] : getLevel2Categories(activeL1)),
-    [activeL1]
+    () => (activeL1 === ALL_FILTER ? [] : getLevel2Categories(categories, activeL1)),
+    [categories, activeL1]
   )
 
   // MainHeader의 HireCore 로고 클릭 시 필터 reset — store의 resetVersion 변경 감지
@@ -89,7 +91,7 @@ export default function PortfolioListView() {
     // 카테고리 매칭 — 포트폴리오의 L3 코드로부터 L1/L2를 lookup
     let matchCat = true
     if (activeL1 !== ALL_FILTER) {
-      const path = getCategoryPath(p.categoryCode)
+      const path = getCategoryPath(categories, p.categoryCode)
       const pL1 = path[0]?.code
       const pL2 = path[1]?.code
       matchCat = pL1 === activeL1 && (activeL2 === ALL_FILTER || pL2 === activeL2)

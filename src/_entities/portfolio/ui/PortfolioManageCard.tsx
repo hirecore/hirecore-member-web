@@ -5,21 +5,17 @@
 // 카드는 onDocLinkClick 콜백으로 클릭 이벤트를 상위(Widget)에 위임한다
 
 import { DocumentManageCard } from "@/_shared/ui/manage-card"
-import { getCategoryPath, isCustomInputCategory } from "@/_shared/lib"
 import type { LinkedDoc, DocType, ManagedPortfolio } from "../model/types"
 import "./portfolio-manage-card.scss"
 
 /** 카테고리 단일 라인 — ManageCard의 categoryHeader 슬롯에 주입.
  *  L1(분야) · L3(직무) 미니멀 형식. 배지/separator 제거로 시각 노이즈 최소.
  */
-function CategoryHeader({ categoryCode, customCategory }: { categoryCode: string; customCategory?: string }) {
-  const path = getCategoryPath(categoryCode)
-  if (path.length === 0) return null
-
-  const useCustom = isCustomInputCategory(categoryCode) && customCategory
-  const l1 = path[0]?.name ?? ""
-  const l3 = useCustom ? customCategory! : (path[2]?.name ?? "")
-
+function CategoryHeader({ majorCategoryName, categoryName, customCategory }: {
+  majorCategoryName: string; categoryName: string; customCategory?: string
+}) {
+  const l1 = majorCategoryName
+  const l3 = customCategory || categoryName
   if (!l1 && !l3) return null
   return (
     <>
@@ -50,7 +46,7 @@ const ThumbPlaceholder = ({ size = 28 }: { size?: number }) => (
 export function PortfolioManageCard({
   portfolio, viewMode = "list", onView, onEdit, onDelete, onDocLinkClick,
 }: PortfolioManageCardProps) {
-  const { thumbnailUrl, title, likeCount, projectType, linkedResume, linkedCoverletter, categoryCode, customCategory } = portfolio
+  const { thumbnailUrl, title, likeCount, projectType, linkedResume, linkedCoverletter, majorCategoryName, categoryName, customCategory } = portfolio
 
   const gridHeader = (
     <div className="mc-thumb-header">
@@ -106,7 +102,7 @@ export function PortfolioManageCard({
       gridHeader={gridHeader}
       listAside={listAside}
       extraMeta={extraMeta}
-      categoryHeader={<CategoryHeader categoryCode={categoryCode} customCategory={customCategory} />}
+      categoryHeader={<CategoryHeader majorCategoryName={majorCategoryName} categoryName={categoryName} customCategory={customCategory} />}
       relationsSection={relationsSection}
       onView={onView}
       onEdit={onEdit}

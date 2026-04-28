@@ -7,6 +7,10 @@ export interface SelectablePortfolio {
   title: string
   /** L3 직무 코드 */
   categoryCode: string
+  /** L3 직무명 (또는 customCategory) — 표시용 */
+  categoryName: string
+  /** L1 분야명 — 표시용 */
+  majorCategoryName: string
   customCategory?: string
   thumbnailUrl: string | null
   tags: string[]

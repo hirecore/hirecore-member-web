@@ -1,64 +1,109 @@
-// _shared/lib | 직무 카테고리 헬퍼 함수
-// JOB_CATEGORIES (flat) 위에서 lookup·검색·트리 탐색을 제공한다.
+// _shared/lib | 직무 카테고리 — API 응답 정규화 + 트리 헬퍼 + React Query 훅
+"use client"
 
-import { JOB_CATEGORIES, type JobCategoryNode } from "./job-categories.data"
+import { useQuery, type UseQueryResult } from "@tanstack/react-query"
+import {
+  fetchJobCategories,
+  type JobCategoryNode as ApiJobCategoryNode,
+  type MaxDepth,
+} from "@/_shared/api"
 
-// ── 인덱스 (모듈 로드 시 1회 구성) ───────────────────────────
-const BY_CODE = new Map<string, JobCategoryNode>(
-  JOB_CATEGORIES.map((node) => [node.code, node])
-)
-
-const CHILDREN_OF = JOB_CATEGORIES.reduce<Map<string | null, JobCategoryNode[]>>((acc, node) => {
-  const list = acc.get(node.parentCode) ?? []
-  list.push(node)
-  acc.set(node.parentCode, list)
-  return acc
-}, new Map())
-
-// 자식 정렬 (sortOrder 오름차순)
-CHILDREN_OF.forEach((list) => list.sort((a, b) => a.sortOrder - b.sortOrder))
-
-// ── 단일 lookup ──────────────────────────────────────────────
-/** 코드로 카테고리 노드 조회 */
-export function getCategoryByCode(code: string | null | undefined): JobCategoryNode | undefined {
-  if (!code) return undefined
-  return BY_CODE.get(code)
+export interface JobCategoryNode {
+  /** 백엔드 categoryCode (영어 대문자 + 언더스코어) */
+  code: string
+  /** 화면 표시용 이름 */
+  name: string
+  /** 1: 분야, 2: 카테고리, 3: 직무 */
+  depth: 1 | 2 | 3
+  /** 상위 카테고리 코드 (L1은 null) */
+  parentCode: string | null
+  /** "기타(직접입력)" 자유 텍스트 입력 허용 여부 */
+  allowsCustomInput: boolean
+  /** 동일 부모 내 정렬 순서 */
+  sortOrder: number
+  /** 사용자가 직접 선택 가능한가 (depth=3 리프) */
+  isAssignable: boolean
 }
 
-/** 카테고리 이름만 조회 (없으면 빈 문자열) */
-export function getCategoryName(code: string | null | undefined): string {
-  return getCategoryByCode(code)?.name ?? ""
+// ── React Query 훅 ─────────────────────────────────────────────
+const STALE_TIME = 1000 * 60 * 30 // 30분
+
+export function useJobCategories(maxDepth: MaxDepth = 3): UseQueryResult<JobCategoryNode[]> {
+  return useQuery({
+    queryKey: ["jobCategories", maxDepth],
+    queryFn: () => fetchJobCategories(maxDepth),
+    select: normalizeNodes,
+    staleTime: STALE_TIME,
+  })
+}
+
+function normalizeNodes(apiNodes: ApiJobCategoryNode[]): JobCategoryNode[] {
+  const idToCode = new Map(apiNodes.map((n) => [n.id, n.categoryCode]))
+  return apiNodes.map((n) => ({
+    code: n.categoryCode,
+    name: n.categoryName,
+    depth: n.depth as 1 | 2 | 3,
+    parentCode: n.parentId !== undefined ? (idToCode.get(n.parentId) ?? null) : null,
+    allowsCustomInput: n.allowsCustomInput,
+    sortOrder: n.sortOrder,
+    isAssignable: n.depth === 3,
+  }))
+}
+
+// ── 단일 lookup ──────────────────────────────────────────────
+export function getCategoryByCode(
+  categories: JobCategoryNode[],
+  code: string | null | undefined
+): JobCategoryNode | undefined {
+  if (!code) return undefined
+  return categories.find((n) => n.code === code)
+}
+
+export function getCategoryName(
+  categories: JobCategoryNode[],
+  code: string | null | undefined
+): string {
+  return getCategoryByCode(categories, code)?.name ?? ""
 }
 
 // ── 트리 탐색 ────────────────────────────────────────────────
-/** 같은 부모 아래의 자식 카테고리들 (sortOrder 정렬) */
-export function getChildren(parentCode: string | null): JobCategoryNode[] {
-  return CHILDREN_OF.get(parentCode) ?? []
+export function getChildren(
+  categories: JobCategoryNode[],
+  parentCode: string | null
+): JobCategoryNode[] {
+  return categories
+    .filter((n) => n.parentCode === parentCode)
+    .sort((a, b) => a.sortOrder - b.sortOrder)
 }
 
-/** 모든 L1 (분야) — sortOrder 정렬 */
-export function getLevel1Categories(): JobCategoryNode[] {
-  return getChildren(null)
+export function getLevel1Categories(categories: JobCategoryNode[]): JobCategoryNode[] {
+  return getChildren(categories, null)
 }
 
-/** L1 코드로부터 그 아래 L2 카테고리들 */
-export function getLevel2Categories(level1Code: string): JobCategoryNode[] {
-  return getChildren(level1Code)
+export function getLevel2Categories(
+  categories: JobCategoryNode[],
+  level1Code: string
+): JobCategoryNode[] {
+  return getChildren(categories, level1Code)
 }
 
-/** L2 코드로부터 그 아래 L3 직무들 */
-export function getLevel3Categories(level2Code: string): JobCategoryNode[] {
-  return getChildren(level2Code)
+export function getLevel3Categories(
+  categories: JobCategoryNode[],
+  level2Code: string
+): JobCategoryNode[] {
+  return getChildren(categories, level2Code)
 }
 
-/** 임의 코드 → 루트(L1)까지 경로 [L1, L2, L3] (또는 [L1, L2] / [L1] / []) */
-export function getCategoryPath(code: string | null | undefined): JobCategoryNode[] {
-  const node = getCategoryByCode(code)
+export function getCategoryPath(
+  categories: JobCategoryNode[],
+  code: string | null | undefined
+): JobCategoryNode[] {
+  const node = getCategoryByCode(categories, code)
   if (!node) return []
   const path: JobCategoryNode[] = [node]
   let cursor: JobCategoryNode | undefined = node
   while (cursor && cursor.parentCode) {
-    const parent = BY_CODE.get(cursor.parentCode)
+    const parent = getCategoryByCode(categories, cursor.parentCode)
     if (!parent) break
     path.unshift(parent)
     cursor = parent
@@ -66,35 +111,39 @@ export function getCategoryPath(code: string | null | undefined): JobCategoryNod
   return path
 }
 
-/** 경로를 ' › ' 구분자로 합친 라벨 (예: "개발·데이터 › SW개발 › 백엔드 개발") */
-export function getCategoryPathLabel(code: string | null | undefined, separator = " › "): string {
-  return getCategoryPath(code).map((n) => n.name).join(separator)
+export function getCategoryPathLabel(
+  categories: JobCategoryNode[],
+  code: string | null | undefined,
+  separator = " › "
+): string {
+  return getCategoryPath(categories, code)
+    .map((n) => n.name)
+    .join(separator)
 }
 
 // ── 검색·필터 ────────────────────────────────────────────────
-/** 사용자가 직접 선택 가능한 직무 (L3 + isAssignable=true) 전체 */
-export function getAssignableCategories(): JobCategoryNode[] {
-  return JOB_CATEGORIES.filter((n) => n.isAssignable)
+export function getAssignableCategories(categories: JobCategoryNode[]): JobCategoryNode[] {
+  return categories.filter((n) => n.isAssignable)
 }
 
-/** 검색어로 assignable 직무를 필터링.
- *  매칭 우선순위: L3 이름 prefix > L3 이름 contains > L1/L2 경로 contains
- *  반환은 최대 limit개 (기본 30)
- */
-export function searchAssignableCategories(query: string, limit = 30): JobCategoryNode[] {
+export function searchAssignableCategories(
+  categories: JobCategoryNode[],
+  query: string,
+  limit = 30
+): JobCategoryNode[] {
   const q = query.trim().toLowerCase()
   if (!q) return []
 
-  const candidates = getAssignableCategories()
-  const scored = candidates
+  const candidates = getAssignableCategories(categories)
+  return candidates
     .map((node) => {
       const lowerName = node.name.toLowerCase()
       let score = 0
-      if (lowerName.startsWith(q)) score = 100 - lowerName.length // prefix 우선
+      if (lowerName.startsWith(q)) score = 100 - lowerName.length
       else if (lowerName.includes(q)) score = 50 - lowerName.length
       else {
-        const pathLabel = getCategoryPathLabel(node.code).toLowerCase()
-        if (pathLabel.includes(q)) score = 10 // 부모 카테고리에 매칭
+        const pathLabel = getCategoryPathLabel(categories, node.code).toLowerCase()
+        if (pathLabel.includes(q)) score = 10
       }
       return { node, score }
     })
@@ -102,11 +151,11 @@ export function searchAssignableCategories(query: string, limit = 30): JobCatego
     .sort((a, b) => b.score - a.score)
     .slice(0, limit)
     .map((x) => x.node)
-
-  return scored
 }
 
-/** "기타(직접입력)" 여부 — L3 코드 기반 */
-export function isCustomInputCategory(code: string | null | undefined): boolean {
-  return getCategoryByCode(code)?.allowsCustomInput ?? false
+export function isCustomInputCategory(
+  categories: JobCategoryNode[],
+  code: string | null | undefined
+): boolean {
+  return getCategoryByCode(categories, code)?.allowsCustomInput ?? false
 }

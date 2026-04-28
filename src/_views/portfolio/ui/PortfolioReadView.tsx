@@ -11,12 +11,7 @@ import {
   PortfolioTocSidebar,
   PortfolioLinkedDocsTab,
 } from "@/_widgets/portfolio"
-import {
-  getCategoryPath,
-  getCategoryName,
-  isCustomInputCategory,
-  type ActiveTab,
-} from "@/_features/portfolio/lib"
+import { type ActiveTab } from "@/_features/portfolio/lib"
 import { USER_ROUTES } from "@/_shared/config"
 import { usePortfolioList } from "@/_entities/portfolio"
 import type { LinkedDocEmbed } from "@/_entities/portfolio"
@@ -80,7 +75,7 @@ function OtherPortfoliosSection({ currentId, authorName }: { currentId: string; 
                 }
               </div>
               <div className="pr-other-card__body">
-                <span className="pr-other-card__cat">{getCategoryName(p.categoryCode)}</span>
+                <span className="pr-other-card__cat">{p.categoryName}</span>
                 <p className="pr-other-card__title">{p.title}</p>
                 <div className="pr-other-card__meta">
                   <span className="pr-other-card__date">{dateStr}</span>
@@ -137,12 +132,8 @@ export function PortfolioReadView({ id }: Props) {
 
   if (!data) return null
 
-  const path = getCategoryPath(data.categoryCode)
-  const majorLabel = path[0]?.name ?? ""
-  const useCustom = isCustomInputCategory(data.categoryCode) && data.customCategory
-  const subLabel = useCustom
-    ? data.customCategory!
-    : path.slice(1).map((n) => n.name).join(" › ")
+  const majorLabel = data.majorCategoryName
+  const subLabel = data.customCategory ?? data.categoryName
   const updatedAt = new Date(data.updatedAt).toLocaleDateString("ko-KR", {
     year: "numeric", month: "2-digit", day: "2-digit",
   }).replace(/\. /g, ".").replace(/\.$/, "")
