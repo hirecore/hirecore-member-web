@@ -6,3 +6,7 @@ export {
   batchUploadImages,
   type BatchUploadOptions, type BatchUploadResult,
 } from "./batch-image-upload"
+export {
+  fetchJobCategories,
+  type JobCategoryNode, type JobCategoriesResponse, type MaxDepth,
+} from "./job-categories"
