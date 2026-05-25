@@ -91,6 +91,7 @@ export default function PortfolioWriteView() {
     category, handleCategoryChange,
     projectType, setProjectType, visibility, setVisibility,
     title, setTitle, privateMemo, setPrivateMemo,
+    previewSummary, setPreviewSummary,
     tags, setTags, externalLinks, setExternalLinks,
     errors, setErrors,
     thumbnailUrl, thumbnailInputRef,
@@ -258,6 +259,28 @@ export default function PortfolioWriteView() {
                 maxLength={200}
               />
               <div className="pw-memo-count">{privateMemo.length}/200</div>
+            </section>
+
+            {/* 포트폴리오 한 줄 소개 */}
+            <section className="pw-section" id="field-previewSummary">
+              <div className="pw-section__head">
+                <span className="pw-section__label">포트폴리오 한 줄 소개</span>
+                <span className="pw-section__required">필수</span>
+                <span className="pw-section__hint">포트폴리오 카드의 내용 요약 정보로 노출됩니다</span>
+              </div>
+              <textarea
+                className="pw-summary-input"
+                placeholder="프로젝트의 핵심을 한 줄로 소개해주세요 (예: TipTap v3와 WebSocket을 결합해 Notion 수준의 협업 에디터를 구현했습니다)"
+                value={previewSummary}
+                onChange={(e) => {
+                  setPreviewSummary(e.target.value)
+                  setErrors((prev) => ({ ...prev, previewSummary: undefined }))
+                }}
+                rows={2}
+                maxLength={100}
+              />
+              <div className="pw-summary-count">{previewSummary.length}/100</div>
+              {errors.previewSummary && <p className="pw-error">{errors.previewSummary}</p>}
             </section>
 
             {/* 포스팅 내용 */}

@@ -16,6 +16,8 @@ export interface CreatePortfolioRequest {
   visibility: Visibility
   title: string
   privateMemo?: string
+  /** 포트폴리오 카드/검색 결과에 노출되는 사용자 입력 요약 (필수, ≤ 100자) */
+  previewSummary: string
   /** TSID 문자열 — 정밀도 보존 컨벤션 (tsid-id-json-convention.md) */
   thumbnailImageId?: string
   contentImageIds?: string[]

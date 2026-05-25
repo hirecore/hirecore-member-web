@@ -58,9 +58,10 @@ export function usePortfolioWriteView() {
   const [category,      setCategory]      = useState<CategorySelection | null>(null)
   const [projectType,   setProjectType]   = useState<ProjectType | null>(null)
   const [visibility,    setVisibility]    = useState<Visibility | null>(null)
-  const [title,         setTitle]         = useState("")
-  const [privateMemo,   setPrivateMemo]   = useState("")
-  const [tags,          setTags]          = useState<string[]>([])
+  const [title,          setTitle]          = useState("")
+  const [privateMemo,    setPrivateMemo]    = useState("")
+  const [previewSummary, setPreviewSummary] = useState("")
+  const [tags,           setTags]           = useState<string[]>([])
   const [externalLinks, setExternalLinks] = useState<PortfolioLink[]>([])
   const [errors,        setErrors]        = useState<Partial<Record<string, string>>>({})
   const [confirmData,   setConfirmData]   = useState<ConfirmData | null>(null)
@@ -136,6 +137,7 @@ export function usePortfolioWriteView() {
         if (saved.visibility)              setVisibility(saved.visibility)
         if (saved.title)                   setTitle(saved.title)
         if (saved.privateMemo)             setPrivateMemo(saved.privateMemo)
+        if (saved.previewSummary)          setPreviewSummary(saved.previewSummary)
         if (saved.thumbnailUrl)            setThumbnailUrl(saved.thumbnailUrl)
         if (saved.tags?.length)            setTags(saved.tags)
         if (saved.externalLinks?.length)   setExternalLinks(saved.externalLinks)
@@ -215,10 +217,12 @@ export function usePortfolioWriteView() {
   const validate = (): typeof errors => {
     const newErrors: typeof errors = {}
     const categoryError = validateCategory(category)
-    if (categoryError)                   newErrors.category    = categoryError
-    if (!projectType)                    newErrors.projectType = "프로젝트 유형을 선택해주세요"
-    if (!visibility)                     newErrors.visibility  = "공개 설정을 선택해주세요"
-    if (!title.trim())                   newErrors.title       = "제목을 입력해주세요"
+    if (categoryError)                   newErrors.category       = categoryError
+    if (!projectType)                    newErrors.projectType    = "프로젝트 유형을 선택해주세요"
+    if (!visibility)                     newErrors.visibility     = "공개 설정을 선택해주세요"
+    if (!title.trim())                   newErrors.title          = "제목을 입력해주세요"
+    if (!previewSummary.trim())          newErrors.previewSummary = "한 줄 소개를 입력해주세요"
+    else if (previewSummary.length > 100) newErrors.previewSummary = "100자 이내로 입력해주세요"
     return newErrors
   }
 
@@ -282,7 +286,9 @@ export function usePortfolioWriteView() {
     setConfirmData({
       category: category!,
       projectType: projectType!, visibility: visibility!,
-      title: title.trim(), privateMemo: privateMemo || undefined, thumbnailUrl, tags, externalLinks,
+      title: title.trim(), privateMemo: privateMemo || undefined,
+      previewSummary: previewSummary.trim(),
+      thumbnailUrl, tags, externalLinks,
       content: editor.getJSON(),
     })
   }
@@ -338,6 +344,7 @@ export function usePortfolioWriteView() {
         visibility:        confirmData.visibility,
         title:             confirmData.title,
         ...(confirmData.privateMemo ? { privateMemo: confirmData.privateMemo } : {}),
+        previewSummary:    confirmData.previewSummary,
         ...(thumbnailImageIdRef.current != null
           ? { thumbnailImageId: thumbnailImageIdRef.current }
           : {}),
@@ -382,7 +389,9 @@ export function usePortfolioWriteView() {
     const data: ConfirmData = {
       category: category!,
       projectType: projectType!, visibility: visibility!,
-      title: title.trim(), privateMemo: privateMemo || undefined, thumbnailUrl, tags, externalLinks,
+      title: title.trim(), privateMemo: privateMemo || undefined,
+      previewSummary: previewSummary.trim(),
+      thumbnailUrl, tags, externalLinks,
       content: editor!.getJSON(),
     }
     const sizesRecord: Record<string, number> = {}
@@ -406,6 +415,7 @@ export function usePortfolioWriteView() {
     category, setCategory, handleCategoryChange,
     projectType, setProjectType, visibility, setVisibility,
     title, setTitle, privateMemo, setPrivateMemo,
+    previewSummary, setPreviewSummary,
     tags, setTags, externalLinks, setExternalLinks,
     errors, setErrors,
     thumbnailUrl, setThumbnailUrl, thumbnailInputRef,

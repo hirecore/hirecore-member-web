@@ -23,6 +23,8 @@ export interface ConfirmData {
   visibility: "public" | "private"
   title: string
   privateMemo?: string
+  /** 포트폴리오 카드에 노출되는 한 줄 소개 (필수, ≤ 100자) */
+  previewSummary: string
   thumbnailUrl: string | null
   tags: string[]
   externalLinks: ExternalLink[]

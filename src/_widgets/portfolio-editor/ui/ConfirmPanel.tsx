@@ -43,6 +43,7 @@ export function ConfirmPanel({ data, categoryLabel, onBack, onConfirm }: Props) 
     { label: "프로젝트 유형", value: data.projectType === "personal" ? "개인 프로젝트" : "팀 프로젝트" },
     { label: "공개 설정",     value: data.visibility === "public" ? "공개" : "비공개" },
     { label: "포스팅 제목",   value: <span className="pw-confirm__title-val">{data.title}</span> },
+    { label: "한 줄 소개",    value: <span className="pw-confirm__title-val">{data.previewSummary}</span> },
     {
       label: "썸네일",
       value: data.thumbnailUrl ? (
