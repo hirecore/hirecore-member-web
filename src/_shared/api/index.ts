@@ -13,4 +13,5 @@ export {
 export {
   createPortfolio,
   type CreatePortfolioRequest, type CreatePortfolioResponse, type PortfolioTagInput,
+  type JobCategoryInput,
 } from "./portfolio"

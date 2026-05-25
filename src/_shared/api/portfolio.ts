@@ -9,9 +9,18 @@ export interface PortfolioTagInput {
   sortOrder: number
 }
 
+/**
+ * 직무 분류 선택.
+ * - code: L3 직무 코드 (assignable=true 인 노드)
+ * - userInput: code 가 가리키는 노드가 allowsCustomInput=true 일 때, 사용자가 입력한 직무명
+ */
+export interface JobCategoryInput {
+  code: string
+  userInput?: string
+}
+
 export interface CreatePortfolioRequest {
-  categoryCode: string
-  customCategory?: string
+  jobCategory: JobCategoryInput
   collaborationType: "team" | "personal"
   visibility: Visibility
   title: string

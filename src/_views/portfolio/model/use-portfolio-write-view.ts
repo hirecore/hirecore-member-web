@@ -336,10 +336,12 @@ export function usePortfolioWriteView() {
     try {
       setUploading(true)
       const { portfolioId } = await createPortfolio({
-        categoryCode:      confirmData.category.categoryCode,
-        ...(confirmData.category.customCategory?.trim()
-          ? { customCategory: confirmData.category.customCategory.trim() }
-          : {}),
+        jobCategory: {
+          code: confirmData.category.categoryCode,
+          ...(confirmData.category.customCategory?.trim()
+            ? { userInput: confirmData.category.customCategory.trim() }
+            : {}),
+        },
         collaborationType: confirmData.projectType,
         visibility:        confirmData.visibility,
         title:             confirmData.title,
