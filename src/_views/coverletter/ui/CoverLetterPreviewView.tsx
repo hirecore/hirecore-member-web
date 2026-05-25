@@ -5,6 +5,7 @@
 import { EditorContent } from "@tiptap/react"
 import { PageContainer } from "@/_shared/ui/layout"
 import { PreviewActionBar } from "@/_shared/ui/preview-action-bar"
+import { useJobCategories, getCategoryByCode } from "@/_shared/lib"
 import { useCoverLetterPreviewView } from "../model/use-cover-letter-preview-view"
 
 import "@/_features/editor/editor.scss"
@@ -12,8 +13,17 @@ import "./coverletter-read-view.scss"
 
 export function CoverLetterPreviewView() {
   const { previewData, editor, handleEdit, handleSubmit } = useCoverLetterPreviewView()
+  const { data: categories = [] } = useJobCategories(3)
 
   if (!previewData) return null
+
+  const categoryLabel = (() => {
+    const c = previewData.category
+    if (!c?.categoryCode) return null
+    const node = getCategoryByCode(categories, c.categoryCode)
+    if (node?.allowsCustomInput) return c.customCategory?.trim() || node.name
+    return node?.name ?? c.categoryCode
+  })()
 
   return (
     <div className="cld-root cld-root--preview">
@@ -42,11 +52,9 @@ export function CoverLetterPreviewView() {
 
           <h1 className="cld-header-card__title">{previewData.title || "제목 없음"}</h1>
 
-          {previewData.interestFields.length > 0 && (
+          {categoryLabel && (
             <div className="cld-header-card__interests">
-              {previewData.interestFields.map((f) => (
-                <span key={f} className="cld-interest-tag">{f}</span>
-              ))}
+              <span className="cld-interest-tag">{categoryLabel}</span>
             </div>
           )}
 

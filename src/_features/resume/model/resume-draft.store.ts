@@ -1,12 +1,14 @@
 import type { JSONContent } from "@tiptap/core"
 import { createDraftStore } from "@/_shared/lib"
 import type { ExternalLink } from "@/_shared/model"
+import type { CategorySelection } from "@/_features/portfolio"
 
 export interface ResumeDraftData {
   visibility: "public" | "private"
   title: string
   memo: string
-  interestFields: string[]
+  /** 단일 직무 카테고리 — 포트폴리오와 동일한 선택 모델 */
+  category: CategorySelection | null
   tags: string[]
   linkedIds: string[]
   externalLinks: ExternalLink[]

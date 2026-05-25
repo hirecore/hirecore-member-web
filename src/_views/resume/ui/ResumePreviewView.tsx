@@ -5,6 +5,7 @@
 import { EditorContent } from "@tiptap/react"
 import { PageContainer } from "@/_shared/ui/layout"
 import { PreviewActionBar } from "@/_shared/ui/preview-action-bar"
+import { useJobCategories, getCategoryByCode } from "@/_shared/lib"
 import { useResumePreviewView } from "../model/use-resume-preview-view"
 
 import "@/_features/editor/editor.scss"
@@ -12,8 +13,17 @@ import "./resume-read-view.scss"
 
 export function ResumePreviewView() {
   const { previewData, editor, handleEdit, handleSubmit } = useResumePreviewView()
+  const { data: categories = [] } = useJobCategories(3)
 
   if (!previewData) return null
+
+  const categoryLabel = (() => {
+    const c = previewData.category
+    if (!c?.categoryCode) return null
+    const node = getCategoryByCode(categories, c.categoryCode)
+    if (node?.allowsCustomInput) return c.customCategory?.trim() || node.name
+    return node?.name ?? c.categoryCode
+  })()
 
   return (
     <div className="rd-root rd-root--preview">
@@ -43,11 +53,9 @@ export function ResumePreviewView() {
 
           <h1 className="rd-header-card__title">{previewData.title || "제목 없음"}</h1>
 
-          {previewData.interestFields.length > 0 && (
+          {categoryLabel && (
             <div className="rd-header-card__interests">
-              {previewData.interestFields.map((f) => (
-                <span key={f} className="rd-interest-tag">{f}</span>
-              ))}
+              <span className="rd-interest-tag">{categoryLabel}</span>
             </div>
           )}
 

@@ -25,9 +25,23 @@ interface Props {
   error?: string
   /** 선택 변경 콜백 — null이면 선택 해제 */
   onChange: (value: CategorySelection | null) => void
+  /** 섹션 클래스 접두어 (기본: "pw" — 포트폴리오) */
+  classPrefix?: string
+  /** 섹션 헤더 라벨 (기본: "직무 카테고리") */
+  label?: string
+  /** true 면 "선택" 배지, false 면 "필수" 배지 (기본: false) */
+  optional?: boolean
+  /** 폼 검증 스크롤용 section id (기본: "field-category") */
+  sectionId?: string
 }
 
-export function JobCategorySection({ value, error, onChange }: Props) {
+export function JobCategorySection({
+  value, error, onChange,
+  classPrefix = "pw",
+  label = "직무 카테고리",
+  optional = false,
+  sectionId = "field-category",
+}: Props) {
   const { data: categories = [] } = useJobCategories(3)
 
   // ── 선택 경로 산출 ────────────────────────────────────────
@@ -111,10 +125,12 @@ export function JobCategorySection({ value, error, onChange }: Props) {
   const l3List = openL2 ? getLevel3Categories(categories, openL2) : []
 
   return (
-    <section className="pw-section" id="field-category">
-      <div className="pw-section__head">
-        <span className="pw-section__label">직무 카테고리</span>
-        <span className="pw-section__required">필수</span>
+    <section className={`${classPrefix}-section`} id={sectionId}>
+      <div className={`${classPrefix}-section__head`}>
+        <span className={`${classPrefix}-section__label`}>{label}</span>
+        <span className={`${classPrefix}-section__${optional ? "optional" : "required"}`}>
+          {optional ? "선택" : "필수"}
+        </span>
       </div>
 
       {/* ── 검색 필드 ───────────────────────────────────── */}
@@ -263,13 +279,13 @@ export function JobCategorySection({ value, error, onChange }: Props) {
             placeholder="직무를 직접 입력해주세요 (예: 블록체인 엔지니어)"
             value={customInput}
             onChange={(e) => handleCustomInputChange(e.target.value)}
-            maxLength={30}
+            maxLength={10}
           />
-          <span className="jcs-custom-input__count">{customInput.length}/30</span>
+          <span className="jcs-custom-input__count">{customInput.length}/10</span>
         </div>
       )}
 
-      {error && <p className="pw-error">{error}</p>}
+      {error && <p className={`${classPrefix}-error`}>{error}</p>}
     </section>
   )
 }

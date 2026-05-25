@@ -19,6 +19,8 @@ import type { ExternalLink } from "@/_shared/model"
 import { useAuthGuard } from "@/_features/auth"
 import { useCoverLetterDraftStore } from "@/_features/coverletter"
 import { useMyPortfolios } from "@/_entities/portfolio"
+import { useJobCategories, isCustomInputCategory } from "@/_shared/lib"
+import type { CategorySelection } from "@/_features/portfolio"
 
 
 export function useCoverLetterWriteView() {
@@ -28,12 +30,13 @@ export function useCoverLetterWriteView() {
 
   const { isLoading: authLoading, user } = useAuthGuard()
   const myPortfolios = useMyPortfolios()
+  const { data: categories = [] } = useJobCategories(3)
 
   // ── 폼 상태 ──────────────────────────────────────────────────────
-  const [visibility,      setVisibility]      = useState<Visibility | null>(null)
-  const [title,           setTitle]           = useState("")
-  const [memo,            setMemo]            = useState("")
-  const [interestFields,  setInterestFields]  = useState<string[]>([])
+  const [visibility, setVisibility] = useState<Visibility | null>(null)
+  const [title,      setTitle]      = useState("")
+  const [memo,       setMemo]       = useState("")
+  const [category,   setCategory]   = useState<CategorySelection | null>(null)
   const [tags,            setTags]            = useState<string[]>([])
   const [linkedIds,       setLinkedIds]       = useState<string[]>([])
   const [externalLinks,   setExternalLinks]   = useState<ExternalLink[]>([])
@@ -70,7 +73,7 @@ export function useCoverLetterWriteView() {
         if (saved.visibility)            setVisibility(saved.visibility)
         if (saved.title)                 setTitle(saved.title)
         if (saved.memo)                  setMemo(saved.memo)
-        if (saved.interestFields.length) setInterestFields(saved.interestFields)
+        if (saved.category)              setCategory(saved.category)
         if (saved.tags.length)           setTags(saved.tags)
         if (saved.linkedIds.length)      setLinkedIds(saved.linkedIds)
         if (saved.externalLinks?.length) setExternalLinks(saved.externalLinks)
@@ -115,6 +118,13 @@ export function useCoverLetterWriteView() {
     if (!visibility)               newErrors.visibility = "공개 설정을 선택해주세요"
     if (!title.trim())             newErrors.title      = "제목을 입력해주세요"
     if (!editor || editor.isEmpty) newErrors.content    = "내용을 입력해주세요"
+    if (
+      category?.categoryCode &&
+      isCustomInputCategory(categories, category.categoryCode) &&
+      !category.customCategory?.trim()
+    ) {
+      newErrors.category = "직접 입력란에 직무를 입력해주세요"
+    }
     return newErrors
   }
 
@@ -131,7 +141,7 @@ export function useCoverLetterWriteView() {
     if (!content) return
     useCoverLetterDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
-      memo, interestFields, tags, linkedIds, externalLinks,
+      memo, category, tags, linkedIds, externalLinks,
       content,
     })
     router.push(USER_ROUTES.coverletter.preview)
@@ -150,7 +160,7 @@ export function useCoverLetterWriteView() {
     if (!content) return
     useCoverLetterDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
-      memo, interestFields, tags, linkedIds, externalLinks,
+      memo, category, tags, linkedIds, externalLinks,
       content,
     })
     router.push(USER_ROUTES.coverletter.preview)
@@ -178,7 +188,7 @@ export function useCoverLetterWriteView() {
     visibility, setVisibility,
     title, setTitle,
     memo, setMemo,
-    interestFields, setInterestFields,
+    category, setCategory,
     tags, setTags,
     linkedIds, setLinkedIds,
     externalLinks, setExternalLinks,

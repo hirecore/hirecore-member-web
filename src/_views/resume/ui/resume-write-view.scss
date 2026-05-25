@@ -108,60 +108,53 @@
   &__hint {
     font-size: 0.8125rem;
     color: #9ca3af;
-    margin-left: auto;
+    margin-left: 0.2rem;
+    .dark & { color: #6b7280; }
 
     &--private {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.2rem;
       color: #7c3aed;
-      background: rgba(124, 58, 237, 0.07);
-      padding: 0.1rem 0.38rem;
-      border-radius: 999px;
-      font-weight: 600;
-      .dark & { color: #a78bfa; background: rgba(167, 139, 250, 0.1); }
+      .dark & { color: #a78bfa; }
     }
   }
 }
 
-/* ── 메모 입력 ── */
+/* ── 나만 보는 메모 입력 — 포트폴리오 등록 페이지와 동일 톤 ── */
 .rw-memo-input {
   width: 100%;
-  border: 1.5px solid rgba(0,0,0,0.08);
-  border-radius: 0.75rem;
   padding: 0.75rem 1rem;
-  font-size: 0.9375rem;
-  line-height: 1.6;
+  border: 1.5px solid rgba(124, 58, 237, 0.2);
+  border-radius: 0.75rem;
+  background: rgba(124, 58, 237, 0.03);
+  font-size: 0.875rem;
   color: #374151;
-  background: rgba(124, 58, 237, 0.02);
   resize: vertical;
-  min-height: 5rem;
-  transition: border-color 0.13s;
+  transition: border-color 0.15s, box-shadow 0.15s;
   font-family: inherit;
+  line-height: 1.6;
 
   &:focus {
     outline: none;
-    border-color: rgba(124, 58, 237, 0.4);
-    background: rgba(124, 58, 237, 0.03);
+    border-color: rgba(124, 58, 237, 0.45);
+    box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.08);
   }
 
-  &::placeholder { color: #d1d5db; }
+  &::placeholder { color: #c4b5fd; }
 
   .dark & {
-    background: rgba(124, 58, 237, 0.04);
-    border-color: rgba(255,255,255,0.08);
-    color: #d1d5db;
-    &:focus { border-color: rgba(167, 139, 250, 0.35); }
-    &::placeholder { color: #4b5563; }
+    background: rgba(124, 58, 237, 0.05);
+    border-color: rgba(167, 139, 250, 0.2);
+    color: #e5e7eb;
+    &:focus { border-color: rgba(167, 139, 250, 0.45); box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12); }
+    &::placeholder { color: #7c3aed; }
   }
 }
 
 .rw-memo-count {
   text-align: right;
   font-size: 0.875rem;
-  color: #9ca3af;
-  margin-top: 0.25rem;
-  .dark & { color: #6b7280; }
+  color: #c4b5fd;
+  margin-top: 0.3rem;
+  .dark & { color: #7c3aed; }
 }
 
 /* ── 에러 ── */

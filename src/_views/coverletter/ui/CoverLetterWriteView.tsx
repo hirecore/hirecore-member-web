@@ -25,7 +25,7 @@ import {
 } from "@/_features/editor"
 
 import { LinkedPortfoliosSection } from "@/_features/document-link"
-import { WriteActionBar, ExternalLinksSection, MultiJobCategorySection } from "@/_widgets/portfolio-editor"
+import { WriteActionBar, ExternalLinksSection, JobCategorySection } from "@/_widgets/portfolio-editor"
 import { useCoverLetterWriteView } from "../model/use-cover-letter-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
 import type { Visibility } from "@/_shared/model"
@@ -98,7 +98,7 @@ export function CoverLetterWriteView() {
     visibility, setVisibility,
     title, setTitle,
     memo, setMemo,
-    interestFields, setInterestFields,
+    category, setCategory,
     tags, setTags,
     linkedIds, setLinkedIds,
     externalLinks, setExternalLinks,
@@ -208,12 +208,15 @@ export function CoverLetterWriteView() {
               {errors.visibility && <p className="clw-error">{errors.visibility}</p>}
             </section>
 
-            {/* 02. 직무 선택 */}
-            <MultiJobCategorySection
-              value={interestFields}
-              maxCount={5}
-              onChange={setInterestFields}
+            {/* 02. 직무 선택 — 포트폴리오와 동일한 JobCategorySection (단일 선택) */}
+            <JobCategorySection
+              value={category}
+              error={errors.category}
+              onChange={(v) => { setCategory(v); setErrors((e) => ({ ...e, category: undefined })) }}
               classPrefix="clw"
+              label="직무 선택"
+              optional
+              sectionId="clw-field-category"
             />
 
             {/* 03. 제목 */}
