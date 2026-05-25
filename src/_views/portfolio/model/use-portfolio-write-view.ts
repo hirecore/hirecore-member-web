@@ -25,7 +25,10 @@ import {
   AUTHORING_IMAGE_UPLOAD_LIMIT,
 } from "@/_shared/config"
 import { previewSizesSave, previewSizesRestore } from "@/_shared/lib"
-import { batchUploadImages, requestPresignedUrls, uploadToS3, getImageDimensions } from "@/_shared/api"
+import {
+  batchUploadImages, requestPresignedUrls, uploadToS3, getImageDimensions,
+  collectImageUrls, createPortfolio,
+} from "@/_shared/api"
 import { toWebP } from "@/_features/editor"
 import { useAuthGuard } from "@/_features/auth"
 import {
@@ -64,6 +67,9 @@ export function usePortfolioWriteView() {
   const [thumbnailUrl,  setThumbnailUrl]  = useState<string | null>(null)
   const thumbnailFileRef = useRef<File | null>(null)
   const thumbnailInputRef = useRef<HTMLInputElement>(null)
+  // publicUrl → imageFileMetaId(TSID 문자열). handleConfirm 재시도 / 신규 추가가 섞여도 ID를 잃지 않도록 누적 추적
+  const imageIdMapRef = useRef<Map<string, string>>(new Map())
+  const thumbnailImageIdRef = useRef<string | null>(null)
 
   // ── 스토리지 & 업로드 상태 ───────────────────────────────────────
   const sessionBytesRef         = useRef(0)
@@ -217,9 +223,10 @@ export function usePortfolioWriteView() {
   }
 
   // ── 썸네일 S3 업로드 ─────────────────────────────────────────────
+  // 파일 변경이 없으면 기존 URL 유지 (이전 업로드의 imageFileMetaId도 ref에 그대로 보존)
   const uploadThumbnail = useCallback(async (): Promise<string | null> => {
     const file = thumbnailFileRef.current
-    if (!file) return thumbnailUrl // 파일 변경 없으면 기존 URL 유지
+    if (!file) return thumbnailUrl
     const webpFile = await toWebP(file)
     const { width, height } = await getImageDimensions(webpFile)
     const { files } = await requestPresignedUrls([{
@@ -234,6 +241,7 @@ export function usePortfolioWriteView() {
     }])
     await uploadToS3(files[0].presignedUrl, webpFile)
     thumbnailFileRef.current = null
+    thumbnailImageIdRef.current = files[0].imageFileMetaId
     return files[0].publicUrl
   }, [thumbnailUrl])
 
@@ -243,13 +251,15 @@ export function usePortfolioWriteView() {
     const rawContent = editor.getJSON()
     try {
       setUploading(true)
-      const [{ content }, uploadedThumbnailUrl] = await Promise.all([
+      const [batchResult, uploadedThumbnailUrl] = await Promise.all([
         batchUploadImages({ content: rawContent, domainType: "portfolio", toWebP }),
         uploadThumbnail(),
       ])
-      editor.commands.setContent(content)
+      // 신규 업로드 분 imageFileMetaId 누적 (재시도/추가 업로드 시 기존 매핑 보존)
+      batchResult.imageIdMap.forEach((id, url) => imageIdMapRef.current.set(url, id))
+      editor.commands.setContent(batchResult.content)
       if (uploadedThumbnailUrl) setThumbnailUrl(uploadedThumbnailUrl)
-      return { content, thumbnailUrl: uploadedThumbnailUrl }
+      return { content: batchResult.content, thumbnailUrl: uploadedThumbnailUrl }
     } catch (e) {
       alert(e instanceof Error ? e.message : "이미지 업로드에 실패했습니다.")
       return null
@@ -295,19 +305,68 @@ export function usePortfolioWriteView() {
     alert("임시저장되었습니다.")
   }
 
-  // ── 등록 확인 → S3 업로드 → 미리보기 이동 ───────────────────────
+  // ── 등록 확인 → S3 업로드 → 등록 API 호출 → 상세 페이지 이동 ────
   const handleConfirm = async () => {
-    if (!confirmData) return
+    if (!confirmData || !editor) return
 
     const result = await uploadAndGetContent()
     if (!result) return
 
-    const finalData = { ...confirmData, content: result.content, thumbnailUrl: result.thumbnailUrl }
-    const sizesRecord: Record<string, number> = {}
-    uploadedSizesRef.current.forEach((size, url) => { sizesRecord[url] = size })
-    previewSizesSave(PORTFOLIO_PREVIEW_SIZES_KEY, sizesRecord)
-    usePortfolioDraftStore.getState().setPreviewData(finalData)
-    router.push(USER_ROUTES.portfolio.preview)
+    // 본문에 박힌 모든 이미지 publicUrl → imageFileMetaId 매핑 (단일 + 캐러셀)
+    const urls = collectImageUrls(result.content)
+    const contentImageIds = Array.from(
+      new Set(
+        urls
+          .map((url) => imageIdMapRef.current.get(url))
+          .filter((id): id is string => typeof id === "string")
+      )
+    )
+
+    // 외부 링크: label / url 한쪽만 채워진 항목은 백엔드에서 거부 → 사전 필터링
+    const cleanedExternalLinks = confirmData.externalLinks.filter(
+      (l) => l.label?.trim() && l.url?.trim()
+    )
+
+    try {
+      setUploading(true)
+      const { portfolioId } = await createPortfolio({
+        categoryCode:      confirmData.category.categoryCode,
+        ...(confirmData.category.customCategory?.trim()
+          ? { customCategory: confirmData.category.customCategory.trim() }
+          : {}),
+        collaborationType: confirmData.projectType,
+        visibility:        confirmData.visibility,
+        title:             confirmData.title,
+        ...(confirmData.privateMemo ? { privateMemo: confirmData.privateMemo } : {}),
+        ...(thumbnailImageIdRef.current != null
+          ? { thumbnailImageId: thumbnailImageIdRef.current }
+          : {}),
+        ...(contentImageIds.length > 0 ? { contentImageIds } : {}),
+        ...(confirmData.tags.length > 0
+          ? {
+              tags: confirmData.tags.map((tag, index) => ({
+                userInputTag: tag,
+                sortOrder: index,
+              })),
+            }
+          : {}),
+        ...(cleanedExternalLinks.length > 0 ? { externalLinks: cleanedExternalLinks } : {}),
+        content: {
+          json: result.content,
+          html: editor.getHTML(),
+        },
+      })
+      // 다음 진입 시 잔여 미리보기 데이터 청소
+      usePortfolioDraftStore.getState().clearPreviewData()
+      setConfirmData(null)
+      router.push(USER_ROUTES.portfolio.detail(portfolioId))
+    } catch (e) {
+      const message = (e as { response?: { data?: { message?: string } } })
+        ?.response?.data?.message ?? "포트폴리오 등록에 실패했습니다."
+      alert(message)
+    } finally {
+      setUploading(false)
+    }
   }
 
   // ── 미리보기 이동 ────────────────────────────────────────────────

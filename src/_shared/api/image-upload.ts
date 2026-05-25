@@ -15,7 +15,8 @@ export interface PresignedFileRequest {
 
 export interface PresignedFileResponse {
   clientFileId: string
-  imageFileMetaId: number
+  /** TSID — 정밀도 보존을 위해 JSON 와이어 위에서 string */
+  imageFileMetaId: string
   presignedUrl: string
   publicUrl: string
 }

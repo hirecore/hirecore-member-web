@@ -98,6 +98,8 @@ export interface BatchUploadResult {
   content: JSONContent
   /** 업로드된 파일 수 */
   uploadedCount: number
+  /** publicUrl → imageFileMetaId(TSID 문자열). 등록 API의 contentImageIds 산출에 사용 */
+  imageIdMap: Map<string, string>
 }
 
 /**
@@ -111,7 +113,7 @@ export async function batchUploadImages({
   // 1. blob URL 수집
   const blobUrls = collectBlobUrls(content)
   if (blobUrls.length === 0) {
-    return { content, uploadedCount: 0 }
+    return { content, uploadedCount: 0, imageIdMap: new Map() }
   }
 
   onProgress?.(5)
@@ -147,10 +149,12 @@ export async function batchUploadImages({
 
   // 4. S3 병렬 업로드
   const urlMap = new Map<string, string>()
+  const imageIdMap = new Map<string, string>()
   const uploadPromises = presignedResult.files.map(async (presigned, i) => {
     const info = imageInfos[i]
     await uploadToS3(presigned.presignedUrl, info.file)
     urlMap.set(info.blobUrl, presigned.publicUrl)
+    imageIdMap.set(presigned.publicUrl, presigned.imageFileMetaId)
   })
 
   // 진행률을 업로드 완료 개수로 추적
@@ -170,5 +174,30 @@ export async function batchUploadImages({
 
   onProgress?.(100)
 
-  return { content: updatedContent, uploadedCount: urlMap.size }
+  return { content: updatedContent, uploadedCount: urlMap.size, imageIdMap }
+}
+
+/**
+ * 에디터 JSON에서 모든 이미지 URL을 수집한다 (단일 이미지 + 캐러셀, 중복 제거).
+ * 등록 API의 contentImageIds 산출 시 현재 본문에 박힌 publicUrl 들을 뽑아내는 용도.
+ */
+export function collectImageUrls(content: JSONContent): string[] {
+  const urls: string[] = []
+
+  function walk(node: JSONContent) {
+    if (node.type === "image" && typeof node.attrs?.src === "string") {
+      urls.push(node.attrs.src)
+    }
+    if (node.type === "imageCarousel" && Array.isArray(node.attrs?.images)) {
+      for (const img of node.attrs.images) {
+        if (typeof img.url === "string") urls.push(img.url)
+      }
+    }
+    if (node.content) {
+      for (const child of node.content) walk(child)
+    }
+  }
+
+  walk(content)
+  return [...new Set(urls)]
 }

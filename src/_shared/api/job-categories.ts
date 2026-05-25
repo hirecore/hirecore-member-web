@@ -2,10 +2,12 @@
 import { httpClient } from "@/_shared/config"
 
 export interface JobCategoryNode {
-  id: number
+  /** TSID 문자열 — 정밀도 보존 컨벤션 */
+  id: string
   depth: number
   sortOrder: number
-  parentId?: number
+  /** TSID 문자열. 루트 노드(depth=1)에서는 응답에서 키 자체가 생략됨 */
+  parentId?: string
   categoryName: string
   categoryCode: string
   allowsCustomInput: boolean
