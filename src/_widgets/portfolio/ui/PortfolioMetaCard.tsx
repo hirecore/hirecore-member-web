@@ -16,12 +16,18 @@ interface Props {
   likeCount: number
   onLikeToggle: () => void
   externalLinks?: PortfolioLink[]
+  /** 통계: 조회수 (미전달 시 0) */
+  viewCount?: number
+  /** 작성자 닉네임 — 미전달 시 "작성자" 노출 */
+  publisher?: string
 }
 
 export function PortfolioMetaCard({
   majorLabel, subCategory, projectType, visibility, title,
   thumbnailUrl, tags, liked, likeCount, onLikeToggle, externalLinks = [],
+  viewCount = 0, publisher,
 }: Props) {
+  const authorName = publisher || "작성자"
   return (
     <div className="pr-meta-card">
 
@@ -86,9 +92,9 @@ export function PortfolioMetaCard({
       <div className="pr-meta-card__divider" aria-hidden />
 
       <div className="pr-meta-card__author">
-        <AvatarPlaceholder name="작성자" size={44} />
+        <AvatarPlaceholder name={authorName} size={44} />
         <div className="pr-meta-card__author-info">
-          <span className="pr-meta-card__author-name">작성자</span>
+          <span className="pr-meta-card__author-name">{authorName}</span>
           {externalLinks.length > 0 && (
             <div className="pr-meta-card__links">
               {externalLinks.map((link) => (
@@ -115,7 +121,7 @@ export function PortfolioMetaCard({
             <ellipse cx="6.5" cy="6.5" rx="5" ry="3.5" stroke="currentColor" strokeWidth="1.2" />
             <circle cx="6.5" cy="6.5" r="1.5" fill="currentColor" />
           </svg>
-          view · 0
+          view · {viewCount}
         </span>
         <span className="pr-stat">
           <svg width="13" height="13" viewBox="0 0 13 13" fill="none" aria-hidden>

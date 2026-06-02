@@ -27,7 +27,7 @@ import {
 import { previewSizesSave, previewSizesRestore } from "@/_shared/lib"
 import {
   batchUploadImages, requestPresignedUrls, uploadToS3, getImageDimensions,
-  collectImageUrls, createPortfolio,
+  collectImageUrls, createPortfolio, updatePortfolio,
 } from "@/_shared/api"
 import { toWebP } from "@/_features/editor"
 import { useAuthGuard } from "@/_features/auth"
@@ -40,6 +40,7 @@ import {
   type ConfirmData,
   type PortfolioLink,
 } from "@/_features/portfolio"
+import { usePortfolioEdit } from "@/_entities/portfolio"
 import { useStorageInfo } from "@/_entities/user"
 
 type ProjectType = "personal" | "team"
@@ -164,6 +165,52 @@ export function usePortfolioWriteView() {
     getPreviewContent: () => usePortfolioDraftStore.getState().previewData?.content,
     onRestored: () => editor && calcEditorSessionBytes(editor, uploadedSizesRef, sessionBytesRef, setSessionBytes),
   })
+
+  // ── 편집 모드 초기화 — GET /api/portfolios/:id/edit ──────────────
+  // editId 가 URL 에 있으면 본인 포트폴리오 데이터를 불러와 폼/에디터를 1회 채운다.
+  // categories(useJobCategories) 가 함께 로드돼야 allowsCustomInput 분기를 정확히 적용 가능.
+  // 미리보기 → "편집하기" 복귀 흐름(editorRestoreAllowedRef.current=true)에서는
+  // 직전 사용자 편집을 보존해야 하므로 API 재반영을 건너뛴다.
+  const isEditMode = !!editId
+  const editQuery = usePortfolioEdit(editId, { enabled: isEditMode })
+  const editPrefillDoneRef = useRef(false)
+
+  useEffect(() => {
+    if (!isEditMode) return
+    if (editPrefillDoneRef.current) return
+    if (editorRestoreAllowedRef.current) {
+      // 미리보기 복귀 — preview store 가 더 최신이므로 API 재반영 금지
+      editPrefillDoneRef.current = true
+      return
+    }
+    if (!editor) return
+    const data = editQuery.data
+    if (!data) return
+    if (categories.length === 0) return // allowsCustomInput 판단을 위해 카테고리 로드 대기
+
+    const allowsCustom = isCustomInputCategory(categories, data.categoryCode)
+    setCategory({
+      categoryCode: data.categoryCode,
+      ...(allowsCustom && data.categoryLeafName
+        ? { customCategory: data.categoryLeafName }
+        : {}),
+    })
+    setProjectType(data.collaborationType)
+    setVisibility(data.visibility)
+    setTitle(data.title)
+    setPrivateMemo(data.privateMemo ?? "")
+    setPreviewSummary(data.previewSummary)
+    setTags(data.tags)
+    setExternalLinks(data.externalLinks)
+    // 서버가 환경별 CDN base URL 까지 결합한 완성 URL 이 내려온다.
+    // null 인 경우 신규 등록 화면과 동일한 빈 드롭존이 노출된다.
+    setThumbnailUrl(data.thumbnailImageUrl)
+
+    editor.commands.setContent(data.content)
+    calcEditorSessionBytes(editor, uploadedSizesRef, sessionBytesRef, setSessionBytes)
+
+    editPrefillDoneRef.current = true
+  }, [isEditMode, editor, editQuery.data, categories])
 
   // ── 이미지 삭제 감지 → StorageBar 실시간 반영 ───────────────────
   useEditorImageStorageTracker(editor, { uploadedSizesRef, sessionBytesRef, pendingUploadBytesRef, setSessionBytes })
@@ -333,45 +380,55 @@ export function usePortfolioWriteView() {
       (l) => l.label?.trim() && l.url?.trim()
     )
 
+    // 공통 body builder — 등록/수정이 동일 shape 을 공유한다.
+    // PUT(수정)은 전체 교체 시맨틱이므로 tags / externalLinks 등 컬렉션은 빈 배열도 그대로 송신해 클리어 의도를 전달.
+    // POST(등록)은 빈 컬렉션을 굳이 보낼 필요가 없어 조건부 스프레드를 유지한다.
+    const buildBody = (forUpdate: boolean) => ({
+      jobCategory: {
+        code: confirmData.category.categoryCode,
+        ...(confirmData.category.customCategory?.trim()
+          ? { userInput: confirmData.category.customCategory.trim() }
+          : {}),
+      },
+      collaborationType: confirmData.projectType,
+      visibility:        confirmData.visibility,
+      title:             confirmData.title,
+      ...(confirmData.privateMemo ? { privateMemo: confirmData.privateMemo } : {}),
+      previewSummary:    confirmData.previewSummary,
+      ...(thumbnailImageIdRef.current != null
+        ? { thumbnailImageId: thumbnailImageIdRef.current }
+        : {}),
+      ...(forUpdate || contentImageIds.length > 0 ? { contentImageIds } : {}),
+      ...(forUpdate || confirmData.tags.length > 0
+        ? {
+            tags: confirmData.tags.map((tag, index) => ({
+              userInputTag: tag,
+              sortOrder: index,
+            })),
+          }
+        : {}),
+      ...(forUpdate || cleanedExternalLinks.length > 0
+        ? { externalLinks: cleanedExternalLinks }
+        : {}),
+      content: {
+        json: result.content,
+        html: editor.getHTML(),
+      },
+    })
+
     try {
       setUploading(true)
-      const { portfolioId } = await createPortfolio({
-        jobCategory: {
-          code: confirmData.category.categoryCode,
-          ...(confirmData.category.customCategory?.trim()
-            ? { userInput: confirmData.category.customCategory.trim() }
-            : {}),
-        },
-        collaborationType: confirmData.projectType,
-        visibility:        confirmData.visibility,
-        title:             confirmData.title,
-        ...(confirmData.privateMemo ? { privateMemo: confirmData.privateMemo } : {}),
-        previewSummary:    confirmData.previewSummary,
-        ...(thumbnailImageIdRef.current != null
-          ? { thumbnailImageId: thumbnailImageIdRef.current }
-          : {}),
-        ...(contentImageIds.length > 0 ? { contentImageIds } : {}),
-        ...(confirmData.tags.length > 0
-          ? {
-              tags: confirmData.tags.map((tag, index) => ({
-                userInputTag: tag,
-                sortOrder: index,
-              })),
-            }
-          : {}),
-        ...(cleanedExternalLinks.length > 0 ? { externalLinks: cleanedExternalLinks } : {}),
-        content: {
-          json: result.content,
-          html: editor.getHTML(),
-        },
-      })
+      const { portfolioId } = isEditMode && editId
+        ? await updatePortfolio(editId, buildBody(true))
+        : await createPortfolio(buildBody(false))
       // 다음 진입 시 잔여 미리보기 데이터 청소
       usePortfolioDraftStore.getState().clearPreviewData()
       setConfirmData(null)
       router.push(USER_ROUTES.portfolio.detail(portfolioId))
     } catch (e) {
+      const fallback = isEditMode ? "포트폴리오 수정에 실패했습니다." : "포트폴리오 등록에 실패했습니다."
       const message = (e as { response?: { data?: { message?: string } } })
-        ?.response?.data?.message ?? "포트폴리오 등록에 실패했습니다."
+        ?.response?.data?.message ?? fallback
       alert(message)
     } finally {
       setUploading(false)
@@ -410,9 +467,14 @@ export function usePortfolioWriteView() {
        : getCategoryPathLabel(categories, category.categoryCode))
     : ""
 
+  // 편집 모드 진입 직후 데이터 로딩 — 폼이 빈 채로 깜빡이지 않도록 view 단에서 게이팅한다
+  const editPrefillLoading = isEditMode && !editPrefillDoneRef.current
+
   return {
     // auth
     authLoading, user,
+    // edit mode
+    isEditMode, editPrefillLoading,
     // form — 직무 카테고리는 단일 객체
     category, setCategory, handleCategoryChange,
     projectType, setProjectType, visibility, setVisibility,

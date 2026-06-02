@@ -67,7 +67,8 @@ const MOCK_LINKED_CL_CONTENT = mockDoc(
 export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
   "1": {
     id: "1",
-    authorId: "u_mock_1",
+    publisher: MOCK_DEFAULT_AUTHOR.name,
+    isOwner: true,
     categoryCode: "FRONTEND_ENGINEER",
     ...label("FRONTEND_ENGINEER"),
     projectType: "team",
@@ -78,7 +79,8 @@ export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
     externalLinks: [{ label: "GitHub", url: "https://github.com" }, { label: "배포 링크", url: "https://example.com" }],
     author: MOCK_DEFAULT_AUTHOR,
     updatedAt: "2025-12-23",
-    likeCount: 120,
+    viewCount: 1245,
+    interestCount: 120,
     content: MOCK_PORTFOLIO_CONTENT,
     linkedResume: {
       id: "r1", type: "resume", title: "프론트엔드 개발자 이력서 (2025)",
@@ -96,19 +98,23 @@ export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
     },
   },
   "2": {
-    id: "2", authorId: "u_mock_1", categoryCode: "BACKEND_ENGINEER", ...label("BACKEND_ENGINEER"), projectType: "personal",
+    id: "2", publisher: MOCK_DEFAULT_AUTHOR.name, isOwner: true,
+    categoryCode: "BACKEND_ENGINEER", ...label("BACKEND_ENGINEER"), projectType: "personal",
     visibility: "public", title: "AI 기반 코드 리뷰 자동화 도구", thumbnailUrl: null,
     tags: ["Python", "FastAPI", "OpenAI"],
     externalLinks: [{ label: "GitHub", url: "https://github.com" }],
     author: MOCK_DEFAULT_AUTHOR, updatedAt: "2025-11-14",
-    likeCount: 87, content: MOCK_PORTFOLIO_CONTENT, linkedResume: null, linkedCoverletter: null,
+    viewCount: 540, interestCount: 87,
+    content: MOCK_PORTFOLIO_CONTENT, linkedResume: null, linkedCoverletter: null,
   },
   "3": {
-    id: "3", authorId: "u_mock_1", categoryCode: "FRONTEND_ENGINEER", ...label("FRONTEND_ENGINEER"), projectType: "personal",
+    id: "3", publisher: MOCK_DEFAULT_AUTHOR.name, isOwner: true,
+    categoryCode: "FRONTEND_ENGINEER", ...label("FRONTEND_ENGINEER"), projectType: "personal",
     visibility: "private", title: "사내 인사 관리 시스템 리뉴얼", thumbnailUrl: null,
     tags: ["React", "TypeScript", "PostgreSQL"], externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR, updatedAt: "2025-10-02",
-    likeCount: 0, content: MOCK_PORTFOLIO_CONTENT, linkedResume: null, linkedCoverletter: null,
+    viewCount: 12, interestCount: 0,
+    content: MOCK_PORTFOLIO_CONTENT, linkedResume: null, linkedCoverletter: null,
   },
 }
 

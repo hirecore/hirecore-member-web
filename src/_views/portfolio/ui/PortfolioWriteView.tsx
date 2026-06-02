@@ -88,6 +88,7 @@ function EditorToolbarContent() {
 export default function PortfolioWriteView() {
   const {
     authLoading, user,
+    isEditMode, editPrefillLoading,
     category, handleCategoryChange,
     projectType, setProjectType, visibility, setVisibility,
     title, setTitle, privateMemo, setPrivateMemo,
@@ -140,6 +141,8 @@ export default function PortfolioWriteView() {
   }
 
   if (authLoading || !user) return null
+  // 편집 모드 진입 시 데이터 도착 전 빈 폼이 깜빡이지 않도록 로딩 동안 렌더 보류
+  if (editPrefillLoading) return null
 
   return (
     <EditorContext.Provider value={{ editor }}>
@@ -199,7 +202,7 @@ export default function PortfolioWriteView() {
                   <path d="M2 12h20" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round"/>
                 </svg>
               </div>
-              <h1 className="pw-page-header__title">포트폴리오 등록</h1>
+              <h1 className="pw-page-header__title">{isEditMode ? "포트폴리오 수정" : "포트폴리오 등록"}</h1>
             </div>
 
             <JobCategorySection
@@ -349,16 +352,22 @@ export default function PortfolioWriteView() {
           </PageContainer>
         </main>
 
-        {/* 하단 액션 바 */}
-        <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} onDraftSave={handleDraftSave} />
+        {/* 하단 액션 바 — 편집 모드면 라벨을 "수정하기"로 전환 */}
+        <WriteActionBar
+          onPreview={handlePreview}
+          onSubmit={handleSubmit}
+          onDraftSave={handleDraftSave}
+          submitLabel={isEditMode ? "수정하기" : undefined}
+        />
 
-        {/* 등록 확인 오버레이 */}
+        {/* 등록/수정 확인 오버레이 */}
         {confirmData && (
           <ConfirmPanel
             data={confirmData}
             categoryLabel={categoryLabel}
             onBack={() => setConfirmData(null)}
             onConfirm={handleConfirm}
+            isEditMode={isEditMode}
           />
         )}
 

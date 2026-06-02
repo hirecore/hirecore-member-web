@@ -12,6 +12,13 @@ export {
 } from "./job-categories"
 export {
   createPortfolio,
+  updatePortfolio,
+  fetchPortfolioDetail,
+  fetchPortfolioForEdit,
   type CreatePortfolioRequest, type CreatePortfolioResponse, type PortfolioTagInput,
   type JobCategoryInput,
+  type UpdatePortfolioRequest, type UpdatePortfolioResponse,
+  type PortfolioDetailResponse, type PortfolioDetailJobCategory,
+  type PortfolioDetailTag, type PortfolioDetailContent,
+  type PortfolioEditResponse,
 } from "./portfolio"

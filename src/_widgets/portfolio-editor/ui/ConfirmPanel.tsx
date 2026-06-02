@@ -9,9 +9,16 @@ interface Props {
   categoryLabel: string
   onBack: () => void
   onConfirm: () => void
+  /** 편집 모드 여부 — true 시 등록 → 수정 으로 문구 전환 */
+  isEditMode?: boolean
 }
 
-export function ConfirmPanel({ data, categoryLabel, onBack, onConfirm }: Props) {
+export function ConfirmPanel({ data, categoryLabel, onBack, onConfirm, isEditMode = false }: Props) {
+  const confirmDescription = isEditMode
+    ? "아래 내용으로 포트폴리오가 수정됩니다. 확인 후 수정해주세요."
+    : "아래 내용으로 포트폴리오가 등록됩니다. 확인 후 등록해주세요."
+  const confirmCta     = isEditMode ? "수정 완료" : "등록 완료"
+  const panelAriaLabel = isEditMode ? "수정 확인" : "등록 확인"
   const { data: categories = [] } = useJobCategories(3)
   // L1 / L2 / L3 경로 — "기타(직접입력)"이면 직접입력 텍스트 표시
   const path = getCategoryPath(categories, data.category.categoryCode)
@@ -79,23 +86,21 @@ export function ConfirmPanel({ data, categoryLabel, onBack, onConfirm }: Props) 
   ]
 
   return (
-    <div className="pw-confirm-overlay" role="dialog" aria-modal aria-label="등록 확인">
+    <div className="pw-confirm-overlay" role="dialog" aria-modal aria-label={panelAriaLabel}>
       <div className="pw-confirm-panel">
         <div className="pw-confirm-panel__header">
-          <button type="button" className="pw-confirm-panel__back" onClick={onBack} aria-label="수정하기">
+          <button type="button" className="pw-confirm-panel__back" onClick={onBack} aria-label="다시 작성하기">
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
               <path d="M10 3L5 8l5 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
             </svg>
-            수정하기
+            다시 작성
           </button>
           <span className="pw-confirm-panel__title">작성 내용 확인</span>
           <div style={{ width: "5rem" }} />
         </div>
 
         <div className="pw-confirm-panel__body">
-          <p className="pw-confirm-panel__desc">
-            아래 내용으로 포트폴리오가 등록됩니다. 확인 후 등록해주세요.
-          </p>
+          <p className="pw-confirm-panel__desc">{confirmDescription}</p>
           <div className="pw-confirm-rows">
             {rows.map((row) => (
               <div key={row.label} className="pw-confirm-row">
@@ -107,9 +112,9 @@ export function ConfirmPanel({ data, categoryLabel, onBack, onConfirm }: Props) 
         </div>
 
         <div className="pw-confirm-panel__footer">
-          <button type="button" className="pw-confirm-panel__cancel" onClick={onBack}>수정하기</button>
+          <button type="button" className="pw-confirm-panel__cancel" onClick={onBack}>다시 작성</button>
           <button type="button" className="pw-confirm-panel__submit" onClick={onConfirm}>
-            등록 완료
+            {confirmCta}
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden>
               <path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" />
             </svg>

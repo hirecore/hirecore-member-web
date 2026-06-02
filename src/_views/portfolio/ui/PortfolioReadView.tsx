@@ -110,9 +110,13 @@ const TABS: { id: ActiveTab; label: string }[] = [
   { id: "portfolio", label: "포트폴리오" },
 ]
 
-interface Props { id: string }
+interface Props {
+  id: string
+  /** /portfolio/temp 등 시각 검토용으로 실 API 대신 mock 데이터를 쓸 때 true */
+  mock?: boolean
+}
 
-export function PortfolioReadView({ id }: Props) {
+export function PortfolioReadView({ id, mock }: Props) {
   const router = useRouter()
   const {
     data, editor, tocHeadings, tabsSentinelRef,
@@ -122,7 +126,7 @@ export function PortfolioReadView({ id }: Props) {
     activeId,
     scrollToHeading,
     isOwner,
-  } = usePortfolioReadView(id)
+  } = usePortfolioReadView(id, { mock })
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
@@ -193,9 +197,11 @@ export function PortfolioReadView({ id }: Props) {
                 thumbnailUrl={data.thumbnailUrl}
                 tags={data.tags}
                 externalLinks={data.externalLinks}
+                viewCount={data.viewCount}
                 liked={liked}
-                likeCount={data.likeCount + (liked ? 1 : 0)}
+                likeCount={data.interestCount + (liked ? 1 : 0)}
                 onLikeToggle={() => setLiked((v) => !v)}
+                publisher={data.publisher}
               />
 
               {/* sentinel */}
