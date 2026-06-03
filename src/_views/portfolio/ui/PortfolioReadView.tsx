@@ -121,7 +121,7 @@ export function PortfolioReadView({ id, mock }: Props) {
   const {
     data, editor, tocHeadings, tabsSentinelRef,
     tab, setTab,
-    liked, setLiked,
+    interested, interestCount, handleInterestToggle,
     tabsSticky,
     activeId,
     scrollToHeading,
@@ -198,10 +198,11 @@ export function PortfolioReadView({ id, mock }: Props) {
                 tags={data.tags}
                 externalLinks={data.externalLinks}
                 viewCount={data.viewCount}
-                liked={liked}
-                likeCount={data.interestCount + (liked ? 1 : 0)}
-                onLikeToggle={() => setLiked((v) => !v)}
+                liked={interested}
+                likeCount={interestCount}
+                onLikeToggle={handleInterestToggle}
                 publisher={data.publisher}
+                showLikeButton={!isOwner}
               />
 
               {/* sentinel */}

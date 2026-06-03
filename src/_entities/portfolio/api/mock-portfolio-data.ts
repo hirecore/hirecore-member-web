@@ -69,6 +69,7 @@ export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
     id: "1",
     publisher: MOCK_DEFAULT_AUTHOR.name,
     isOwner: true,
+    isInterested: null,
     categoryCode: "FRONTEND_ENGINEER",
     ...label("FRONTEND_ENGINEER"),
     projectType: "team",
@@ -98,7 +99,7 @@ export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
     },
   },
   "2": {
-    id: "2", publisher: MOCK_DEFAULT_AUTHOR.name, isOwner: true,
+    id: "2", publisher: MOCK_DEFAULT_AUTHOR.name, isOwner: true, isInterested: null,
     categoryCode: "BACKEND_ENGINEER", ...label("BACKEND_ENGINEER"), projectType: "personal",
     visibility: "public", title: "AI 기반 코드 리뷰 자동화 도구", thumbnailUrl: null,
     tags: ["Python", "FastAPI", "OpenAI"],
@@ -108,7 +109,7 @@ export const MOCK_PORTFOLIO_DETAIL_DATA: Record<string, PortfolioDetail> = {
     content: MOCK_PORTFOLIO_CONTENT, linkedResume: null, linkedCoverletter: null,
   },
   "3": {
-    id: "3", publisher: MOCK_DEFAULT_AUTHOR.name, isOwner: true,
+    id: "3", publisher: MOCK_DEFAULT_AUTHOR.name, isOwner: true, isInterested: null,
     categoryCode: "FRONTEND_ENGINEER", ...label("FRONTEND_ENGINEER"), projectType: "personal",
     visibility: "private", title: "사내 인사 관리 시스템 리뉴얼", thumbnailUrl: null,
     tags: ["React", "TypeScript", "PostgreSQL"], externalLinks: [],

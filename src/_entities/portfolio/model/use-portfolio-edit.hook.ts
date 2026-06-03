@@ -9,17 +9,25 @@ import type { JSONContent } from "@tiptap/core"
 import {
   fetchPortfolioForEdit,
   type PortfolioEditResponse,
+  type PortfolioEditContentImage,
 } from "@/_shared/api"
 import type { ExternalLink, Visibility } from "@/_shared/model"
 
 export interface PortfolioEditData {
   privateMemo: string | null
   previewSummary: string
+  /** 썸네일 ImageFileMeta ID. PUT 수정 요청에 그대로 동봉해 동일 썸네일 유지를 전달한다. */
+  thumbnailImageId: string | null
   /**
    * 썸네일 이미지의 전체 URL (서버가 환경별 CDN base URL 을 결합해 내려줌).
    * null 이면 등록 시 썸네일 미지정 — 편집 화면에서 드롭존을 노출한다.
    */
   thumbnailImageUrl: string | null
+  /**
+   * 본문 image 노드 src ↔ ImageFileMeta ID 매핑. 편집 진입 직후 클라이언트가 룩업 테이블에
+   * 적재해 PUT 수정 시 contentImageIds 산출에 사용한다.
+   */
+  contentImages: PortfolioEditContentImage[]
   /** L3(리프) 직무 코드 */
   categoryCode: string
   /**
@@ -55,7 +63,9 @@ function mapResponse(res: PortfolioEditResponse): PortfolioEditData {
   return {
     privateMemo: res.privateMemo,
     previewSummary: res.previewSummary,
+    thumbnailImageId: res.thumbnailImageId,
     thumbnailImageUrl: res.thumbnailImageUrl,
+    contentImages: res.contentImages ?? [],
     categoryCode: leaf?.categoryCode ?? "",
     categoryLeafName: leaf?.name ?? "",
     collaborationType: res.collaborationType,

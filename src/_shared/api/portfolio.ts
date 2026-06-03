@@ -1,8 +1,10 @@
-// _shared/api | 포트폴리오 등록 / 수정 / 상세 조회 / 편집 조회 API
-// 등록     : POST /api/portfolios — 사전조건: presigned URL → S3 업로드 후 imageFileMetaId 확보
-// 수정     : PUT  /api/portfolios/{portfolioId} — 전체 교체 시맨틱, body shape 은 등록과 동일
-// 상세     : GET  /api/portfolios/{portfolioId}
-// 편집 조회: GET  /api/portfolios/{portfolioId}/edit — 작성자 본인만 접근 가능
+// _shared/api | 포트폴리오 등록 / 수정 / 상세 조회 / 편집 조회 / 관심 토글 API
+// 등록     : POST   /api/portfolios — 사전조건: presigned URL → S3 업로드 후 imageFileMetaId 확보
+// 수정     : PUT    /api/portfolios/{portfolioId} — 전체 교체 시맨틱, body shape 은 등록과 동일
+// 상세     : GET    /api/portfolios/{portfolioId}
+// 편집 조회: GET    /api/portfolios/{portfolioId}/edit — 작성자 본인만 접근 가능
+// 관심 등록: POST   /api/portfolios/{portfolioId}/interest — 멱등, 204 No Content
+// 관심 해제: DELETE /api/portfolios/{portfolioId}/interest — 멱등, 204 No Content
 import type { JSONContent } from "@tiptap/core"
 import type { ExternalLink, Visibility } from "@/_shared/model"
 import { httpClient } from "@/_shared/config"
@@ -27,11 +29,15 @@ export interface CreatePortfolioRequest {
   collaborationType: "team" | "personal"
   visibility: Visibility
   title: string
-  privateMemo?: string
+  /** null 명시 시 비공개 메모 클리어 (PUT 수정 컨텍스트 한정). */
+  privateMemo?: string | null
   /** 포트폴리오 카드/검색 결과에 노출되는 사용자 입력 요약 (필수, ≤ 100자) */
   previewSummary: string
-  /** TSID 문자열 — 정밀도 보존 컨벤션 (tsid-id-json-convention.md) */
-  thumbnailImageId?: string
+  /**
+   * 썸네일 ImageFileMeta TSID. null 명시 시 썸네일 제거 (PUT 수정 컨텍스트).
+   * POST 등록은 보통 미지정 시 키 자체를 생략한다.
+   */
+  thumbnailImageId?: string | null
   contentImageIds?: string[]
   tags?: PortfolioTagInput[]
   externalLinks?: ExternalLink[]
@@ -39,8 +45,10 @@ export interface CreatePortfolioRequest {
     json: JSONContent
     html: string
   }
-  linkedResumeId?: string
-  linkedCoverLetterId?: string
+  /** null 명시 시 연결 해제 (PUT 수정 컨텍스트). */
+  linkedResumeId?: string | null
+  /** null 명시 시 연결 해제 (PUT 수정 컨텍스트). */
+  linkedCoverLetterId?: string | null
 }
 
 export interface CreatePortfolioResponse {
@@ -106,6 +114,13 @@ export interface PortfolioDetailContent {
 
 export interface PortfolioDetailResponse {
   isOwner: boolean
+  /**
+   * 요청자가 이 포트폴리오에 관심 등록했는지 여부.
+   * - 비로그인 사용자 / 본인 포트폴리오(isOwner=true) → null
+   * - 비소유자 미등록 → false
+   * - 비소유자 등록됨 → true
+   */
+  isInterested: boolean | null
   publisher: string
   jobCategories: PortfolioDetailJobCategory[]
   collaborationType: "team" | "personal"
@@ -135,10 +150,23 @@ export async function fetchPortfolioDetail(
 // privateMemo / previewSummary 가 포함되고, isOwner/publisher/viewCount/
 // interestCount/updatedAt 등 통계·메타 필드는 빠진다.
 
+/** 편집 응답에 포함되는 본문 이미지 (imageFileMetaId ↔ URL) 매핑. */
+export interface PortfolioEditContentImage {
+  /** ImageFileMeta TSID 문자열 */
+  imageId: string
+  /** 본문 image 노드의 src 와 동일한 전체 URL */
+  url: string
+}
+
 export interface PortfolioEditResponse {
   /** 작성자 비공개 메모. 미작성 시 null */
   privateMemo: string | null
   previewSummary: string
+  /**
+   * 썸네일 ImageFileMeta ID. PUT 수정 요청에서 동일 썸네일 유지를 전달하기 위해
+   * 클라이언트가 그대로 thumbnailImageId 로 돌려보낸다. 썸네일 미등록 시 null.
+   */
+  thumbnailImageId: string | null
   /**
    * 썸네일 이미지의 전체 URL (환경별 CDN base URL 은 서버에서 자동 결합).
    * null 인 경우 사용자가 등록 시 썸네일을 넣지 않은 상태 — 편집 화면에서는
@@ -151,6 +179,13 @@ export interface PortfolioEditResponse {
   title: string
   tags: PortfolioDetailTag[]
   externalLinks: ExternalLink[]
+  /**
+   * 본문에서 사용 중인 이미지의 (imageId, url) 매핑 목록. 본문에 이미지가 없으면 빈 배열.
+   * 편집 진입 직후 클라이언트는 이 매핑을 룩업 테이블로 보관해 PUT 수정 시
+   * 본문 image src → imageFileMetaId 변환에 사용한다. 누락 시 서버가 모든 본문 이미지를
+   * 회수(orphan) 처리하므로 PUT 요청 시 반드시 채워서 보낸다.
+   */
+  contentImages: PortfolioEditContentImage[]
   content: PortfolioDetailContent
 }
 
@@ -161,4 +196,17 @@ export async function fetchPortfolioForEdit(
     `/api/portfolios/${portfolioId}/edit`
   )
   return data
+}
+
+// ── 관심 토글 ──────────────────────────────────────────────────────
+// POST   /api/portfolios/{portfolioId}/interest — 관심 등록
+// DELETE /api/portfolios/{portfolioId}/interest — 관심 해제
+// 두 엔드포인트 모두 멱등 (이미 등록/미등록 상태에서도 204 응답).
+
+export async function registerPortfolioInterest(portfolioId: string): Promise<void> {
+  await httpClient.post(`/api/portfolios/${portfolioId}/interest`)
+}
+
+export async function cancelPortfolioInterest(portfolioId: string): Promise<void> {
+  await httpClient.delete(`/api/portfolios/${portfolioId}/interest`)
 }

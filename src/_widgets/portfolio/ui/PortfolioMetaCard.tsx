@@ -20,12 +20,18 @@ interface Props {
   viewCount?: number
   /** 작성자 닉네임 — 미전달 시 "작성자" 노출 */
   publisher?: string
+  /**
+   * 하트(관심) 버튼 렌더 여부. 기본 true.
+   * 본인 포트폴리오(isOwner=true) 인 경우 호출자가 false 로 지정해 DOM 에서 제거한다.
+   * (관심 등록 정책상 본인 포트폴리오에는 등록 불가 — 비활성보다 제거가 의도 명확.)
+   */
+  showLikeButton?: boolean
 }
 
 export function PortfolioMetaCard({
   majorLabel, subCategory, projectType, visibility, title,
   thumbnailUrl, tags, liked, likeCount, onLikeToggle, externalLinks = [],
-  viewCount = 0, publisher,
+  viewCount = 0, publisher, showLikeButton = true,
 }: Props) {
   const authorName = publisher || "작성자"
   return (
@@ -64,20 +70,22 @@ export function PortfolioMetaCard({
           <span className={`pr-badge pr-badge--vis${visibility === "private" ? " pr-badge--private" : ""}`}>
             {visibility === "public" ? "공개" : "비공개"}
           </span>
-          <button
-            type="button"
-            className={`pr-like-btn${liked ? " pr-like-btn--active" : ""}`}
-            onClick={onLikeToggle}
-            aria-label={liked ? "관심 취소" : "관심 포트폴리오 등록"}
-          >
-            <svg width="14" height="14" viewBox="0 0 14 14" fill={liked ? "currentColor" : "none"}>
-              <path
-                d="M7 11.5S1.5 8 1.5 4.5a2.5 2.5 0 0 1 5.5-0.5A2.5 2.5 0 0 1 12.5 4.5C12.5 8 7 11.5 7 11.5Z"
-                stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round"
-              />
-            </svg>
-            관심
-          </button>
+          {showLikeButton && (
+            <button
+              type="button"
+              className={`pr-like-btn${liked ? " pr-like-btn--active" : ""}`}
+              onClick={onLikeToggle}
+              aria-label={liked ? "관심 취소" : "관심 포트폴리오 등록"}
+            >
+              <svg width="14" height="14" viewBox="0 0 14 14" fill={liked ? "currentColor" : "none"}>
+                <path
+                  d="M7 11.5S1.5 8 1.5 4.5a2.5 2.5 0 0 1 5.5-0.5A2.5 2.5 0 0 1 12.5 4.5C12.5 8 7 11.5 7 11.5Z"
+                  stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round"
+                />
+              </svg>
+              관심
+            </button>
+          )}
         </div>
       </div>
 

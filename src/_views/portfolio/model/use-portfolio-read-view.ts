@@ -1,9 +1,9 @@
 "use client"
 
 // _views/portfolio/model | 포트폴리오 상세 읽기 뷰 비즈니스 로직
-// 탭·좋아요·sticky 감지·TOC 스크롤·에디터·리다이렉트 — UI와 무관하므로 model에 분리
+// 탭·관심·sticky 감지·TOC 스크롤·에디터·리다이렉트 — UI와 무관하므로 model에 분리
 //
-// mock=true (예: /portfolio/temp) 인 경우 실 API 대신 mock 데이터를 사용한다.
+// mock=true (예: /portfolio/temp) 인 경우 실 API 호출 없이 mock 데이터를 사용한다.
 // 실 API 경로에서는 React Query 상태를 통해 로딩/에러 처리를 한다.
 import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
@@ -12,6 +12,7 @@ import { USER_ROUTES } from "@/_shared/config"
 import {
   usePortfolioDetail,
   useMockPortfolioDetail,
+  usePortfolioInterestToggle,
 } from "@/_entities/portfolio"
 import { useTocTracking } from "@/_features/portfolio"
 import type { ActiveTab } from "@/_features/portfolio/lib"
@@ -31,11 +32,28 @@ export function usePortfolioReadView(id: string, { mock = false }: Options = {})
   const isLoading = mock ? false : query.isPending
   const isError = mock ? false : query.isError
 
-  const [tab, setTab]     = useState<ActiveTab>("portfolio")
-  const [liked, setLiked] = useState(false)
+  const [tab, setTab] = useState<ActiveTab>("portfolio")
 
-  // 작성자 여부는 API 응답값을 그대로 사용 — 비로그인이면 false
+  // 작성자 / 관심 상태는 API 응답값을 그대로 사용
   const isOwner = data?.isOwner ?? false
+  // isInterested: true → 채움, false/null → 비움 (null 은 비로그인 또는 본인 케이스)
+  const interested = data?.isInterested === true
+  const interestCount = data?.interestCount ?? 0
+
+  // 관심 토글 — 옵티미스틱으로 캐시된 detail 데이터를 즉시 갱신
+  const interestToggle = usePortfolioInterestToggle(id)
+
+  const handleInterestToggle = () => {
+    if (mock || !data) return
+    // 비로그인 사용자(isInterested == null && isOwner == false) → 로그인 유도
+    if (data.isInterested === null && !data.isOwner) {
+      router.push(USER_ROUTES.auth.login)
+      return
+    }
+    // 본인 포트폴리오 — 버튼 자체가 숨겨져 있어야 하지만 방어적으로 차단
+    if (data.isOwner) return
+    interestToggle.mutate(!interested)
+  }
 
   const editor = useReadOnlyEditor({ content: data?.content, includeImages: true })
 
@@ -51,7 +69,8 @@ export function usePortfolioReadView(id: string, { mock = false }: Options = {})
   return {
     data, editor, tocHeadings, tabsSentinelRef,
     tab, setTab,
-    liked, setLiked,
+    interested, interestCount,
+    handleInterestToggle,
     tabsSticky,
     activeId,
     scrollToHeading,

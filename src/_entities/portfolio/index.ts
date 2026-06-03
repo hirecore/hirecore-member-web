@@ -6,6 +6,7 @@ export { usePortfolioDetail, useMockPortfolioDetail } from "./model/use-portfoli
 export type { PortfolioDetail, LinkedDocEmbed, OtherPortfolio } from "./model/use-portfolio-detail.hook"
 export { usePortfolioEdit } from "./model/use-portfolio-edit.hook"
 export type { PortfolioEditData } from "./model/use-portfolio-edit.hook"
+export { usePortfolioInterestToggle } from "./model/use-portfolio-interest.hook"
 export { useManagedPortfolios } from "./model/use-managed-portfolios.hook"
 export { useDraftPortfolios } from "./model/use-draft-portfolios.hook"
 export type { ManagedPortfoliosResult } from "./model/use-managed-portfolios.hook"

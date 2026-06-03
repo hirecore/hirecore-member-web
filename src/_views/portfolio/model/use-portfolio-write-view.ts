@@ -4,6 +4,7 @@
 // 폼 상태, 스토리지 추적, 이미지 업로드, 유효성 검사, 제출 — UI 렌더와 무관하므로 model에 분리
 import { useCallback, useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
+import { useQueryClient } from "@tanstack/react-query"
 import { useEditor } from "@tiptap/react"
 import {
   ImageUploadNode,
@@ -49,6 +50,7 @@ export function usePortfolioWriteView() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const editId = searchParams.get("editId")
+  const queryClient = useQueryClient()
 
   const { isLoading: authLoading, user } = useAuthGuard()
   const storageInfo = useStorageInfo()
@@ -170,22 +172,35 @@ export function usePortfolioWriteView() {
   // editId 가 URL 에 있으면 본인 포트폴리오 데이터를 불러와 폼/에디터를 1회 채운다.
   // categories(useJobCategories) 가 함께 로드돼야 allowsCustomInput 분기를 정확히 적용 가능.
   // 미리보기 → "편집하기" 복귀 흐름(editorRestoreAllowedRef.current=true)에서는
-  // 직전 사용자 편집을 보존해야 하므로 API 재반영을 건너뛴다.
+  // 직전 사용자 편집을 보존해야 하므로 폼/에디터 본문 재주입은 건너뛰지만,
+  // PUT 수정 시 contentImageIds 산출에 필요한 thumbnailImageIdRef / imageIdMapRef 는
+  // 매 경우 반드시 채워둔다 (누락 시 서버가 기존 이미지를 전부 회수 처리).
   const isEditMode = !!editId
   const editQuery = usePortfolioEdit(editId, { enabled: isEditMode })
   const editPrefillDoneRef = useRef(false)
+  const editImageMapInitDoneRef = useRef(false)
 
   useEffect(() => {
     if (!isEditMode) return
+    const data = editQuery.data
+    if (!data) return
+
+    // 이미지 ID 매핑 — 미리보기 복귀 흐름에서도 PUT 송신에 필요하므로 항상 초기화
+    if (!editImageMapInitDoneRef.current) {
+      thumbnailImageIdRef.current = data.thumbnailImageId ?? null
+      for (const img of data.contentImages) {
+        imageIdMapRef.current.set(img.url, img.imageId)
+      }
+      editImageMapInitDoneRef.current = true
+    }
+
     if (editPrefillDoneRef.current) return
     if (editorRestoreAllowedRef.current) {
-      // 미리보기 복귀 — preview store 가 더 최신이므로 API 재반영 금지
+      // 미리보기 복귀 — preview store 가 더 최신이므로 폼/에디터 본문 재주입은 건너뜀
       editPrefillDoneRef.current = true
       return
     }
     if (!editor) return
-    const data = editQuery.data
-    if (!data) return
     if (categories.length === 0) return // allowsCustomInput 판단을 위해 카테고리 로드 대기
 
     const allowsCustom = isCustomInputCategory(categories, data.categoryCode)
@@ -245,6 +260,9 @@ export function usePortfolioWriteView() {
   const removeThumbnail = () => {
     if (thumbnailUrl?.startsWith("blob:")) URL.revokeObjectURL(thumbnailUrl)
     thumbnailFileRef.current = null
+    // 편집 모드에서 기존 썸네일을 제거한 경우 PUT 본문에 thumbnailImageId 가 남으면
+    // 서버가 동일 썸네일 유지로 해석하므로 ref 도 같이 비운다 (등록 모드도 동일하게 정리).
+    thumbnailImageIdRef.current = null
     setThumbnailUrl(null)
     if (thumbnailInputRef.current) thumbnailInputRef.current.value = ""
   }
@@ -381,8 +399,10 @@ export function usePortfolioWriteView() {
     )
 
     // 공통 body builder — 등록/수정이 동일 shape 을 공유한다.
-    // PUT(수정)은 전체 교체 시맨틱이므로 tags / externalLinks 등 컬렉션은 빈 배열도 그대로 송신해 클리어 의도를 전달.
-    // POST(등록)은 빈 컬렉션을 굳이 보낼 필요가 없어 조건부 스프레드를 유지한다.
+    // PUT(수정)은 전체 교체 시맨틱이므로:
+    //  - tags / externalLinks 등 컬렉션은 빈 배열도 그대로 송신해 클리어 의도를 전달
+    //  - thumbnailImageId 는 null 도 명시 전송해 "썸네일 제거" 의도를 전달
+    // POST(등록)은 빈 컬렉션/null 을 굳이 보낼 필요가 없어 조건부 스프레드를 유지한다.
     const buildBody = (forUpdate: boolean) => ({
       jobCategory: {
         code: confirmData.category.categoryCode,
@@ -395,9 +415,11 @@ export function usePortfolioWriteView() {
       title:             confirmData.title,
       ...(confirmData.privateMemo ? { privateMemo: confirmData.privateMemo } : {}),
       previewSummary:    confirmData.previewSummary,
-      ...(thumbnailImageIdRef.current != null
+      ...(forUpdate
         ? { thumbnailImageId: thumbnailImageIdRef.current }
-        : {}),
+        : thumbnailImageIdRef.current != null
+          ? { thumbnailImageId: thumbnailImageIdRef.current }
+          : {}),
       ...(forUpdate || contentImageIds.length > 0 ? { contentImageIds } : {}),
       ...(forUpdate || confirmData.tags.length > 0
         ? {
@@ -424,6 +446,13 @@ export function usePortfolioWriteView() {
       // 다음 진입 시 잔여 미리보기 데이터 청소
       usePortfolioDraftStore.getState().clearPreviewData()
       setConfirmData(null)
+      // 캐시 무효화 — staleTime(60s) 내 재진입 시 옛 데이터가 노출되지 않도록
+      // 상세 / 편집 양쪽 쿼리를 모두 비운다. 수정 모드일 때만 무효화가 의미 있지만
+      // 등록 모드에서도 동일 ID로 미리 들어가 있을 가능성은 없어 안전.
+      if (isEditMode && editId) {
+        queryClient.invalidateQueries({ queryKey: ["portfolio", "edit", editId] })
+        queryClient.invalidateQueries({ queryKey: ["portfolio", "detail", editId] })
+      }
       router.push(USER_ROUTES.portfolio.detail(portfolioId))
     } catch (e) {
       const fallback = isEditMode ? "포트폴리오 수정에 실패했습니다." : "포트폴리오 등록에 실패했습니다."

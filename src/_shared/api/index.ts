@@ -15,10 +15,12 @@ export {
   updatePortfolio,
   fetchPortfolioDetail,
   fetchPortfolioForEdit,
+  registerPortfolioInterest,
+  cancelPortfolioInterest,
   type CreatePortfolioRequest, type CreatePortfolioResponse, type PortfolioTagInput,
   type JobCategoryInput,
   type UpdatePortfolioRequest, type UpdatePortfolioResponse,
   type PortfolioDetailResponse, type PortfolioDetailJobCategory,
   type PortfolioDetailTag, type PortfolioDetailContent,
-  type PortfolioEditResponse,
+  type PortfolioEditResponse, type PortfolioEditContentImage,
 } from "./portfolio"

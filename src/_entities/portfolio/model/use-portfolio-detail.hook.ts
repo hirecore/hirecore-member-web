@@ -40,6 +40,12 @@ export interface PortfolioDetail {
   publisher: string
   /** 요청자가 작성자인지 — API 응답값을 그대로 사용 */
   isOwner: boolean
+  /**
+   * 요청자가 관심 등록한 상태인지.
+   * - 비로그인 / 본인 포트폴리오 → null (UI 에서 하트 비활성/숨김)
+   * - 그 외 로그인 사용자 → true/false
+   */
+  isInterested: boolean | null
   /** L3 직무 코드 (루트→리프 계층 중 가장 깊은 노드) */
   categoryCode: string
   /** L3 직무명 (또는 customCategory) — 표시용 */
@@ -105,6 +111,7 @@ function mapResponse(id: string, res: PortfolioDetailResponse): PortfolioDetail 
     id,
     publisher: res.publisher,
     isOwner: res.isOwner,
+    isInterested: res.isInterested,
     categoryCode: leaf?.categoryCode ?? "",
     categoryName: leaf?.name ?? "",
     majorCategoryName: major?.name ?? "",
