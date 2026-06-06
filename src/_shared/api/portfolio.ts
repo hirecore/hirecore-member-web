@@ -11,7 +11,7 @@ import type { ExternalLink, Visibility } from "@/_shared/model"
 import { httpClient } from "@/_shared/config"
 
 export interface PortfolioTagInput {
-  userInputTag: string
+  name: string
   sortOrder: number
 }
 
@@ -102,7 +102,7 @@ export interface PortfolioDetailJobCategory {
 }
 
 export interface PortfolioDetailTag {
-  userInputTag: string
+  name: string
   sortOrder: number
 }
 

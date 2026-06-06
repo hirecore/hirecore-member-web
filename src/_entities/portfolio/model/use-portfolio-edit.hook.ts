@@ -50,7 +50,7 @@ function mapResponse(res: PortfolioEditResponse): PortfolioEditData {
   const leaf = sortedCats[sortedCats.length - 1]
   const sortedTags = [...res.tags]
     .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map((t) => t.userInputTag)
+    .map((t) => t.name)
 
   // content.json 은 직렬화 문자열 — 에디터에 주입하기 전 파싱
   let parsedContent: JSONContent

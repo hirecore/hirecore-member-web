@@ -412,7 +412,7 @@ export function usePortfolioWriteView() {
       ...(forUpdate || confirmData.tags.length > 0
         ? {
             tags: confirmData.tags.map((tag, index) => ({
-              userInputTag: tag,
+              name: tag,
               sortOrder: index,
             })),
           }

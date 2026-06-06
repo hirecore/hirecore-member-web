@@ -97,7 +97,7 @@ function mapResponse(id: string, res: PortfolioDetailResponse): PortfolioDetail 
   const leaf = sortedCats[sortedCats.length - 1]
   const sortedTags = [...res.tags]
     .sort((a, b) => a.sortOrder - b.sortOrder)
-    .map((t) => t.userInputTag)
+    .map((t) => t.name)
 
   // content.json은 직렬화된 문자열 — TipTap에 주입하기 전 파싱
   let parsedContent: JSONContent
