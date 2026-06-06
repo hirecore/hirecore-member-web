@@ -47,10 +47,11 @@ export function useResumeWriteView() {
   const { data: categories = [] } = useJobCategories(3)
 
   // ── 폼 상태 ──────────────────────────────────────────────────────
-  const [visibility, setVisibility] = useState<Visibility | null>(null)
-  const [title,      setTitle]      = useState("")
-  const [memo,       setMemo]       = useState("")
-  const [category,   setCategory]   = useState<CategorySelection | null>(null)
+  const [visibility,     setVisibility]     = useState<Visibility | null>(null)
+  const [title,          setTitle]          = useState("")
+  const [memo,           setMemo]           = useState("")
+  const [category,       setCategory]       = useState<CategorySelection | null>(null)
+  const [previewSummary, setPreviewSummary] = useState("")
   const [tags,            setTags]            = useState<string[]>([])
   const [linkedIds,       setLinkedIds]       = useState<string[]>([])
   const [externalLinks,   setExternalLinks]   = useState<ExternalLink[]>([])
@@ -131,6 +132,7 @@ export function useResumeWriteView() {
         if (saved.title)                 setTitle(saved.title)
         if (saved.memo)                  setMemo(saved.memo)
         if (saved.category)              setCategory(saved.category)
+        if (saved.previewSummary)        setPreviewSummary(saved.previewSummary)
         if (saved.tags.length)           setTags(saved.tags)
         if (saved.linkedIds.length)      setLinkedIds(saved.linkedIds)
         if (saved.externalLinks?.length) setExternalLinks(saved.externalLinks)
@@ -181,10 +183,13 @@ export function useResumeWriteView() {
     const newErrors: typeof errors = {}
     if (!visibility)               newErrors.visibility = "공개 설정을 선택해주세요"
     if (!title.trim())             newErrors.title      = "제목을 입력해주세요"
+    if (!previewSummary.trim())          newErrors.previewSummary = "한 줄 소개를 입력해주세요"
+    else if (previewSummary.length > 100) newErrors.previewSummary = "100자 이내로 입력해주세요"
     if (!editor || editor.isEmpty) newErrors.content    = "내용을 입력해주세요"
-    // 직접입력 카테고리를 골랐다면 customCategory 필수
-    if (
-      category?.categoryCode &&
+    // 직무 카테고리는 필수 — 포트폴리오와 동일 (L3 코드 + "기타(직접입력)"이면 customCategory 필수)
+    if (!category?.categoryCode) {
+      newErrors.category = "직무 카테고리를 선택해주세요"
+    } else if (
       isCustomInputCategory(categories, category.categoryCode) &&
       !category.customCategory?.trim()
     ) {
@@ -209,7 +214,7 @@ export function useResumeWriteView() {
     previewSizesSave(RESUME_PREVIEW_SIZES_KEY, sizesRecord)
     useResumeDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
-      memo, category, tags, linkedIds, externalLinks,
+      memo, category, previewSummary: previewSummary.trim(), tags, linkedIds, externalLinks,
       content,
     })
     router.push(USER_ROUTES.resume.preview)
@@ -231,26 +236,17 @@ export function useResumeWriteView() {
     previewSizesSave(RESUME_PREVIEW_SIZES_KEY, sizesRecord)
     useResumeDraftStore.getState().setPreviewData({
       visibility: visibility!, title: title.trim(),
-      memo, category, tags, linkedIds, externalLinks,
+      memo, category, previewSummary: previewSummary.trim(), tags, linkedIds, externalLinks,
       content,
     })
     router.push(USER_ROUTES.resume.preview)
   }
 
   // ── 임시저장 ────────────────────────────────────────────────────
-  const handleDraftSave = async () => {
-    const newErrors = validate()
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      const firstKey = Object.keys(newErrors)[0]
-      document.getElementById(`rw-field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
-      return
-    }
-    const content = await uploadAndGetContent()
-    if (!content) return
-    // TODO: API 호출 — POST /api/posts/draft
-    alert("임시저장되었습니다.")
-  }
+  // 백엔드 임시저장 endpoint 미구현 — 검증/업로드 사전 수행 없이 안내 모달만 노출.
+  // API 구축 후 validate → uploadAndGetContent → POST /api/posts/draft 로 복구.
+  const [draftNotReadyOpen, setDraftNotReadyOpen] = useState(false)
+  const handleDraftSave = () => setDraftNotReadyOpen(true)
 
   return {
     // auth
@@ -260,6 +256,7 @@ export function useResumeWriteView() {
     title, setTitle,
     memo, setMemo,
     category, setCategory,
+    previewSummary, setPreviewSummary,
     tags, setTags,
     linkedIds, setLinkedIds,
     externalLinks, setExternalLinks,
@@ -268,6 +265,8 @@ export function useResumeWriteView() {
     // storage
     storageInfo, sessionBytes, uploadError, uploadErrorKey,
     exceededModal, setExceededModal,
+    // modal
+    draftNotReadyOpen, setDraftNotReadyOpen,
     // editor
     editor, trackedUpload, editorFocused, uploading,
     // bubble menu

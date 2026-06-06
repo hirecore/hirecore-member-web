@@ -8,13 +8,17 @@ interface DeleteConfirmModalProps {
   docTypeName: string
   /** 삭제 시 부가 안내 문구 (연결 해제 등) */
   notice?: string
+  /** 삭제 요청 진행 중 — true 면 모든 액션 비활성화하고 라벨을 "삭제 중..."으로 전환 */
+  isPending?: boolean
   onConfirm: () => void
   onCancel: () => void
 }
 
-export function DeleteConfirmModal({ docTypeName, notice, onConfirm, onCancel }: DeleteConfirmModalProps) {
+export function DeleteConfirmModal({ docTypeName, notice, isPending = false, onConfirm, onCancel }: DeleteConfirmModalProps) {
+  // 진행 중이면 dismiss / 액션 전부 차단 — 중복 호출 가드 (백엔드 비멱등 DELETE)
+  const handleOverlayClick = isPending ? undefined : onCancel
   return createPortal(
-    <div className="dcm-overlay" onClick={onCancel} role="presentation">
+    <div className="dcm-overlay" onClick={handleOverlayClick} role="presentation">
       <div
         className="dcm-modal"
         onClick={(e) => e.stopPropagation()}
@@ -22,7 +26,13 @@ export function DeleteConfirmModal({ docTypeName, notice, onConfirm, onCancel }:
         aria-modal="true"
         aria-labelledby="dcm-title"
       >
-        <button className="dcm-modal__close" type="button" onClick={onCancel} aria-label="닫기">
+        <button
+          className="dcm-modal__close"
+          type="button"
+          onClick={onCancel}
+          aria-label="닫기"
+          disabled={isPending}
+        >
           <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden>
             <path d="M1 1l9 9M10 1L1 10" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
           </svg>
@@ -55,11 +65,22 @@ export function DeleteConfirmModal({ docTypeName, notice, onConfirm, onCancel }:
         )}
 
         <div className="dcm-modal__actions">
-          <button type="button" className="dcm-modal__btn dcm-modal__btn--cancel" onClick={onCancel}>
+          <button
+            type="button"
+            className="dcm-modal__btn dcm-modal__btn--cancel"
+            onClick={onCancel}
+            disabled={isPending}
+          >
             취소
           </button>
-          <button type="button" className="dcm-modal__btn dcm-modal__btn--delete" onClick={onConfirm}>
-            삭제하기
+          <button
+            type="button"
+            className="dcm-modal__btn dcm-modal__btn--delete"
+            onClick={onConfirm}
+            disabled={isPending}
+            aria-busy={isPending}
+          >
+            {isPending ? "삭제 중..." : "삭제하기"}
           </button>
         </div>
       </div>

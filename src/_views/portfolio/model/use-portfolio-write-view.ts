@@ -359,22 +359,10 @@ export function usePortfolioWriteView() {
   }
 
   // ── 임시저장 ────────────────────────────────────────────────────
-  const handleDraftSave = async () => {
-    const newErrors = validate()
-    if (!editor || editor.isEmpty) newErrors.content = "내용을 입력해주세요"
-    if (Object.keys(newErrors).length > 0) {
-      setErrors(newErrors)
-      const firstKey = Object.keys(newErrors)[0]
-      document.getElementById(`field-${firstKey}`)?.scrollIntoView({ behavior: "smooth", block: "center" })
-      return
-    }
-
-    const result = await uploadAndGetContent()
-    if (!result) return
-
-    // TODO: API 호출 — POST /api/portfolios/drafts (content에 publicUrl 포함)
-    alert("임시저장되었습니다.")
-  }
+  // 백엔드 임시저장 endpoint 미구현 — 검증/업로드 사전 수행 없이 안내 모달만 노출.
+  // API 구축 후 validate → uploadAndGetContent → POST /api/portfolios/drafts 로 복구.
+  const [draftNotReadyOpen, setDraftNotReadyOpen] = useState(false)
+  const handleDraftSave = () => setDraftNotReadyOpen(true)
 
   // ── 등록 확인 → S3 업로드 → 등록 API 호출 → 상세 페이지 이동 ────
   const handleConfirm = async () => {
@@ -517,6 +505,7 @@ export function usePortfolioWriteView() {
     exceededModal, setExceededModal,
     // modals & state
     emptyModal, setEmptyModal, uploading,
+    draftNotReadyOpen, setDraftNotReadyOpen,
     confirmData, setConfirmData, categoryLabel,
     // editor
     editor, trackedUpload, editorFocused,

@@ -3,6 +3,8 @@
 // ref 패턴으로 stale closure 없이 항상 최신 상태를 참조하면서도 trackedUpload는 stable 참조를 유지한다.
 import { useCallback, useRef } from "react"
 import type { StorageInfo } from "@/_shared/model"
+import { registerBlobOriginalName } from "@/_shared/api"
+import { validateImageFilename } from "@/_shared/lib"
 import { handleImageUpload, toWebP } from "../lib"
 
 interface StableImageUploadOptions {
@@ -56,6 +58,11 @@ export function useStableImageUpload({
 
   // 렌더마다 최신 ref 값을 참조하도록 current를 교체 — 모든 의존성이 ref이므로 stale closure 없음
   stableUploadRef.current = async (file: File): Promise<string> => {
+    // 사용자 입력 파일명 1차 검증 — 백엔드 검증과 별개의 UX + 다층 방어용 차단
+    const filenameCheck = validateImageFilename(file.name)
+    if (!filenameCheck.ok) {
+      throw new Error(filenameCheck.reason)
+    }
     const webpFile = await toWebP(file)
     const info = storageInfoRef.current
     if (info) {
@@ -69,6 +76,8 @@ export function useStableImageUpload({
     }
     try {
       const url = await handleImageUpload(webpFile)
+      // 등록 시점 Presigned URL 요청의 originalFileName 으로 사용자 업로드 원본 파일명 전달
+      registerBlobOriginalName(url, file.name)
       uploadedSizesRef.current.set(url, webpFile.size)
       if (info) sessionBytesRef.current += webpFile.size
       return url

@@ -13,7 +13,7 @@ import {
 } from "@/_widgets/portfolio"
 import { type ActiveTab } from "@/_features/portfolio/lib"
 import { USER_ROUTES } from "@/_shared/config"
-import { usePortfolioList } from "@/_entities/portfolio"
+import { usePortfolioList, usePortfolioDelete } from "@/_entities/portfolio"
 import type { LinkedDocEmbed } from "@/_entities/portfolio"
 import { useReadOnlyEditor } from "@/_features/editor"
 import { useTocTracking } from "@/_features/portfolio"
@@ -129,10 +129,37 @@ export function PortfolioReadView({ id, mock }: Props) {
   } = usePortfolioReadView(id, { mock })
 
   const [showDeleteModal, setShowDeleteModal] = useState(false)
+  // 영구 삭제 mutation — 비멱등이므로 isPending 으로 중복 호출/모달 dismiss 가드
+  const deleteMutation = usePortfolioDelete(id)
 
   // 연결 문서 에디터 — 항상 호출 (React hooks 규칙 준수)
   const linkedResume = useLinkedDocEditor(data?.linkedResume ?? null)
   const linkedCoverletter = useLinkedDocEditor(data?.linkedCoverletter ?? null)
+
+  const handleDeleteConfirm = () => {
+    if (deleteMutation.isPending) return
+    deleteMutation.mutate(undefined, {
+      onSuccess: () => {
+        setShowDeleteModal(false)
+        // 삭제된 상세 페이지에 머무르면 새로고침 시 404 — 홈으로 즉시 이동
+        router.replace(USER_ROUTES.home)
+      },
+      onError: (err) => {
+        const status = (err as { response?: { status?: number } })?.response?.status
+        setShowDeleteModal(false)
+        if (status === 403) {
+          alert("본인이 작성한 포트폴리오만 삭제할 수 있습니다.")
+        } else if (status === 404) {
+          // 이미 삭제됨 — 사용자 안내 후 목록으로 이동
+          alert("이미 삭제된 포트폴리오입니다.")
+          router.replace(USER_ROUTES.home)
+        } else {
+          // 401 은 axios 인터셉터가 로그인 페이지로 자동 라우팅 — 여기까지 거의 도달하지 않음
+          alert("포트폴리오 삭제에 실패했습니다. 잠시 후 다시 시도해주세요.")
+        }
+      },
+    })
+  }
 
   if (!data) return null
 
@@ -148,11 +175,9 @@ export function PortfolioReadView({ id, mock }: Props) {
       {showDeleteModal && (
         <DeleteConfirmModal
           docTypeName="포트폴리오"
-          notice="포트폴리오만 삭제되며, 연결된 이력서와 자기소개서는 그대로 유지됩니다."
-          onConfirm={() => {
-            setShowDeleteModal(false)
-            router.push(USER_ROUTES.mypage)
-          }}
+          notice="포트폴리오에 첨부된 이미지도 함께 삭제되며, 연결된 이력서와 자기소개서는 그대로 유지됩니다."
+          isPending={deleteMutation.isPending}
+          onConfirm={handleDeleteConfirm}
           onCancel={() => setShowDeleteModal(false)}
         />
       )}

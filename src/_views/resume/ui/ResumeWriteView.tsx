@@ -31,6 +31,7 @@ import { LinkedPortfoliosSection } from "@/_features/document-link"
 import { WriteActionBar, ExternalLinksSection, JobCategorySection } from "@/_widgets/portfolio-editor"
 import { useResumeWriteView } from "../model/use-resume-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
+import { DraftSaveNotReadyModal } from "@/_shared/ui/draft-save-not-ready-modal"
 import type { Visibility } from "@/_shared/model"
 import "@/_features/editor/editor.scss"
 import "./resume-write-view.scss"
@@ -105,6 +106,7 @@ export function ResumeWriteView() {
     title, setTitle,
     memo, setMemo,
     category, setCategory,
+    previewSummary, setPreviewSummary,
     tags, setTags,
     linkedIds, setLinkedIds,
     externalLinks, setExternalLinks,
@@ -112,6 +114,7 @@ export function ResumeWriteView() {
     myPortfolios,
     storageInfo, sessionBytes, uploadError, uploadErrorKey,
     exceededModal, setExceededModal,
+    draftNotReadyOpen, setDraftNotReadyOpen,
     editor, editorFocused,
     isDraggingRef, getVirtualElement,
     handlePreview, handleSubmit, handleDraftSave,
@@ -226,21 +229,20 @@ export function ResumeWriteView() {
               {errors.visibility && <p className="rw-error">{errors.visibility}</p>}
             </section>
 
-            {/* 02. 직무 선택 — 포트폴리오와 동일한 JobCategorySection (단일 선택) */}
+            {/* 02. 직무 선택 — 포트폴리오와 동일한 JobCategorySection (단일 선택, 필수) */}
             <JobCategorySection
               value={category}
               error={errors.category}
               onChange={(v) => { setCategory(v); setErrors((e) => ({ ...e, category: undefined })) }}
               classPrefix="rw"
               label="직무 선택"
-              optional
               sectionId="rw-field-category"
             />
 
             {/* 03. 제목 */}
             <section className="rw-section" id="rw-field-title">
               <div className="rw-section__head">
-                <span className="rw-section__label">제목</span>
+                <span className="rw-section__label">이력서 제목</span>
                 <span className="rw-section__required">필수</span>
               </div>
               <input
@@ -278,7 +280,29 @@ export function ResumeWriteView() {
               <div className="rw-memo-count">{memo.length}/200</div>
             </section>
 
-            {/* 05. 본문 */}
+            {/* 05. 이력서 한 줄 소개 */}
+            <section className="rw-section" id="rw-field-previewSummary">
+              <div className="rw-section__head">
+                <span className="rw-section__label">이력서 한 줄 소개</span>
+                <span className="rw-section__required">필수</span>
+                <span className="rw-section__hint">이력서 카드의 내용 요약 정보로 노출됩니다</span>
+              </div>
+              <textarea
+                className="rw-summary-input"
+                placeholder="이력서의 핵심을 한 줄로 소개해주세요 (예: React/Next.js 3년차, 사용자 인터랙션 최적화에 강점)"
+                value={previewSummary}
+                onChange={(e) => {
+                  setPreviewSummary(e.target.value)
+                  setErrors((prev) => ({ ...prev, previewSummary: undefined }))
+                }}
+                rows={2}
+                maxLength={100}
+              />
+              <div className="rw-summary-count">{previewSummary.length}/100</div>
+              {errors.previewSummary && <p className="rw-error">{errors.previewSummary}</p>}
+            </section>
+
+            {/* 06. 본문 */}
             <section className="rw-section" id="rw-field-content">
               <div className="rw-section__head">
                 <span className="rw-section__label">이력서 내용</span>
@@ -377,6 +401,9 @@ export function ResumeWriteView() {
 
         {/* 하단 액션 바 */}
         <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} onDraftSave={handleDraftSave} />
+
+        {/* 임시저장 API 미구현 안내 */}
+        {draftNotReadyOpen && <DraftSaveNotReadyModal onClose={() => setDraftNotReadyOpen(false)} />}
       </div>
     </EditorContext.Provider>
   )

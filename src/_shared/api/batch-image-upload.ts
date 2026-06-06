@@ -5,6 +5,16 @@ import type { JSONContent } from "@tiptap/core"
 import { requestPresignedUrls, uploadToS3, getImageDimensions } from "./image-upload"
 import type { PresignedFileRequest } from "./image-upload"
 
+// blob URL → 사용자가 업로드한 원본 파일명 매핑.
+// 업로드 진입점(useStableImageUpload)에서 blob URL 생성 직후 등록하고,
+// Presigned URL 요청 시 originalFileName 값으로 그대로 전송한다.
+// blob URL 자체가 탭 세션 동안만 유효하므로 별도 cleanup 없이 페이지 unload 시 함께 GC 됨.
+const blobOriginalNames = new Map<string, string>()
+
+export function registerBlobOriginalName(blobUrl: string, originalName: string): void {
+  blobOriginalNames.set(blobUrl, originalName)
+}
+
 interface BlobImageInfo {
   blobUrl: string
   file: File
@@ -134,7 +144,8 @@ export async function batchUploadImages({
   const requests: PresignedFileRequest[] = imageInfos.map((info, i) => ({
     purpose: "contentImage" as const,
     mimeType: "image/webp",
-    originalFileName: info.file.name,
+    // 사용자가 업로드한 원본 파일명 우선, 미등록 시 합성 이름 fallback
+    originalFileName: blobOriginalNames.get(info.blobUrl) ?? info.file.name,
     width: info.width,
     height: info.height,
     fileExtension: "webp" as const,

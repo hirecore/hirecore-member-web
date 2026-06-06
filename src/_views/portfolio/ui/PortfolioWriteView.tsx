@@ -42,6 +42,7 @@ import {
 
 import { usePortfolioWriteView } from "../model/use-portfolio-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
+import { DraftSaveNotReadyModal } from "@/_shared/ui/draft-save-not-ready-modal"
 import "@/_features/editor/editor.scss"
 import "./portfolio-write-view.scss"
 
@@ -99,6 +100,7 @@ export default function PortfolioWriteView() {
     storageInfo, sessionBytes, uploadError, uploadErrorKey,
     exceededModal, setExceededModal,
     emptyModal, setEmptyModal,
+    draftNotReadyOpen, setDraftNotReadyOpen,
     confirmData, setConfirmData, categoryLabel,
     editor, editorFocused,
     isDraggingRef, getVirtualElement,
@@ -370,6 +372,9 @@ export default function PortfolioWriteView() {
             isEditMode={isEditMode}
           />
         )}
+
+        {/* 임시저장 API 미구현 안내 */}
+        {draftNotReadyOpen && <DraftSaveNotReadyModal onClose={() => setDraftNotReadyOpen(false)} />}
 
       </div>
     </EditorContext.Provider>

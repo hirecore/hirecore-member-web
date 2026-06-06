@@ -1,10 +1,11 @@
-// _shared/api | 포트폴리오 등록 / 수정 / 상세 조회 / 편집 조회 / 관심 토글 API
+// _shared/api | 포트폴리오 등록 / 수정 / 상세 조회 / 편집 조회 / 관심 토글 / 삭제 API
 // 등록     : POST   /api/portfolios — 사전조건: presigned URL → S3 업로드 후 imageFileMetaId 확보
 // 수정     : PUT    /api/portfolios/{portfolioId} — 전체 교체 시맨틱, body shape 은 등록과 동일
 // 상세     : GET    /api/portfolios/{portfolioId}
 // 편집 조회: GET    /api/portfolios/{portfolioId}/edit — 작성자 본인만 접근 가능
 // 관심 등록: POST   /api/portfolios/{portfolioId}/interest — 멱등, 204 No Content
 // 관심 해제: DELETE /api/portfolios/{portfolioId}/interest — 멱등, 204 No Content
+// 삭제     : DELETE /api/portfolios/{portfolioId} — hard delete, 비멱등 (재호출 시 404)
 import type { JSONContent } from "@tiptap/core"
 import type { ExternalLink, Visibility } from "@/_shared/model"
 import { httpClient } from "@/_shared/config"
@@ -209,4 +210,22 @@ export async function registerPortfolioInterest(portfolioId: string): Promise<vo
 
 export async function cancelPortfolioInterest(portfolioId: string): Promise<void> {
   await httpClient.delete(`/api/portfolios/${portfolioId}/interest`)
+}
+
+// ── 영구 삭제 ──────────────────────────────────────────────────────
+// DELETE /api/portfolios/{portfolioId}
+// hard delete — DB 행, 본문/직무/태그, 다른 사용자의 관심·조회 기록 모두 영구 삭제.
+// 참조 중이던 본문/썸네일 이미지는 ORPHANED 전이되며 사용자 스토리지 사용량 자동 차감.
+// 비멱등: 재호출 시 404 PORTFOLIO_NOT_FOUND → 클라이언트 중복 클릭 가드 필요.
+//
+// 도메인 에러: 401 AUTHENTICATION_FAILED / 403 PORTFOLIO_FORBIDDEN / 404 PORTFOLIO_NOT_FOUND
+// (401 은 axios 응답 인터셉터가 로그인 페이지로 자동 라우팅한다.)
+
+export type PortfolioDeleteErrorCode =
+  | "PORTFOLIO_FORBIDDEN"
+  | "PORTFOLIO_NOT_FOUND"
+  | "AUTHENTICATION_FAILED"
+
+export async function deletePortfolio(portfolioId: string): Promise<void> {
+  await httpClient.delete(`/api/portfolios/${portfolioId}`)
 }

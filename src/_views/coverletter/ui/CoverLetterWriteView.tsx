@@ -28,6 +28,7 @@ import { LinkedPortfoliosSection } from "@/_features/document-link"
 import { WriteActionBar, ExternalLinksSection, JobCategorySection } from "@/_widgets/portfolio-editor"
 import { useCoverLetterWriteView } from "../model/use-cover-letter-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
+import { DraftSaveNotReadyModal } from "@/_shared/ui/draft-save-not-ready-modal"
 import type { Visibility } from "@/_shared/model"
 import "@/_features/editor/editor.scss"
 import "./coverletter-write-view.scss"
@@ -99,11 +100,13 @@ export function CoverLetterWriteView() {
     title, setTitle,
     memo, setMemo,
     category, setCategory,
+    previewSummary, setPreviewSummary,
     tags, setTags,
     linkedIds, setLinkedIds,
     externalLinks, setExternalLinks,
     errors, setErrors,
     myPortfolios,
+    draftNotReadyOpen, setDraftNotReadyOpen,
     editor, editorFocused,
     isDraggingRef, getVirtualElement,
     handlePreview, handleSubmit, handleDraftSave,
@@ -208,21 +211,20 @@ export function CoverLetterWriteView() {
               {errors.visibility && <p className="clw-error">{errors.visibility}</p>}
             </section>
 
-            {/* 02. 직무 선택 — 포트폴리오와 동일한 JobCategorySection (단일 선택) */}
+            {/* 02. 직무 선택 — 포트폴리오와 동일한 JobCategorySection (단일 선택, 필수) */}
             <JobCategorySection
               value={category}
               error={errors.category}
               onChange={(v) => { setCategory(v); setErrors((e) => ({ ...e, category: undefined })) }}
               classPrefix="clw"
               label="직무 선택"
-              optional
               sectionId="clw-field-category"
             />
 
             {/* 03. 제목 */}
             <section className="clw-section" id="clw-field-title">
               <div className="clw-section__head">
-                <span className="clw-section__label">제목</span>
+                <span className="clw-section__label">자기소개서 제목</span>
                 <span className="clw-section__required">필수</span>
               </div>
               <input
@@ -260,7 +262,29 @@ export function CoverLetterWriteView() {
               <div className="clw-memo-count">{memo.length}/200</div>
             </section>
 
-            {/* 05. 본문 */}
+            {/* 05. 자기소개서 한 줄 소개 */}
+            <section className="clw-section" id="clw-field-previewSummary">
+              <div className="clw-section__head">
+                <span className="clw-section__label">자기소개서 한 줄 소개</span>
+                <span className="clw-section__required">필수</span>
+                <span className="clw-section__hint">자기소개서 카드의 내용 요약 정보로 노출됩니다</span>
+              </div>
+              <textarea
+                className="clw-summary-input"
+                placeholder="자기소개서의 핵심을 한 줄로 소개해주세요 (예: 사용자 중심 설계 경험과 협업으로 PR 200건 리뷰)"
+                value={previewSummary}
+                onChange={(e) => {
+                  setPreviewSummary(e.target.value)
+                  setErrors((prev) => ({ ...prev, previewSummary: undefined }))
+                }}
+                rows={2}
+                maxLength={100}
+              />
+              <div className="clw-summary-count">{previewSummary.length}/100</div>
+              {errors.previewSummary && <p className="clw-error">{errors.previewSummary}</p>}
+            </section>
+
+            {/* 06. 본문 */}
             <section className="clw-section" id="clw-field-content">
               <div className="clw-section__head">
                 <span className="clw-section__label">자기소개서 내용</span>
@@ -353,6 +377,9 @@ export function CoverLetterWriteView() {
 
         {/* 하단 액션 바 */}
         <WriteActionBar onPreview={handlePreview} onSubmit={handleSubmit} onDraftSave={handleDraftSave} />
+
+        {/* 임시저장 API 미구현 안내 */}
+        {draftNotReadyOpen && <DraftSaveNotReadyModal onClose={() => setDraftNotReadyOpen(false)} />}
       </div>
     </EditorContext.Provider>
   )

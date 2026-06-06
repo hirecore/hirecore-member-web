@@ -9,6 +9,8 @@ export interface CoverLetterDraftData {
   memo: string
   /** 단일 직무 카테고리 — 포트폴리오와 동일한 선택 모델 */
   category: CategorySelection | null
+  /** 카드/검색 결과에 노출되는 한 줄 소개 (필수, ≤ 100자) */
+  previewSummary: string
   tags: string[]
   linkedIds: string[]
   externalLinks: ExternalLink[]

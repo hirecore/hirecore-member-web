@@ -3,7 +3,7 @@ export {
   type PresignedFileRequest, type PresignedFileResponse, type PresignedUrlResult,
 } from "./image-upload"
 export {
-  batchUploadImages, collectImageUrls,
+  batchUploadImages, collectImageUrls, registerBlobOriginalName,
   type BatchUploadOptions, type BatchUploadResult,
 } from "./batch-image-upload"
 export {
@@ -17,10 +17,12 @@ export {
   fetchPortfolioForEdit,
   registerPortfolioInterest,
   cancelPortfolioInterest,
+  deletePortfolio,
   type CreatePortfolioRequest, type CreatePortfolioResponse, type PortfolioTagInput,
   type JobCategoryInput,
   type UpdatePortfolioRequest, type UpdatePortfolioResponse,
   type PortfolioDetailResponse, type PortfolioDetailJobCategory,
   type PortfolioDetailTag, type PortfolioDetailContent,
   type PortfolioEditResponse, type PortfolioEditContentImage,
+  type PortfolioDeleteErrorCode,
 } from "./portfolio"

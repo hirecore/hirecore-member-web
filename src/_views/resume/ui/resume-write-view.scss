@@ -157,6 +157,45 @@
   .dark & { color: #7c3aed; }
 }
 
+/* ── 이력서 한 줄 소개 입력 (공개 필드 — 중립 톤, 포트폴리오와 동일) ── */
+.rw-summary-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1.5px solid rgba(0, 0, 0, 0.12);
+  border-radius: 0.75rem;
+  background: #fff;
+  font-size: 0.875rem;
+  color: #374151;
+  resize: vertical;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  font-family: inherit;
+  line-height: 1.6;
+
+  &:focus {
+    outline: none;
+    border-color: rgba(59, 130, 246, 0.45);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+  }
+
+  &::placeholder { color: #9ca3af; }
+
+  .dark & {
+    background: rgba(255, 255, 255, 0.03);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #e5e7eb;
+    &:focus { border-color: rgba(96, 165, 250, 0.5); box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
+    &::placeholder { color: #6b7280; }
+  }
+}
+
+.rw-summary-count {
+  text-align: right;
+  font-size: 0.875rem;
+  color: #9ca3af;
+  margin-top: 0.3rem;
+  .dark & { color: #6b7280; }
+}
+
 /* ── 에러 ── */
 .rw-error {
   font-size: 0.875rem;
