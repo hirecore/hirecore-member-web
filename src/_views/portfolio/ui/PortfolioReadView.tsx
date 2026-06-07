@@ -156,20 +156,12 @@ export function PortfolioReadView({ id, mock }: Props) {
   const linkedResume = useLinkedDocEditor(data?.linkedResume ?? null)
   const linkedCoverletter = useLinkedDocEditor(data?.linkedCoverletter ?? null)
 
-  // 작성자의 다른 포트폴리오 카드 데이터 — API 모드는 응답값, mock 모드는 PortfolioList mock 으로 폴백
-  // (mock fallback 은 /portfolio/temp 시각 검토 흐름 유지를 위해 보존)
+  // 작성자의 다른 포트폴리오 카드 데이터
+  // - API 모드(mock=false): 응답의 otherPortfolios 를 그대로 사용. 빈 배열도 의도된 결과 → mock 폴백 금지.
+  // - mock 모드(/portfolio/temp): API 미호출이므로 PortfolioList mock 으로 채워 시각 검토 유지.
   const mockListItems = usePortfolioList()
-  const otherPortfolioCards: OtherPortfolioCardItem[] = data?.otherPortfolios?.length
-    ? data.otherPortfolios.map((p) => ({
-        id: p.id,
-        title: p.title,
-        thumbnailUrl: p.thumbnailUrl,
-        categoryName: p.categoryName,
-        updatedAt: p.updatedAt,
-        viewCount: p.viewCount,
-        likeCount: p.likeCount,
-      }))
-    : mockListItems
+  const otherPortfolioCards: OtherPortfolioCardItem[] = mock
+    ? mockListItems
         .filter((p) => p.id !== id)
         .slice(0, 6)
         .map((p) => ({
@@ -181,6 +173,15 @@ export function PortfolioReadView({ id, mock }: Props) {
           viewCount: p.viewCount,
           likeCount: p.likeCount,
         }))
+    : (data?.otherPortfolios ?? []).map((p) => ({
+        id: p.id,
+        title: p.title,
+        thumbnailUrl: p.thumbnailUrl,
+        categoryName: p.categoryName,
+        updatedAt: p.updatedAt,
+        viewCount: p.viewCount,
+        likeCount: p.likeCount,
+      }))
 
   const handleDeleteConfirm = () => {
     if (deleteMutation.isPending) return
