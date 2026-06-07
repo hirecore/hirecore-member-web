@@ -11,7 +11,7 @@ export type { DraftState } from "./create-draft-store";
 export {
   MOCK_DEFAULT_AUTHOR, mockText, mockHeading, mockParagraph, mockBulletList, mockDoc,
 } from "./mock-helpers";
-export { formatDate, formatDateShort } from "./format-date";
+export { formatDate, formatDateShort, formatDateTimeMinute } from "./format-date";
 export { validateImageFilename } from "./validate-image-filename";
 export type { ImageFilenameCheck } from "./validate-image-filename";
 export type { JobCategoryNode } from "./job-categories";

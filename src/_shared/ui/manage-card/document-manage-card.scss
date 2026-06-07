@@ -218,6 +218,15 @@
 /* ── Memo ─────────────────────────────────────────────────────── */
 .mc-memo { @include mc.memo-box; }
 
+/* 메모 빈 상태 안내 — 채워진 메모 텍스트보다 살짝 옅고 가벼운 톤 */
+.mc-memo__text--empty {
+  color: #9ca3af;
+  font-style: italic;
+  font-weight: 400;
+
+  .dark & { color: #6b7280; }
+}
+
 /* ── Interest Chips ───────────────────────────────────────────── */
 .mc-interest-chips {
   display: flex;
@@ -245,6 +254,18 @@
 /* ── Tags ─────────────────────────────────────────────────────── */
 .mc-tags-section { display: flex; flex-direction: column; }
 .mc-tags { @include mc.tag-container; }
+
+/* 태그 빈 상태 안내 */
+.mc-tags-empty {
+  display: inline-block;
+  font-size: 0.78rem;
+  font-weight: 400;
+  color: #9ca3af;
+  letter-spacing: -0.01em;
+  padding: 0.1rem 0;
+
+  .dark & { color: #6b7280; }
+}
 
 .mc-tag {
   @include mc.tag-base;

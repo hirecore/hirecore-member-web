@@ -6,6 +6,7 @@
 
 import type { ReactNode } from "react"
 import { Tags2Row } from "@/_shared/ui/tags-row"
+import { formatDateTimeMinute } from "@/_shared/lib"
 import "./document-manage-card.scss"
 
 export type ManageCardColorScheme = "green" | "amber" | "blue"
@@ -53,18 +54,18 @@ export function DocumentManageCard({
     </div>
   )
 
-  const Memo = () => {
-    if (!privateMemo) return null
-    return (
-      <div className="mc-memo">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden>
-          <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.8"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
-        </svg>
-        <span className="mc-memo__text">{privateMemo}</span>
-      </div>
-    )
-  }
+  const Memo = () => (
+    <div className="mc-memo">
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" aria-hidden>
+        <rect x="3" y="11" width="18" height="11" rx="2" stroke="currentColor" strokeWidth="1.8"/>
+        <path d="M7 11V7a5 5 0 0 1 10 0v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round"/>
+      </svg>
+      {privateMemo
+        ? <span className="mc-memo__text">{privateMemo}</span>
+        : <span className="mc-memo__text mc-memo__text--empty">나만 보는 메모가 작성되지 않았어요</span>
+      }
+    </div>
+  )
 
   const InterestChips = () => {
     if (!interestFields || interestFields.length === 0) return null
@@ -77,14 +78,16 @@ export function DocumentManageCard({
     )
   }
 
-  const TagsSection = () => {
-    if (tags.length === 0) return null
-    return (
-      <div className="mc-tags-section">
-        <Tags2Row tags={tags} containerClass="mc-tags" tagClass="mc-tag" moreClass="mc-tag mc-tag--more" />
-      </div>
-    )
-  }
+  const TagsSection = () => (
+    <div className="mc-tags-section">
+      {tags.length > 0
+        ? <Tags2Row tags={tags} containerClass="mc-tags" tagClass="mc-tag" moreClass="mc-tag mc-tag--more" />
+        : <span className="mc-tags-empty">등록된 태그가 없어요</span>
+      }
+    </div>
+  )
+
+  const formattedDate = formatDateTimeMinute(updatedAt)
 
   if (viewMode === "grid") {
     return (
@@ -96,7 +99,7 @@ export function DocumentManageCard({
               {categoryHeader && <div className="mc-category-row">{categoryHeader}</div>}
               <div className="mc-summary__title-row">
                 <h3 className="mc-title">{title}</h3>
-                <span className="mc-date">{updatedAt}</span>
+                <span className="mc-date">{formattedDate}</span>
               </div>
               <div className="mc-summary__meta">
                 <span className={`mc-badge mc-badge--${visibility}`}>
@@ -133,7 +136,7 @@ export function DocumentManageCard({
               {visibility === "public" ? "공개" : "비공개"}
             </span>
             {extraMeta}
-            <span className="mc-date">{updatedAt}</span>
+            <span className="mc-date">{formattedDate}</span>
           </div>
         </section>
         <Memo />
