@@ -3,7 +3,7 @@
 // _entities/resume/ui | 이력서 관리 카드 — 표현 중심 Entity
 // 네비게이션·confirm·라우팅 결정은 onView/onEdit/onDelete prop으로 상위(Widget)에 위임
 
-import { DocumentManageCard, PortfolioLinkButton } from "@/_shared/ui/manage-card"
+import { DocumentManageCard, PortfolioLinkButton, CategoryHeader } from "@/_shared/ui/manage-card"
 import type { ManagedResume } from "../model/types"
 
 export type { ManagedResume }
@@ -40,7 +40,13 @@ export function ResumeManageCard({ resume, viewMode, onView, onEdit, onDelete, l
       colorScheme="green"
       gridHeader={<div className="mc-icon-header" aria-hidden><DocumentIcon /></div>}
       listAside={<div className="mc-icon-aside" aria-hidden><DocumentIcon /></div>}
-      interestFields={resume.interestFields}
+      categoryHeader={
+        <CategoryHeader
+          majorCategoryName={resume.majorCategoryName}
+          categoryName={resume.categoryName}
+          customCategory={resume.customCategory}
+        />
+      }
       relationsSection={<PortfolioLinkButton linkedIds={linkedIds} onClick={onPortfolioLinkClick} />}
       onView={onView}
       onEdit={onEdit}

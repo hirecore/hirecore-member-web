@@ -18,11 +18,6 @@ import {
 import type { ExternalLink } from "@/_shared/model"
 import { MOCK_PORTFOLIO_DETAIL_DATA } from "../api/mock-portfolio-data"
 
-export interface InterestField {
-  code: string
-  name: string
-}
-
 export interface LinkedDocEmbed {
   id: string
   type: "resume" | "coverletter"
@@ -31,7 +26,6 @@ export interface LinkedDocEmbed {
   content: object | null
   // 아래 필드는 상세 API 미제공 — mock 데이터에서만 채움.
   visibility?: "public" | "private"
-  interestFields?: InterestField[]
   tags?: string[]
   author?: { name: string; profileImageUrl: string | null }
   updatedAt?: string

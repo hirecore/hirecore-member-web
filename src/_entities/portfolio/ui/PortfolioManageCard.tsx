@@ -4,27 +4,9 @@
 // 문서 연결 모달/플로우는 _features/document-link/DocLinkModal 에서 관리
 // 카드는 onDocLinkClick 콜백으로 클릭 이벤트를 상위(Widget)에 위임한다
 
-import { DocumentManageCard } from "@/_shared/ui/manage-card"
+import { DocumentManageCard, CategoryHeader } from "@/_shared/ui/manage-card"
 import type { LinkedDoc, DocType, ManagedPortfolio } from "../model/types"
 import "./portfolio-manage-card.scss"
-
-/** 카테고리 단일 라인 — ManageCard의 categoryHeader 슬롯에 주입.
- *  L1(분야) · L3(직무) 미니멀 형식. 배지/separator 제거로 시각 노이즈 최소.
- */
-function CategoryHeader({ majorCategoryName, categoryName, customCategory }: {
-  majorCategoryName: string; categoryName: string; customCategory?: string
-}) {
-  const l1 = majorCategoryName
-  const l3 = customCategory || categoryName
-  if (!l1 && !l3) return null
-  return (
-    <>
-      {l1 && <span className="mc-cat-line__field">{l1}</span>}
-      {l1 && l3 && <span className="mc-cat-line__sep" aria-hidden>·</span>}
-      {l3 && <span className="mc-cat-line__job">{l3}</span>}
-    </>
-  )
-}
 
 interface PortfolioManageCardProps {
   portfolio: ManagedPortfolio

@@ -227,30 +227,6 @@
   .dark & { color: #6b7280; }
 }
 
-/* ── Interest Chips ───────────────────────────────────────────── */
-.mc-interest-chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.mc-interest-chip {
-  display: inline-flex;
-  align-items: center;
-  font-size: 0.72rem;
-  font-weight: 500;
-  padding: 0.18rem 0.55rem;
-  border-radius: 999px;
-  background: rgba(var(--mc-rgb), 0.1);
-  color: var(--mc-color);
-  border: 1px solid rgba(var(--mc-rgb), 0.2);
-
-  .dark & {
-    background: rgba(var(--mc-rgb), 0.12);
-    border-color: rgba(var(--mc-dk-rgb), 0.2);
-  }
-}
-
 /* ── Tags ─────────────────────────────────────────────────────── */
 .mc-tags-section { display: flex; flex-direction: column; }
 .mc-tags { @include mc.tag-container; }

@@ -25,8 +25,12 @@ export function useUserMypageView() {
     parseTab(searchParams.get("tab"))
   )
 
-  // tab 파라미터가 없거나 유효하지 않으면 기본값으로 리다이렉트, 있으면 상태 동기화
+  // tab 파라미터가 없거나 유효하지 않으면 기본값으로 리다이렉트, 있으면 상태 동기화.
+  // ⚠️ pathname 가드 — 마이페이지 라우트가 아닐 때는 즉시 skip.
+  // 예: 로고 클릭으로 router.push("/") 되는 찰나에 pathname 이 "/" 로 잠시 바뀌면서
+  // 이 effect 가 발화해 /?tab=portfolio 로 강제 replace → 홈 이동을 막던 버그 방지.
   useEffect(() => {
+    if (!pathname.startsWith("/mypage")) return
     const raw = searchParams.get("tab")
     if (!raw || !["home", "portfolio", "resume", "coverletter"].includes(raw)) {
       router.replace(`${pathname}?tab=portfolio`, { scroll: false })

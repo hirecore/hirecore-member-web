@@ -17,7 +17,14 @@ export interface ManagedDocument {
   updatedAt: string
   visibility: Visibility
   tags: string[]
-  interestFields?: string[]
+  /** L3 직무 코드 (mock 단계에서만 채워짐, API 연결 시 동일 필드명 유지 예정) */
+  categoryCode?: string
+  /** L3 직무명 (또는 customCategory). 카드 카테고리 라인의 L3 자리에 표시 */
+  categoryName?: string
+  /** L1 분야명. 카드 카테고리 라인의 L1 자리에 표시 */
+  majorCategoryName?: string
+  /** "기타(직접입력)" 선택 시 사용자 입력 텍스트 */
+  customCategory?: string
   linkedPortfolioCount: number
   linkedPortfolioIds?: string[]
 }

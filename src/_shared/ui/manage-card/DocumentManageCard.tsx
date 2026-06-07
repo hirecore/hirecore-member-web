@@ -27,10 +27,8 @@ export interface DocumentManageCardProps {
   listAside?: ReactNode
   /** 공개/비공개 배지 뒤에 추가되는 메타 정보 */
   extraMeta?: ReactNode
-  /** 제목 위 카테고리 표시 (포트폴리오의 직무 카테고리 등) */
+  /** 제목 위 카테고리 표시 (포트폴리오·이력서·자기소개서 공통) */
   categoryHeader?: ReactNode
-  /** 관심분야 칩 */
-  interestFields?: string[]
   /** 연결 정보 섹션 (포트폴리오 연결 버튼 또는 문서 연결 칩) */
   relationsSection?: ReactNode
 
@@ -42,7 +40,7 @@ export interface DocumentManageCardProps {
 export function DocumentManageCard({
   id, title, updatedAt, visibility, privateMemo, tags,
   viewMode, colorScheme,
-  gridHeader, listAside, extraMeta, categoryHeader, interestFields, relationsSection,
+  gridHeader, listAside, extraMeta, categoryHeader, relationsSection,
   onView, onEdit, onDelete,
 }: DocumentManageCardProps) {
 
@@ -66,17 +64,6 @@ export function DocumentManageCard({
       }
     </div>
   )
-
-  const InterestChips = () => {
-    if (!interestFields || interestFields.length === 0) return null
-    return (
-      <div className="mc-interest-chips">
-        {interestFields.map((f) => (
-          <span key={f} className="mc-interest-chip">{f}</span>
-        ))}
-      </div>
-    )
-  }
 
   const TagsSection = () => (
     <div className="mc-tags-section">
@@ -110,7 +97,6 @@ export function DocumentManageCard({
             </section>
             <Memo />
           </div>
-          <InterestChips />
           <TagsSection />
           {relationsSection}
           <footer className="mc-card-footer">
@@ -140,7 +126,6 @@ export function DocumentManageCard({
           </div>
         </section>
         <Memo />
-        <InterestChips />
         <TagsSection />
         {relationsSection}
       </div>

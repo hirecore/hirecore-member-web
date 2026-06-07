@@ -95,11 +95,6 @@ export function CoverLetterReadView({ id }: Props) {
                   </div>
                 )}
                 <h1 className="cld-header-card__title">{data.title}</h1>
-                {data.interestFields.length > 0 && (
-                  <div className="cld-header-card__interests">
-                    {data.interestFields.map((f) => <span key={f.code} className="cld-interest-tag">{f.name}</span>)}
-                  </div>
-                )}
                 {data.tags.length > 0 && (
                   <div className="cld-header-card__tags">
                     {data.tags.map((t) => <span key={t} className="cld-tag">#{t}</span>)}

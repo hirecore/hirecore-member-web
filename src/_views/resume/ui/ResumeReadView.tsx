@@ -90,11 +90,6 @@ export function ResumeReadView({ id }: Props) {
                   </span>
                 </div>
                 <h1 className="rd-header-card__title">{data.title}</h1>
-                {data.interestFields.length > 0 && (
-                  <div className="rd-header-card__interests">
-                    {data.interestFields.map((f) => <span key={f.code} className="rd-interest-tag">{f.name}</span>)}
-                  </div>
-                )}
                 {data.tags.length > 0 && (
                   <div className="rd-header-card__tags">
                     {data.tags.map((t) => <span key={t} className="rd-tag">#{t}</span>)}

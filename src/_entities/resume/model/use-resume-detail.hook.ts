@@ -8,7 +8,6 @@ export interface ResumeDetail {
   authorId: string
   title: string
   visibility: "public" | "private"
-  interestFields: Array<{ code: string; name: string }>
   tags: string[]
   externalLinks: ExternalLink[]
   author: { name: string; profileImageUrl: string | null }

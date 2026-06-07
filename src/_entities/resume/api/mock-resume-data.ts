@@ -4,18 +4,6 @@ import { MOCK_DEFAULT_AUTHOR, mockDoc, mockHeading, mockParagraph, mockBulletLis
 import type { ResumeDetail } from "../model/use-resume-detail.hook"
 import type { ManagedResume } from "../model/types"
 
-// 목업 전용 코드→직무명 매핑. 실제 API 연결 시 서버가 직접 응답에 포함한다.
-const MOCK_FIELD_NAMES: Record<string, string> = {
-  FRONTEND_ENGINEER:  "프론트엔드 개발",
-  BACKEND_ENGINEER:   "백엔드 개발",
-  FULLSTACK_ENGINEER: "풀스택 개발",
-  WEB_DEVELOPER:      "웹 개발자",
-  DEVOPS_ENGINEER:    "데브옵스 엔지니어",
-}
-function fields(codes: string[]) {
-  return codes.map((c) => ({ code: c, name: MOCK_FIELD_NAMES[c] ?? c }))
-}
-
 // ── 이력서 본문 콘텐츠 ───────────────────────────────────────────────
 export const MOCK_RESUME_CONTENT = mockDoc(
   mockHeading(2, "자기 소개"),
@@ -44,7 +32,6 @@ export const MOCK_RESUME_DETAIL_DATA: Record<string, ResumeDetail> = {
     authorId: "u_mock_1",
     title: "3년차 프론트엔드 개발자 이력서",
     visibility: "public",
-    interestFields: fields(["FRONTEND_ENGINEER", "WEB_DEVELOPER"]),
     tags: ["React", "Next.js", "TypeScript", "TailwindCSS", "GraphQL"],
     externalLinks: [
       { label: "GitHub", url: "https://github.com/example" },
@@ -63,7 +50,6 @@ export const MOCK_RESUME_DETAIL_DATA: Record<string, ResumeDetail> = {
     authorId: "u_mock_1",
     title: "풀스택 개발자 이력서 (스타트업 지원용)",
     visibility: "private",
-    interestFields: fields(["FULLSTACK_ENGINEER", "BACKEND_ENGINEER"]),
     tags: ["Node.js", "PostgreSQL", "Docker", "AWS"],
     externalLinks: [],
     author: MOCK_DEFAULT_AUTHOR,
@@ -75,6 +61,16 @@ export const MOCK_RESUME_DETAIL_DATA: Record<string, ResumeDetail> = {
 
 // ── 마이페이지 이력서 관리 탭 ────────────────────────────────────────
 export const MOCK_MANAGED_RESUMES_DATA: ManagedResume[] = [
-  { id: "1", title: "3년차 프론트엔드 개발자 이력서", privateMemo: "네이버/카카오 공채 지원용", updatedAt: "2026-03-10", visibility: "public", tags: ["React", "Next.js", "TypeScript"], interestFields: ["FRONTEND_ENGINEER", "WEB_DEVELOPER"], linkedPortfolioCount: 2, linkedPortfolioIds: ["1", "2"] },
-  { id: "2", title: "풀스택 개발자 이력서 (스타트업 지원용)", updatedAt: "2026-02-28", visibility: "private", tags: ["Node.js", "PostgreSQL", "Docker"], interestFields: ["FULLSTACK_ENGINEER", "BACKEND_ENGINEER", "DEVOPS_ENGINEER"], linkedPortfolioCount: 1, linkedPortfolioIds: ["2"] },
+  {
+    id: "1", title: "3년차 프론트엔드 개발자 이력서", privateMemo: "네이버/카카오 공채 지원용",
+    updatedAt: "2026-03-10", visibility: "public", tags: ["React", "Next.js", "TypeScript"],
+    majorCategoryName: "개발", categoryName: "프론트엔드",
+    linkedPortfolioCount: 2, linkedPortfolioIds: ["1", "2"],
+  },
+  {
+    id: "2", title: "풀스택 개발자 이력서 (스타트업 지원용)",
+    updatedAt: "2026-02-28", visibility: "private", tags: ["Node.js", "PostgreSQL", "Docker"],
+    majorCategoryName: "개발", categoryName: "풀스택",
+    linkedPortfolioCount: 1, linkedPortfolioIds: ["2"],
+  },
 ]

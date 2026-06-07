@@ -10,7 +10,6 @@ export interface CoverLetterDetail {
   company: string | null
   position: string | null
   visibility: "public" | "private"
-  interestFields: Array<{ code: string; name: string }>
   tags: string[]
   externalLinks: ExternalLink[]
   author: { name: string; profileImageUrl: string | null }
