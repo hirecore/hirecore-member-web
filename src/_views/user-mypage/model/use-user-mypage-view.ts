@@ -3,7 +3,7 @@
 // _views/user-mypage/model | 마이페이지 뷰 비즈니스 로직
 // URL 탭 파라미터 동기화 + 미인증 리다이렉트 — view에서 분리된 이유: 라우팅·인증 로직은 UI와 무관하므로 model에 속함
 import { useEffect, useState } from "react"
-import { useRouter, useSearchParams } from "next/navigation"
+import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useCurrentUser } from "@/_features/auth"
 import { USER_ROUTES } from "@/_shared/config"
 import type { UserMypageSection } from "@/_features/user-mypage"
@@ -16,6 +16,9 @@ function parseTab(raw: string | null): UserMypageSection {
 export function useUserMypageView() {
   const router = useRouter()
   const searchParams = useSearchParams()
+  // 현재 경로 보존용 — /mypage 와 /mypage/temp 가 동일 view 를 공유하므로
+  // tab 정규화 / 섹션 변경 시 하드코딩 대신 현재 pathname 으로 리다이렉트한다.
+  const pathname = usePathname()
   const { data: user, isLoading } = useCurrentUser()
 
   const [activeSection, setActiveSection] = useState<UserMypageSection>(
@@ -26,11 +29,11 @@ export function useUserMypageView() {
   useEffect(() => {
     const raw = searchParams.get("tab")
     if (!raw || !["home", "portfolio", "resume", "coverletter"].includes(raw)) {
-      router.replace(`${USER_ROUTES.mypage}?tab=portfolio`, { scroll: false })
+      router.replace(`${pathname}?tab=portfolio`, { scroll: false })
     } else {
       setActiveSection(raw as UserMypageSection)
     }
-  }, [searchParams, router])
+  }, [searchParams, router, pathname])
 
   // 미인증 사용자는 로그인 페이지로 강제 이동
   useEffect(() => {
@@ -39,7 +42,7 @@ export function useUserMypageView() {
 
   const handleSectionChange = (section: UserMypageSection) => {
     setActiveSection(section)
-    router.replace(`${USER_ROUTES.mypage}?tab=${section}`, { scroll: false })
+    router.replace(`${pathname}?tab=${section}`, { scroll: false })
   }
 
   return { activeSection, handleSectionChange, user, isLoading }
