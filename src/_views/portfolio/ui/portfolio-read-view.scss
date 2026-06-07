@@ -156,6 +156,62 @@
   }
 }
 
+/* ── 다른 포트폴리오 빈 상태 ── */
+.pr-others-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 2.5rem 1.5rem;
+  border-radius: 1rem;
+  background: linear-gradient(180deg, rgba(59, 130, 246, 0.025) 0%, rgba(0, 0, 0, 0.015) 100%);
+  border: 1px dashed rgba(59, 130, 246, 0.18);
+  text-align: center;
+
+  .dark & {
+    background: linear-gradient(180deg, rgba(96, 165, 250, 0.05) 0%, rgba(255, 255, 255, 0.015) 100%);
+    border-color: rgba(96, 165, 250, 0.2);
+  }
+
+  &__icon {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: rgba(59, 130, 246, 0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #3b82f6;
+    margin-bottom: 0.25rem;
+
+    .dark & {
+      background: rgba(96, 165, 250, 0.12);
+      color: #93c5fd;
+    }
+  }
+
+  &__title {
+    margin: 0;
+    font-size: 0.92rem;
+    font-weight: 700;
+    color: #1f2937;
+    letter-spacing: -0.015em;
+
+    .dark & { color: #e5e7eb; }
+  }
+
+  &__desc {
+    margin: 0;
+    font-size: 0.82rem;
+    color: #6b7280;
+    line-height: 1.6;
+    letter-spacing: -0.01em;
+
+    .dark & { color: #9ca3af; }
+  }
+}
+
 .pr-other-card {
   display: flex;
   align-items: flex-start;

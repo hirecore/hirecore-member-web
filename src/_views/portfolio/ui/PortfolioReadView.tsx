@@ -61,10 +61,10 @@ interface OtherPortfolioCardItem {
  * API 모드: 상세 응답의 publisher.otherPortfolios 를 매핑해 prop 으로 전달받음
  * mock 모드: 기존 usePortfolioList() 로부터 동일 형상을 만들어 전달
  * 두 경로 모두 동일 prop shape 으로 통일.
+ * 다른 포트폴리오가 없어도 섹션은 노출하고 빈 상태 안내를 표시한다.
  */
 function OtherPortfoliosSection({ authorName, portfolios }: { authorName: string; portfolios: OtherPortfolioCardItem[] }) {
   const others = portfolios.slice(0, 6)
-  if (others.length === 0) return null
   return (
     <section className="pr-others">
       <h2 className="pr-others__head">
@@ -74,6 +74,19 @@ function OtherPortfoliosSection({ authorName, portfolios }: { authorName: string
         </svg>
         {authorName}님의 다른 포트폴리오
       </h2>
+      {others.length === 0 ? (
+        <div className="pr-others-empty" role="status">
+          <div className="pr-others-empty__icon" aria-hidden>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none">
+              <rect x="3" y="6" width="18" height="14" rx="2.5" stroke="currentColor" strokeWidth="1.6" />
+              <path d="M16 6V4.5A1.5 1.5 0 0 0 14.5 3h-5A1.5 1.5 0 0 0 8 4.5V6" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+              <path d="M8 12h8M8 16h5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" />
+            </svg>
+          </div>
+          <p className="pr-others-empty__title">아직 다른 포트폴리오가 없어요</p>
+          <p className="pr-others-empty__desc">{authorName} 님이 새로운 포트폴리오를 등록하면 이 곳에서 확인할 수 있어요</p>
+        </div>
+      ) : (
       <div className="pr-others__grid">
         {others.map((p) => {
           const c0 = p.title.charCodeAt(0) || 65
@@ -120,6 +133,7 @@ function OtherPortfoliosSection({ authorName, portfolios }: { authorName: string
           )
         })}
       </div>
+      )}
     </section>
   )
 }
