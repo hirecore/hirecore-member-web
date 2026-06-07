@@ -2,17 +2,13 @@
 
 import { useState, useCallback } from "react"
 import Link from "next/link"
-import { usePathname, useRouter } from "next/navigation"
 import { useTheme, useBodyLock } from "@/_shared/model"
 import { USER_ROUTES } from "@/_shared/config"
 import "./main-header.scss"
 import { MoonIcon, SunIcon } from "@/_shared/ui/icon"
 import { useCurrentUser, useOAuthLogout } from "@/_features/auth"
-import { usePortfolioListFilterStore } from "@/_features/portfolio"
 
 export function MainHeader() {
-  const pathname = usePathname()
-  const router = useRouter()
   const { data: user, isLoading } = useCurrentUser()
   const { mutate: logout } = useOAuthLogout()
   const { isDark, toggle } = useTheme()
@@ -23,26 +19,14 @@ export function MainHeader() {
   // body scroll lock + ESC close — sheet 오픈 시에만 적용
   useBodyLock(accountOpen, closeAccount)
 
-  // 로고 클릭:
-  //   - 항상 필터/검색 reset 트리거 (사용자는 "처음 접속한 것처럼 전체 목록" 기대)
-  //   - 같은 페이지면 scroll-to-top, 다른 페이지면 홈으로 이동
-  // (Next.js Link는 same-route 클릭 시 기본 noop, state도 유지되므로 수동 reset 필요)
-  const triggerListReset = usePortfolioListFilterStore((s) => s.triggerReset)
-  const handleLogoClick = useCallback((e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault()
-    triggerListReset()
-    if (pathname !== USER_ROUTES.home) router.push(USER_ROUTES.home)
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }, [pathname, router, triggerListReset])
-
   return (
     <header className="sh-root">
       <div className="sh-container">
         <div className="sh-inner">
 
-          {/* ── 왼쪽: 로고 ── */}
+          {/* ── 왼쪽: 로고 — 클릭 시 next/link 의 기본 navigation 으로 홈 이동 ── */}
           <div className="sh-left">
-            <Link href={USER_ROUTES.home} className="sh-logo" onClick={handleLogoClick}>HireCore</Link>
+            <Link href={USER_ROUTES.home} className="sh-logo">HireCore</Link>
           </div>
 
           {/* ── 오른쪽: 인증 + 다크모드 ── */}

@@ -6,6 +6,7 @@
 // 는 이력서·자기소개서 전용 API 가 갖춰진 뒤 별도 보강 예정 — 현재는 비워 둔다.
 "use client"
 
+import { useMemo } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   fetchMyPortfolioSummaries,
@@ -66,8 +67,16 @@ export function useMyPortfolioSummaries(): MyPortfolioSummariesResult {
     },
   })
 
+  // ⚠️ data.items.map(...) 은 매 호출마다 새 배열을 만든다.
+  //    참조 안정성이 깨지면 소비자(useEffect 의존성 등)에서 무한 루프를 일으키므로
+  //    react-query 의 data 가 바뀔 때만 재계산되도록 useMemo 로 안정화한다.
+  const portfolios = useMemo(
+    () => data?.items.map(mapToManagedPortfolio) ?? [],
+    [data]
+  )
+
   return {
-    portfolios: data?.items.map(mapToManagedPortfolio) ?? [],
+    portfolios,
     isLoading: isPending,
     isError,
   }

@@ -2,7 +2,7 @@
 
 // _views/user-mypage/model | 마이페이지 뷰 비즈니스 로직
 // URL 탭 파라미터 동기화 + 미인증 리다이렉트 — view에서 분리된 이유: 라우팅·인증 로직은 UI와 무관하므로 model에 속함
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams, usePathname } from "next/navigation"
 import { useCurrentUser } from "@/_features/auth"
 import { USER_ROUTES } from "@/_shared/config"
@@ -25,19 +25,23 @@ export function useUserMypageView() {
     parseTab(searchParams.get("tab"))
   )
 
-  // tab 파라미터가 없거나 유효하지 않으면 기본값으로 리다이렉트, 있으면 상태 동기화.
-  // ⚠️ pathname 가드 — 마이페이지 라우트가 아닐 때는 즉시 skip.
-  // 예: 로고 클릭으로 router.push("/") 되는 찰나에 pathname 이 "/" 로 잠시 바뀌면서
-  // 이 effect 가 발화해 /?tab=portfolio 로 강제 replace → 홈 이동을 막던 버그 방지.
+  // URL tab → 활성 탭 상태 동기화.
+  // - mount 1회 한정으로 누락된 tab 을 ?tab=portfolio 로 정규화 (ref 가드)
+  //   → 매번 발화하지 않으므로 외부 navigation(예: 로고 → /) 과 경쟁하지 않는다.
+  // - 이후 URL 변경(사이드바 클릭·뒤로가기 등)은 setActiveSection 만 수행.
+  const hasNormalizedRef = useRef(false)
   useEffect(() => {
     if (!pathname.startsWith("/mypage")) return
     const raw = searchParams.get("tab")
-    if (!raw || !["home", "portfolio", "resume", "coverletter"].includes(raw)) {
-      router.replace(`${pathname}?tab=portfolio`, { scroll: false })
-    } else {
-      setActiveSection(raw as UserMypageSection)
+    if (!hasNormalizedRef.current) {
+      hasNormalizedRef.current = true
+      if (!raw || !["home", "portfolio", "resume", "coverletter"].includes(raw)) {
+        router.replace(`${pathname}?tab=portfolio`, { scroll: false })
+        return
+      }
     }
-  }, [searchParams, router, pathname])
+    setActiveSection(parseTab(raw))
+  }, [searchParams, pathname, router])
 
   // 미인증 사용자는 로그인 페이지로 강제 이동
   useEffect(() => {
