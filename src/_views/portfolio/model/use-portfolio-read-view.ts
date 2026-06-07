@@ -5,7 +5,7 @@
 //
 // mock=true (예: /portfolio/temp) 인 경우 실 API 호출 없이 mock 데이터를 사용한다.
 // 실 API 경로에서는 React Query 상태를 통해 로딩/에러 처리를 한다.
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useReadOnlyEditor } from "@/_features/editor"
 import { USER_ROUTES } from "@/_shared/config"
@@ -31,6 +31,7 @@ export function usePortfolioReadView(id: string, { mock = false }: Options = {})
   const data = mock ? mockData : (query.data ?? null)
   const isLoading = mock ? false : query.isPending
   const isError = mock ? false : query.isError
+  const queryError = mock ? null : query.error
 
   const [tab, setTab] = useState<ActiveTab>("portfolio")
 
@@ -60,11 +61,46 @@ export function usePortfolioReadView(id: string, { mock = false }: Options = {})
   const { tocHeadings, tabsSticky, activeId, tabsSentinelRef, scrollToHeading } =
     useTocTracking({ editor, content: data?.content })
 
-  // 에러(404/403 등) 발생 시 목록으로 리다이렉트.
-  // 로딩 중에는 데이터가 비어있어도 리다이렉트하지 않는다.
+  // 에러 발생 시 도메인 errorCode 에 맞는 안내 후 목록으로 리다이렉트.
+  // (401 AUTHENTICATION_FAILED 는 axios 응답 인터셉터가 로그인 페이지로 자동 라우팅 — 여기 도달하지 않음)
+  const errorHandledRef = useRef(false)
   useEffect(() => {
-    if (isError) router.replace(USER_ROUTES.portfolio.list)
-  }, [isError, router])
+    if (!isError) return
+    if (errorHandledRef.current) return
+    errorHandledRef.current = true
+
+    const err = queryError as
+      | { response?: { status?: number; data?: { errorCode?: string; message?: string } } }
+      | null
+      | undefined
+    const status = err?.response?.status
+    const errorCode = err?.response?.data?.errorCode
+    const backendMessage = err?.response?.data?.message
+
+    let userMessage: string
+    if (status === 403) {
+      userMessage = backendMessage ?? "요청한 포트폴리오가 비공개이거나 접근할 권한이 없습니다."
+    } else if (status === 404) {
+      switch (errorCode) {
+        case "PORTFOLIO_NOT_FOUND":
+          userMessage = backendMessage ?? "요청한 포트폴리오가 존재하지 않습니다."
+          break
+        case "PORTFOLIO_NICKNAME_NOT_FOUND":
+          userMessage = backendMessage ?? "포트폴리오 작성자의 닉네임을 불러올 수 없습니다. 관리자에게 문의해주세요."
+          break
+        case "JOB_CATEGORY_NOT_FOUND":
+          userMessage = backendMessage ?? "포트폴리오에 해당하는 직무 카테고리를 찾을 수 없습니다. 관리자에게 문의해주세요."
+          break
+        default:
+          userMessage = backendMessage ?? "요청한 포트폴리오를 불러올 수 없습니다."
+      }
+    } else {
+      userMessage = backendMessage ?? "포트폴리오를 불러오는 중 오류가 발생했습니다."
+    }
+
+    alert(userMessage)
+    router.replace(USER_ROUTES.portfolio.list)
+  }, [isError, queryError, router])
 
   return {
     data, editor, tocHeadings, tabsSentinelRef,
