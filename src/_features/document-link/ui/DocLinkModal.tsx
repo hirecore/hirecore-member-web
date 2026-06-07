@@ -107,19 +107,29 @@ export function DocLinkModal({
       <div className="dlm-overlay" onClick={onClose} role="dialog" aria-modal aria-label={`${label} 미리보기`}>
         <div className="dlm-modal" onClick={(e) => e.stopPropagation()}>
           <Header titleText={doc.title} />
-          <div className="dlm-modal__doc-preview">
-            <div className="dlm-modal__doc-meta">
-              <span className={`dlm-modal__doc-badge dlm-modal__doc-badge--${doc.visibility}`}>
-                {doc.visibility === "public" ? "공개" : "비공개"}
-              </span>
-              <span className="dlm-modal__doc-date">최종수정 {doc.updatedAt}</span>
+          {/* 백엔드 summary API 는 { id, title } 만 제공 — visibility/updatedAt/tags 가
+              있는 경우(mock 또는 향후 리치 응답)에만 메타 영역 노출 */}
+          {(doc.visibility || doc.updatedAt || (doc.tags && doc.tags.length > 0)) && (
+            <div className="dlm-modal__doc-preview">
+              {(doc.visibility || doc.updatedAt) && (
+                <div className="dlm-modal__doc-meta">
+                  {doc.visibility && (
+                    <span className={`dlm-modal__doc-badge dlm-modal__doc-badge--${doc.visibility}`}>
+                      {doc.visibility === "public" ? "공개" : "비공개"}
+                    </span>
+                  )}
+                  {doc.updatedAt && (
+                    <span className="dlm-modal__doc-date">최종수정 {doc.updatedAt}</span>
+                  )}
+                </div>
+              )}
+              {doc.tags && doc.tags.length > 0 && (
+                <div className="dlm-modal__doc-tags">
+                  {doc.tags.map((t) => <span key={t} className="dlm-modal__doc-tag">#{t}</span>)}
+                </div>
+              )}
             </div>
-            {doc.tags && doc.tags.length > 0 && (
-              <div className="dlm-modal__doc-tags">
-                {doc.tags.map((t) => <span key={t} className="dlm-modal__doc-tag">#{t}</span>)}
-              </div>
-            )}
-          </div>
+          )}
           <div className="dlm-modal__footer">
             <button type="button" className="dlm-modal__btn dlm-modal__btn--unlink" onClick={() => onLink(null)}>
               연결 해제

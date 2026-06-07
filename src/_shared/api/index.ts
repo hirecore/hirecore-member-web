@@ -18,6 +18,7 @@ export {
   registerPortfolioInterest,
   cancelPortfolioInterest,
   deletePortfolio,
+  fetchMyPortfolioSummaries,
   type CreatePortfolioRequest, type CreatePortfolioResponse, type PortfolioTagInput,
   type JobCategoryInput,
   type UpdatePortfolioRequest, type UpdatePortfolioResponse,
@@ -25,4 +26,6 @@ export {
   type PortfolioDetailTag, type PortfolioDetailContent,
   type PortfolioEditResponse, type PortfolioEditContentImage,
   type PortfolioDeleteErrorCode,
+  type MyPortfolioSummariesResponse, type MyPortfolioSummary,
+  type MyPortfolioSummaryTag, type MyPortfolioSummaryJobCategory, type MyPortfolioLinkedDoc,
 } from "./portfolio"

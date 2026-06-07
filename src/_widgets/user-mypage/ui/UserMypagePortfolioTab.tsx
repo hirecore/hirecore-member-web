@@ -1,21 +1,44 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { USER_ROUTES, LOCAL_STORAGE_KEYS } from "@/_shared/config"
 import { TabDocHeader } from "@/_shared/ui/tab-doc-header"
 import { TabDocCTA } from "@/_shared/ui/tab-doc-cta"
-import { useManagedPortfolios, useDraftPortfolios, type AvailableDoc, type DocType, type ManagedPortfolio } from "@/_entities/portfolio"
+import {
+  useManagedPortfolios,
+  useDraftPortfolios,
+  useMyPortfolioSummaries,
+  type AvailableDoc,
+  type DocType,
+  type ManagedPortfolio,
+} from "@/_entities/portfolio"
 import { DraftSection } from "@/_shared/ui/draft-section"
 import { PortfolioList } from "./PortfolioList"
 import { useTabViewMode } from "../model/use-tab-view-mode"
 import "./user-mypage-portfolio-tab.scss"
 
-export function UserMypagePortfolioTab() {
+interface UserMypagePortfolioTabProps {
+  /** true 면 mock 데이터 (`useManagedPortfolios`), false 면 실 API (`useMyPortfolioSummaries`). */
+  mock?: boolean
+}
+
+export function UserMypagePortfolioTab({ mock = false }: UserMypagePortfolioTabProps = {}) {
   const router = useRouter()
-  const { portfolios: initialPortfolios, availableResumes, availableCoverletters } = useManagedPortfolios()
+  // 데이터 소스: mock 모드는 기존 mock hook, 그 외에는 GET /api/portfolios/summaries/mine
+  // (mock 모드에서도 availableResumes/Coverletters 가 함께 노출되어 link 모달이 동작한다.
+  //  실 API 모드는 이력서·자기소개서 API 가 갖춰지기 전까지 link 후보 목록을 빈 배열로 둔다.)
+  const mockData = useManagedPortfolios()
+  const apiData = useMyPortfolioSummaries()
+  const sourcePortfolios = mock ? mockData.portfolios : apiData.portfolios
+  const availableResumes = mock ? mockData.availableResumes : ([] as AvailableDoc[])
+  const availableCoverletters = mock ? mockData.availableCoverletters : ([] as AvailableDoc[])
+
   const draftPortfolios = useDraftPortfolios()
-  const [portfolios, setPortfolios] = useState<ManagedPortfolio[]>(initialPortfolios)
+  // 로컬 mutation (delete/link) 을 위해 useState 로 복사 + source 변경 시 동기화.
+  // TODO: 실 API 모드의 delete/link 는 서버 호출 + 캐시 무효화로 교체 예정.
+  const [portfolios, setPortfolios] = useState<ManagedPortfolio[]>(sourcePortfolios)
+  useEffect(() => { setPortfolios(sourcePortfolios) }, [sourcePortfolios])
   const [search,    setSearch]    = useState("")
   const [tagSearch, setTagSearch] = useState("")
   const { viewMode, handleViewMode } = useTabViewMode(LOCAL_STORAGE_KEYS.MYPAGE_PORTFOLIO_VIEW_MODE)

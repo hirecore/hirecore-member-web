@@ -1,4 +1,4 @@
-// _shared/api | 포트폴리오 등록 / 수정 / 상세 조회 / 편집 조회 / 관심 토글 / 삭제 API
+// _shared/api | 포트폴리오 등록 / 수정 / 상세 조회 / 편집 조회 / 관심 토글 / 삭제 / 내 요약 목록 API
 // 등록     : POST   /api/portfolios — 사전조건: presigned URL → S3 업로드 후 imageFileMetaId 확보
 // 수정     : PUT    /api/portfolios/{portfolioId} — 전체 교체 시맨틱, body shape 은 등록과 동일
 // 상세     : GET    /api/portfolios/{portfolioId}
@@ -6,6 +6,7 @@
 // 관심 등록: POST   /api/portfolios/{portfolioId}/interest — 멱등, 204 No Content
 // 관심 해제: DELETE /api/portfolios/{portfolioId}/interest — 멱등, 204 No Content
 // 삭제     : DELETE /api/portfolios/{portfolioId} — hard delete, 비멱등 (재호출 시 404)
+// 내 요약   : GET    /api/portfolios/summaries/mine — 작성자 본인의 모든 포트폴리오 요약, updatedAt 내림차순
 import type { JSONContent } from "@tiptap/core"
 import type { ExternalLink, Visibility } from "@/_shared/model"
 import { httpClient } from "@/_shared/config"
@@ -228,4 +229,60 @@ export type PortfolioDeleteErrorCode =
 
 export async function deletePortfolio(portfolioId: string): Promise<void> {
   await httpClient.delete(`/api/portfolios/${portfolioId}`)
+}
+
+// ── 내 포트폴리오 요약 목록 ────────────────────────────────────────
+// GET /api/portfolios/summaries/mine
+// 작성자 본인 호출 전용 — 비로그인 시 401. updatedAt 내림차순, 페이징 없음 (단일 호출).
+// 응답에 본문(content) / externalLinks 미포함 — 상세는 fetchPortfolioDetail 사용.
+
+export interface MyPortfolioSummaryTag {
+  name: string
+  sortOrder: number
+}
+
+export interface MyPortfolioSummaryJobCategory {
+  /** TSID 문자열 */
+  id: string
+  depth: number
+  categoryCode: string
+  name: string
+}
+
+/** 연결된 이력서·자기소개서 요약. 합성 실패 / 미연결 시 null. */
+export interface MyPortfolioLinkedDoc {
+  /** TSID 문자열 */
+  id: string
+  title: string
+}
+
+export interface MyPortfolioSummary {
+  /** TSID 문자열 — 상세/편집 라우팅 키 */
+  portfolioId: string
+  title: string
+  previewSummary: string
+  privateMemo: string | null
+  thumbnailImageId: string | null
+  thumbnailImageUrl: string | null
+  jobCategories: MyPortfolioSummaryJobCategory[]
+  collaborationType: "team" | "personal"
+  visibility: Visibility
+  tags: MyPortfolioSummaryTag[]
+  interestCount: number
+  linkedResume: MyPortfolioLinkedDoc | null
+  linkedCoverLetter: MyPortfolioLinkedDoc | null
+  /** ISO-8601 (UTC) */
+  updatedAt: string
+}
+
+export interface MyPortfolioSummariesResponse {
+  /** updatedAt 내림차순. 보유 포트폴리오 없으면 빈 배열. */
+  items: MyPortfolioSummary[]
+}
+
+export async function fetchMyPortfolioSummaries(): Promise<MyPortfolioSummariesResponse> {
+  const { data } = await httpClient.get<MyPortfolioSummariesResponse>(
+    "/api/portfolios/summaries/mine"
+  )
+  return data
 }

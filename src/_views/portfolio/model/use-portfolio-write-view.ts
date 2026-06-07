@@ -441,6 +441,8 @@ export function usePortfolioWriteView() {
         queryClient.invalidateQueries({ queryKey: ["portfolio", "edit", editId] })
         queryClient.invalidateQueries({ queryKey: ["portfolio", "detail", editId] })
       }
+      // 마이페이지 요약 목록 — 등록/수정 모두 신규 항목 추가 또는 메타 변경이 반영되어야 함
+      queryClient.invalidateQueries({ queryKey: ["portfolio", "summaries", "mine"] })
       router.push(USER_ROUTES.portfolio.detail(portfolioId))
     } catch (e) {
       const fallback = isEditMode ? "포트폴리오 수정에 실패했습니다." : "포트폴리오 등록에 실패했습니다."

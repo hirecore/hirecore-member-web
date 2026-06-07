@@ -35,8 +35,13 @@ export interface Portfolio {
 export interface LinkedDoc {
   id: string
   title: string
-  visibility: "public" | "private"
-  updatedAt: string
+  /**
+   * GET /api/portfolios/summaries/mine 응답은 { id, title } 만 제공해 옵셔널.
+   * mock 데이터/리치 표시 경로에서만 채워진다.
+   */
+  visibility?: "public" | "private"
+  /** ISO-8601. summaries API 미제공. */
+  updatedAt?: string
   tags?: string[]
 }
 

@@ -17,6 +17,8 @@ export function usePortfolioDelete(portfolioId: string) {
     onSuccess: () => {
       queryClient.removeQueries({ queryKey: ["portfolio", "detail", portfolioId] })
       queryClient.removeQueries({ queryKey: ["portfolio", "edit", portfolioId] })
+      // 마이페이지 요약 목록 — 삭제된 항목이 즉시 사라지도록 invalidation
+      queryClient.invalidateQueries({ queryKey: ["portfolio", "summaries", "mine"] })
     },
   })
 }

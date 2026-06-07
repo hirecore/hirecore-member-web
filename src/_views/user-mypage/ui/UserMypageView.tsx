@@ -21,7 +21,12 @@ const SECTION_LABELS: Record<string, string> = {
   coverletter: "자기소개서",
 }
 
-export function UserMypageView() {
+interface UserMypageViewProps {
+  /** true 면 mock 데이터 화면을 유지 (실 API 호출 안 함). /mypage/temp 전용. */
+  mock?: boolean
+}
+
+export function UserMypageView({ mock = false }: UserMypageViewProps = {}) {
   const { activeSection, handleSectionChange, user, isLoading } = useUserMypageView()
   const [drawerOpen, setDrawerOpen] = useState(false)
 
@@ -67,7 +72,7 @@ export function UserMypageView() {
                 description="나의 활동 요약과 통계를 한눈에 확인할 수 있어요."
               />
             )}
-            {activeSection === "portfolio" && <UserMypagePortfolioTab />}
+            {activeSection === "portfolio" && <UserMypagePortfolioTab mock={mock} />}
             {activeSection === "resume" && <UserMypageResumeTab />}
             {activeSection === "coverletter" && <UserMypageCoverLetterTab />}
           </main>
