@@ -52,10 +52,12 @@ function mapResponse(res: PortfolioEditResponse): PortfolioEditData {
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((t) => t.name)
 
-  // content.json 은 직렬화 문자열 — 에디터에 주입하기 전 파싱
+  // content.json 은 백엔드가 object 또는 문자열로 내려줄 수 있음 — 둘 다 파싱
   let parsedContent: JSONContent
   try {
-    parsedContent = JSON.parse(res.content.json) as JSONContent
+    parsedContent = typeof res.content.json === "string"
+      ? (JSON.parse(res.content.json) as JSONContent)
+      : (res.content.json as JSONContent)
   } catch {
     parsedContent = { type: "doc", content: [] }
   }

@@ -2,8 +2,8 @@
 // - usePortfolioDetail(id):     GET /api/portfolios/:id (실 API, React Query)
 // - useMockPortfolioDetail(id): /portfolio/temp 페이지 전용 mock 조회
 //
-// 응답에는 linkedResume / linkedCoverletter / 작성자의 다른 포트폴리오가 포함되지 않는다.
-// 해당 섹션은 별도 API로 제공 예정이며, 현재는 null / mock 데이터로 처리한다.
+// 응답 nested — portfolio / publisher.otherPortfolios / linkedResume / linkedCoverLetter
+// 모두 한 번에 받는다. 연결 자원의 content 는 visibility 정책상 null 가능 (자원 자체는 존재).
 "use client"
 
 import { useQuery, type UseQueryResult } from "@tanstack/react-query"
@@ -11,6 +11,9 @@ import type { JSONContent } from "@tiptap/core"
 import {
   fetchPortfolioDetail,
   type PortfolioDetailResponse,
+  type PortfolioDetailContent,
+  type PortfolioDetailLinkedDoc,
+  type PublisherOtherPortfolioSummary,
 } from "@/_shared/api"
 import type { ExternalLink } from "@/_shared/model"
 import { MOCK_PORTFOLIO_DETAIL_DATA } from "../api/mock-portfolio-data"
@@ -24,14 +27,16 @@ export interface LinkedDocEmbed {
   id: string
   type: "resume" | "coverletter"
   title: string
-  visibility: "public" | "private"
-  interestFields: InterestField[]
-  tags: string[]
-  author: { name: string; profileImageUrl: string | null }
-  updatedAt: string
+  /** 본문 — 자원이 PRIVATE 이고 viewer 가 자원 소유자가 아니면 null 로 차단 표시. */
+  content: object | null
+  // 아래 필드는 상세 API 미제공 — mock 데이터에서만 채움.
+  visibility?: "public" | "private"
+  interestFields?: InterestField[]
+  tags?: string[]
+  author?: { name: string; profileImageUrl: string | null }
+  updatedAt?: string
   company?: string | null
   position?: string | null
-  content: object
 }
 
 export interface PortfolioDetail {
@@ -84,50 +89,99 @@ export interface OtherPortfolio {
   title: string
   tags: string[]
   thumbnailUrl: string | null
+  /** = interestCount (마이페이지 mock 호환 키) */
   likeCount: number
+  viewCount: number
   updatedAt: string
   visibility: "public" | "private"
 }
 
-// ── API 응답 → 도메인 모델 변환 ────────────────────────────────────
-function mapResponse(id: string, res: PortfolioDetailResponse): PortfolioDetail {
-  // jobCategories는 백엔드가 루트→리프 순으로 정렬해 내려주지만, 안전하게 depth 기준 재정렬
-  const sortedCats = [...res.jobCategories].sort((a, b) => a.depth - b.depth)
+// ── content.json 파싱 (object | string 모두 허용) ─────────────────
+// 백엔드는 object 로 내려주지만, 이전 flat 응답 호환 및 방어 차원에서 문자열도 처리.
+function parseContentJson(content: PortfolioDetailContent | null | undefined): JSONContent {
+  if (!content) return { type: "doc", content: [] }
+  try {
+    if (typeof content.json === "string") {
+      return JSON.parse(content.json) as JSONContent
+    }
+    return content.json as JSONContent
+  } catch {
+    return { type: "doc", content: [] }
+  }
+}
+
+// ── 연결 자원 매핑 ────────────────────────────────────────────────
+// 자원 객체 자체가 null 이면 LinkedDocEmbed 도 null (연결 없음 / 자원 삭제).
+// content 만 null 이면 자원은 존재하나 visibility 정책상 본문 가려진 상태 — 빈 doc 으로 렌더.
+function mapLinkedDoc(
+  raw: PortfolioDetailLinkedDoc | null,
+  type: "resume" | "coverletter"
+): LinkedDocEmbed | null {
+  if (!raw) return null
+  return {
+    id: raw.id,
+    type,
+    title: raw.title,
+    content: raw.content ? parseContentJson(raw.content) : null,
+  }
+}
+
+// ── 작성자의 다른 포트폴리오 매핑 ──────────────────────────────────
+// 응답은 PUBLIC 만, 본 포트폴리오 제외, updatedAt DESC 정렬되어 옴.
+function mapOtherPortfolio(item: PublisherOtherPortfolioSummary): OtherPortfolio {
+  const sortedCats = [...item.jobCategories].sort((a, b) => a.depth - b.depth)
   const major = sortedCats[0]
   const leaf = sortedCats[sortedCats.length - 1]
-  const sortedTags = [...res.tags]
+  return {
+    id: item.portfolioId,
+    categoryCode: leaf?.categoryCode ?? "",
+    categoryName: leaf?.name ?? "",
+    majorCategoryName: major?.name ?? "",
+    title: item.title,
+    // 응답 미제공 — 빈 배열 / null fallback
+    tags: [],
+    thumbnailUrl: null,
+    likeCount: item.interestCount,
+    viewCount: item.viewCount,
+    updatedAt: item.updatedAt,
+    // otherPortfolios 는 PUBLIC 만 포함된다고 명세
+    visibility: "public",
+  }
+}
+
+// ── API 응답 → 도메인 모델 변환 ────────────────────────────────────
+function mapResponse(id: string, res: PortfolioDetailResponse): PortfolioDetail {
+  const body = res.portfolio
+  // jobCategories는 백엔드가 루트→리프 순으로 정렬해 내려주지만, 안전하게 depth 기준 재정렬
+  const sortedCats = [...body.jobCategories].sort((a, b) => a.depth - b.depth)
+  const major = sortedCats[0]
+  const leaf = sortedCats[sortedCats.length - 1]
+  const sortedTags = [...body.tags]
     .sort((a, b) => a.sortOrder - b.sortOrder)
     .map((t) => t.name)
 
-  // content.json은 직렬화된 문자열 — TipTap에 주입하기 전 파싱
-  let parsedContent: JSONContent
-  try {
-    parsedContent = JSON.parse(res.content.json) as JSONContent
-  } catch {
-    parsedContent = { type: "doc", content: [] }
-  }
-
   return {
     id,
-    publisher: res.publisher,
+    publisher: res.publisher.nickname,
     isOwner: res.isOwner,
     isInterested: res.isInterested,
     categoryCode: leaf?.categoryCode ?? "",
     categoryName: leaf?.name ?? "",
     majorCategoryName: major?.name ?? "",
-    projectType: res.collaborationType,
-    visibility: res.visibility,
-    title: res.title,
+    projectType: body.collaborationType,
+    visibility: body.visibility,
+    title: body.title,
     thumbnailUrl: null,
     tags: sortedTags,
-    externalLinks: res.externalLinks ?? [],
-    author: { name: res.publisher, profileImageUrl: null },
-    updatedAt: res.updatedAt,
+    externalLinks: body.externalLinks ?? [],
+    author: { name: res.publisher.nickname, profileImageUrl: null },
+    updatedAt: res.updatedAt ?? "",
     viewCount: res.viewCount,
     interestCount: res.interestCount,
-    content: parsedContent,
-    linkedResume: null,
-    linkedCoverletter: null,
+    content: parseContentJson(body.content),
+    linkedResume:     mapLinkedDoc(res.linkedResume,      "resume"),
+    linkedCoverletter: mapLinkedDoc(res.linkedCoverLetter, "coverletter"),
+    otherPortfolios:  res.publisher.otherPortfolios.map(mapOtherPortfolio),
   }
 }
 

@@ -84,6 +84,22 @@
   padding-bottom: 10vh;
 }
 
+/* ── 비공개 자원 본문 차단 안내 ── */
+.pr-blocked-notice {
+  padding: 1.25rem 1rem;
+  text-align: center;
+  font-size: 0.9rem;
+  color: #6b7280;
+  background: rgba(0, 0, 0, 0.03);
+  border-radius: 0.75rem;
+  margin: 1rem 0 2rem;
+
+  .dark & {
+    color: #9ca3af;
+    background: rgba(255, 255, 255, 0.04);
+  }
+}
+
 /* ── 업데이트 메타 바 ── */
 .pr-post-meta-bar {
   display: flex;

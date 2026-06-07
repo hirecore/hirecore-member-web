@@ -91,7 +91,9 @@ export async function updatePortfolio(
 
 // ── 상세 조회 ─────────────────────────────────────────────────────
 // GET /api/portfolios/{portfolioId}
-// 인증: 선택 — 로그인 시 cookie 기반 토큰이 자동 전송되어 isOwner / 비공개 접근이 활성화된다.
+// 인증: 선택 — 로그인 시 cookie 기반 토큰이 자동 전송되어 isOwner / 비공개 접근 / 자원 본문 노출 결정에 사용.
+// 응답 구조는 nested — viewer 의존 통계는 최상위, 본문/메타는 portfolio, 작성자 정보는 publisher,
+// 연결 자원(이력서/자기소개서)은 별도 키로 분리되어 있다.
 
 /** 루트→리프 순서의 직무 카테고리 계층 단일 노드 */
 export interface PortfolioDetailJobCategory {
@@ -108,14 +110,57 @@ export interface PortfolioDetailTag {
 }
 
 export interface PortfolioDetailContent {
-  /** 에디터 원본 JSON 직렬화 문자열 — JSON.parse 후 TipTap에 주입 */
-  json: string
+  /** 에디터 직렬화 JSON. 백엔드가 object 로 내려보내지만 문자열 호환 위해 unknown 으로 둠 — 매퍼에서 파싱. */
+  json: unknown
   /** 렌더링용 HTML */
   html: string
 }
 
+/** 본 포트폴리오 본체. 메타/태그/외부링크/본문을 묶는다. */
+export interface PortfolioDetailBody {
+  title: string
+  collaborationType: "team" | "personal"
+  visibility: Visibility
+  /** 루트→리프 정렬되어 옴 */
+  jobCategories: PortfolioDetailJobCategory[]
+  /** sortOrder ASC 정렬되어 옴 */
+  tags: PortfolioDetailTag[]
+  externalLinks: ExternalLink[]
+  content: PortfolioDetailContent
+}
+
+/** publisher.otherPortfolios — 작성자의 다른 PUBLIC 포트폴리오 요약 (본 포트폴리오 제외) */
+export interface PublisherOtherPortfolioSummary {
+  portfolioId: string
+  title: string
+  jobCategories: PortfolioDetailJobCategory[]
+  viewCount: number
+  interestCount: number
+  updatedAt: string
+}
+
+/** 작성자 정보 + 같은 작성자의 다른 PUBLIC 포트폴리오 요약 목록 (페이징 없음, updatedAt DESC). */
+export interface PortfolioDetailPublisher {
+  nickname: string
+  otherPortfolios: PublisherOtherPortfolioSummary[]
+}
+
+/**
+ * 연결된 이력서·자기소개서.
+ * - 객체 자체가 null: 연결 없음 또는 자원 삭제
+ * - content 가 null: 자원은 존재하지만 visibility 정책상 viewer 에게 본문 노출 차단
+ */
+export interface PortfolioDetailLinkedDoc {
+  id: string
+  title: string
+  content: PortfolioDetailContent | null
+}
+
 export interface PortfolioDetailResponse {
+  // ── viewer 의존 통계 / 분기 ──
   isOwner: boolean
+  viewCount: number
+  interestCount: number
   /**
    * 요청자가 이 포트폴리오에 관심 등록했는지 여부.
    * - 비로그인 사용자 / 본인 포트폴리오(isOwner=true) → null
@@ -123,18 +168,14 @@ export interface PortfolioDetailResponse {
    * - 비소유자 등록됨 → true
    */
   isInterested: boolean | null
-  publisher: string
-  jobCategories: PortfolioDetailJobCategory[]
-  collaborationType: "team" | "personal"
-  visibility: Visibility
-  viewCount: number
-  interestCount: number
-  title: string
-  tags: PortfolioDetailTag[]
-  externalLinks: ExternalLink[]
-  content: PortfolioDetailContent
-  /** ISO-8601 Instant (UTC, 'Z' 접미사) — 소수점 자릿수 가변 */
-  updatedAt: string
+  /** ISO-8601. 본문/태그/메타 중 가장 최근 갱신 시각. 비정상 케이스에 null 가능. */
+  updatedAt: string | null
+
+  // ── 본문 / 작성자 / 연결 자원 ──
+  portfolio: PortfolioDetailBody
+  publisher: PortfolioDetailPublisher
+  linkedResume: PortfolioDetailLinkedDoc | null
+  linkedCoverLetter: PortfolioDetailLinkedDoc | null
 }
 
 export async function fetchPortfolioDetail(

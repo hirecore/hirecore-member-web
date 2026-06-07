@@ -24,6 +24,8 @@ export {
   type UpdatePortfolioRequest, type UpdatePortfolioResponse,
   type PortfolioDetailResponse, type PortfolioDetailJobCategory,
   type PortfolioDetailTag, type PortfolioDetailContent,
+  type PortfolioDetailBody, type PortfolioDetailPublisher,
+  type PublisherOtherPortfolioSummary, type PortfolioDetailLinkedDoc,
   type PortfolioEditResponse, type PortfolioEditContentImage,
   type PortfolioDeleteErrorCode,
   type MyPortfolioSummariesResponse, type MyPortfolioSummary,

@@ -27,23 +27,43 @@ import "./portfolio-read-view.scss"
 
 
 /* ── 연결 문서 에디터 훅 — content 없으면 빈 에디터 ── */
+// 본문 가시성 차단 케이스(API 응답 content === null)에서는 빈 에디터를 그대로 보여준다.
+// updatedAt 은 상세 API 미제공 — mock 에서만 채워지며, 없으면 빈 문자열을 반환해 메타 표시를 가린다.
 function useLinkedDocEditor(doc: LinkedDocEmbed | null) {
-  const editor = useReadOnlyEditor({ content: doc?.content, includeImages: doc?.type === "resume" })
+  const docContent = doc?.content ?? undefined
+  const editor = useReadOnlyEditor({ content: docContent, includeImages: doc?.type === "resume" })
   const { tocHeadings, activeId, scrollToHeading } = useTocTracking({
     editor,
-    content: doc?.content as JSONContent | undefined,
+    content: docContent as JSONContent | undefined,
     scrollOffset: 160,
   })
-  const updatedAt = doc ? new Date(doc.updatedAt).toLocaleDateString("ko-KR", {
-    year: "numeric", month: "2-digit", day: "2-digit",
-  }).replace(/\. /g, ".").replace(/\.$/, "") : ""
+  const updatedAt = doc?.updatedAt
+    ? new Date(doc.updatedAt).toLocaleDateString("ko-KR", {
+        year: "numeric", month: "2-digit", day: "2-digit",
+      }).replace(/\. /g, ".").replace(/\.$/, "")
+    : ""
 
-  return { editor, tocHeadings, activeId, scrollToHeading, updatedAt }
+  return { editor, tocHeadings, activeId, scrollToHeading, updatedAt, contentBlocked: doc != null && doc.content == null }
 }
 
-/* ── 다른 포트폴리오 카드 ── */
-function OtherPortfoliosSection({ currentId, authorName }: { currentId: string; authorName: string }) {
-  const others = usePortfolioList().filter((p) => p.id !== currentId).slice(0, 6)
+/* ── 다른 포트폴리오 카드 — 카드 1개를 그리는 데 필요한 최소 필드 형상 ── */
+interface OtherPortfolioCardItem {
+  id: string
+  title: string
+  thumbnailUrl: string | null
+  categoryName: string
+  updatedAt: string
+  viewCount: number
+  likeCount: number
+}
+
+/* ── 다른 포트폴리오 카드 ──
+ * API 모드: 상세 응답의 publisher.otherPortfolios 를 매핑해 prop 으로 전달받음
+ * mock 모드: 기존 usePortfolioList() 로부터 동일 형상을 만들어 전달
+ * 두 경로 모두 동일 prop shape 으로 통일.
+ */
+function OtherPortfoliosSection({ authorName, portfolios }: { authorName: string; portfolios: OtherPortfolioCardItem[] }) {
+  const others = portfolios.slice(0, 6)
   if (others.length === 0) return null
   return (
     <section className="pr-others">
@@ -136,6 +156,32 @@ export function PortfolioReadView({ id, mock }: Props) {
   const linkedResume = useLinkedDocEditor(data?.linkedResume ?? null)
   const linkedCoverletter = useLinkedDocEditor(data?.linkedCoverletter ?? null)
 
+  // 작성자의 다른 포트폴리오 카드 데이터 — API 모드는 응답값, mock 모드는 PortfolioList mock 으로 폴백
+  // (mock fallback 은 /portfolio/temp 시각 검토 흐름 유지를 위해 보존)
+  const mockListItems = usePortfolioList()
+  const otherPortfolioCards: OtherPortfolioCardItem[] = data?.otherPortfolios?.length
+    ? data.otherPortfolios.map((p) => ({
+        id: p.id,
+        title: p.title,
+        thumbnailUrl: p.thumbnailUrl,
+        categoryName: p.categoryName,
+        updatedAt: p.updatedAt,
+        viewCount: p.viewCount,
+        likeCount: p.likeCount,
+      }))
+    : mockListItems
+        .filter((p) => p.id !== id)
+        .slice(0, 6)
+        .map((p) => ({
+          id: p.id,
+          title: p.title,
+          thumbnailUrl: p.thumbnailUrl,
+          categoryName: p.categoryName,
+          updatedAt: p.updatedAt,
+          viewCount: p.viewCount,
+          likeCount: p.likeCount,
+        }))
+
   const handleDeleteConfirm = () => {
     if (deleteMutation.isPending) return
     deleteMutation.mutate(undefined, {
@@ -165,9 +211,12 @@ export function PortfolioReadView({ id, mock }: Props) {
 
   const majorLabel = data.majorCategoryName
   const subLabel = data.customCategory ?? data.categoryName
-  const updatedAt = new Date(data.updatedAt).toLocaleDateString("ko-KR", {
-    year: "numeric", month: "2-digit", day: "2-digit",
-  }).replace(/\. /g, ".").replace(/\.$/, "")
+  // updatedAt 은 정상 흐름에서 항상 ISO 문자열이지만, API 응답상 null 가능 — 빈 문자열로 안전 처리
+  const updatedAt = data.updatedAt
+    ? new Date(data.updatedAt).toLocaleDateString("ko-KR", {
+        year: "numeric", month: "2-digit", day: "2-digit",
+      }).replace(/\. /g, ".").replace(/\.$/, "")
+    : ""
 
   return (
     <div className="pr-root">
@@ -250,15 +299,21 @@ export function PortfolioReadView({ id, mock }: Props) {
                 <div className="pr-post-area">
                   {data.linkedResume ? (
                     <>
-                      <div className="pr-post-meta-bar">
-                        <span className="pr-post-meta-bar__updated">마지막 업데이트 : {linkedResume.updatedAt}</span>
-                      </div>
-                      <EditorContent editor={linkedResume.editor} className="simple-editor-content pr-editor-content" />
+                      {linkedResume.updatedAt && (
+                        <div className="pr-post-meta-bar">
+                          <span className="pr-post-meta-bar__updated">마지막 업데이트 : {linkedResume.updatedAt}</span>
+                        </div>
+                      )}
+                      {linkedResume.contentBlocked ? (
+                        <p className="pr-blocked-notice">비공개로 설정된 이력서입니다. 본문은 작성자만 볼 수 있어요.</p>
+                      ) : (
+                        <EditorContent editor={linkedResume.editor} className="simple-editor-content pr-editor-content" />
+                      )}
                     </>
                   ) : (
                     <PortfolioLinkedDocsTab type="resume" docs={[]} isOwner={isOwner} />
                   )}
-                  <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
+                  <OtherPortfoliosSection authorName={data.author.name} portfolios={otherPortfolioCards} />
                 </div>
               )}
 
@@ -267,15 +322,21 @@ export function PortfolioReadView({ id, mock }: Props) {
                 <div className="pr-post-area">
                   {data.linkedCoverletter ? (
                     <>
-                      <div className="pr-post-meta-bar">
-                        <span className="pr-post-meta-bar__updated">마지막 업데이트 : {linkedCoverletter.updatedAt}</span>
-                      </div>
-                      <EditorContent editor={linkedCoverletter.editor} className="simple-editor-content pr-editor-content" />
+                      {linkedCoverletter.updatedAt && (
+                        <div className="pr-post-meta-bar">
+                          <span className="pr-post-meta-bar__updated">마지막 업데이트 : {linkedCoverletter.updatedAt}</span>
+                        </div>
+                      )}
+                      {linkedCoverletter.contentBlocked ? (
+                        <p className="pr-blocked-notice">비공개로 설정된 자기소개서입니다. 본문은 작성자만 볼 수 있어요.</p>
+                      ) : (
+                        <EditorContent editor={linkedCoverletter.editor} className="simple-editor-content pr-editor-content" />
+                      )}
                     </>
                   ) : (
                     <PortfolioLinkedDocsTab type="coverletter" docs={[]} isOwner={isOwner} />
                   )}
-                  <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
+                  <OtherPortfoliosSection authorName={data.author.name} portfolios={otherPortfolioCards} />
                 </div>
               )}
 
@@ -293,7 +354,7 @@ export function PortfolioReadView({ id, mock }: Props) {
                       className="simple-editor-content pr-editor-content"
                     />
                   </div>
-                  <OtherPortfoliosSection currentId={id} authorName={data.author.name} />
+                  <OtherPortfoliosSection authorName={data.author.name} portfolios={otherPortfolioCards} />
                 </div>
               )}
             </>
