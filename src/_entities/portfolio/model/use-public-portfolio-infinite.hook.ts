@@ -28,8 +28,7 @@ function mapToPortfolio(item: PublicPortfolioSummary): Portfolio {
     categoryCode: leaf?.categoryCode ?? "",
     categoryName: leaf?.name ?? "",
     majorCategoryName: major?.name ?? "",
-    // API 미제공 — 카드 badge 가 항상 "개인" 으로 표시. 상세 진입 시 실값 확인 가능.
-    projectType: "personal",
+    projectType: item.collaborationType,
     visibility: "public",
     title: item.title,
     excerpt: item.previewSummary,
@@ -43,6 +42,7 @@ function mapToPortfolio(item: PublicPortfolioSummary): Portfolio {
     viewCount: item.viewCount,
     likeCount: item.interestCount,
     updatedAt: item.updatedAt,
+    isOwner: item.isOwner,
   }
 }
 

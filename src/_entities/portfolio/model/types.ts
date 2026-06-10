@@ -30,6 +30,12 @@ export interface Portfolio {
   viewCount: number
   likeCount: number
   updatedAt: string
+  /**
+   * 호출자가 작성자 본인인지 여부 — API 응답의 isOwner 미러링.
+   * - mock 데이터에는 채워지지 않으므로 옵셔널.
+   * - true 면 카드의 관심(하트) 버튼을 숨김 처리.
+   */
+  isOwner?: boolean
 }
 
 export interface LinkedDoc {

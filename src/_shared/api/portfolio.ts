@@ -361,12 +361,20 @@ export interface PublicPortfolioSummary {
   jobCategories: PublicPortfolioSummaryJobCategory[]
   title: string
   previewSummary: string
+  /** 협업 유형 — 카드의 "팀/개인" 배지에 사용 */
+  collaborationType: "team" | "personal"
   tags: PublicPortfolioSummaryTag[]
   externalLinks: ExternalLink[]
   /** 작성자 닉네임. 해소 실패 시 null */
   nickname: string | null
   viewCount: number
   interestCount: number
+  /**
+   * 호출자가 해당 포트폴리오의 작성자인지 여부.
+   * - 비로그인 호출 시 항상 false.
+   * - 도메인 규칙: 본인 포트폴리오에는 관심 등록 불가 → 카드의 관심 버튼을 숨김/비활성에 사용.
+   */
+  isOwner: boolean
   /** ISO-8601 (UTC). effective updatedAt — 정렬 키와 동일 */
   updatedAt: string
 }

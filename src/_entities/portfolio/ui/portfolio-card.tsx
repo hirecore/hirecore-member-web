@@ -105,17 +105,20 @@ export function PortfolioRowCard({ item, liked, onLike }: PortfolioCardProps) {
               </svg>
               {formatCount(item.likeCount + (liked ? 1 : 0))}
             </span>
-            <button
-              type="button"
-              className={`pl-like-btn${liked ? " pl-like-btn--active" : ""}`}
-              onClick={(e) => { e.preventDefault(); onLike() }}
-              aria-label={liked ? "관심 취소" : "관심 포트폴리오 등록"}
-            >
-              <svg width="12" height="12" viewBox="0 0 12 12" fill={liked ? "currentColor" : "none"}>
-                <path d="M6 10.5S1 7.5 1 4.5a2.5 2.5 0 0 1 5 0A2.5 2.5 0 0 1 11 4.5c0 3-5 6-5 6Z" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
-              </svg>
-              관심
-            </button>
+            {/* 본인 포트폴리오에는 관심 등록 불가 → 버튼 자체를 미렌더 */}
+            {!item.isOwner && (
+              <button
+                type="button"
+                className={`pl-like-btn${liked ? " pl-like-btn--active" : ""}`}
+                onClick={(e) => { e.preventDefault(); onLike() }}
+                aria-label={liked ? "관심 취소" : "관심 포트폴리오 등록"}
+              >
+                <svg width="12" height="12" viewBox="0 0 12 12" fill={liked ? "currentColor" : "none"}>
+                  <path d="M6 10.5S1 7.5 1 4.5a2.5 2.5 0 0 1 5 0A2.5 2.5 0 0 1 11 4.5c0 3-5 6-5 6Z" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
+                </svg>
+                관심
+              </button>
+            )}
           </div>
         </div>
 
@@ -200,17 +203,20 @@ export function PortfolioCard({ item, liked, onLike }: PortfolioCardProps) {
           <span className={`pl-badge pl-badge--type${item.projectType === "team" ? " pl-badge--team" : ""} pl-badge--overlay`}>
             {item.projectType === "personal" ? "개인" : "팀"}
           </span>
-          <button
-            type="button"
-            className={`pl-like-btn pl-like-btn--overlay${liked ? " pl-like-btn--active" : ""}`}
-            onClick={(e) => { e.preventDefault(); onLike() }}
-            aria-label={liked ? "관심 취소" : "관심 포트폴리오 등록"}
-          >
-            <svg width="12" height="12" viewBox="0 0 12 12" fill={liked ? "currentColor" : "none"}>
-              <path d="M6 10.5S1 7.5 1 4.5a2.5 2.5 0 0 1 5 0A2.5 2.5 0 0 1 11 4.5c0 3-5 6-5 6Z" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
-            </svg>
-            관심
-          </button>
+          {/* 본인 포트폴리오에는 관심 등록 불가 → 오버레이 버튼 미렌더 */}
+          {!item.isOwner && (
+            <button
+              type="button"
+              className={`pl-like-btn pl-like-btn--overlay${liked ? " pl-like-btn--active" : ""}`}
+              onClick={(e) => { e.preventDefault(); onLike() }}
+              aria-label={liked ? "관심 취소" : "관심 포트폴리오 등록"}
+            >
+              <svg width="12" height="12" viewBox="0 0 12 12" fill={liked ? "currentColor" : "none"}>
+                <path d="M6 10.5S1 7.5 1 4.5a2.5 2.5 0 0 1 5 0A2.5 2.5 0 0 1 11 4.5c0 3-5 6-5 6Z" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
+              </svg>
+              관심
+            </button>
+          )}
         </div>
       </div>
 
