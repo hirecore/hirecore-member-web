@@ -19,6 +19,8 @@ export function usePortfolioDelete(portfolioId: string) {
       queryClient.removeQueries({ queryKey: ["portfolio", "edit", portfolioId] })
       // 마이페이지 요약 목록 — 삭제된 항목이 즉시 사라지도록 invalidation
       queryClient.invalidateQueries({ queryKey: ["portfolio", "summaries", "mine"] })
+      // 공개 무한 스크롤 목록 — 본인 포트폴리오가 PUBLIC 이었다면 목록에서 즉시 사라지도록
+      queryClient.invalidateQueries({ queryKey: ["portfolio", "summaries", "public"] })
     },
   })
 }

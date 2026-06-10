@@ -19,6 +19,7 @@ export {
   cancelPortfolioInterest,
   deletePortfolio,
   fetchMyPortfolioSummaries,
+  fetchPublicPortfolioSummaries,
   type CreatePortfolioRequest, type CreatePortfolioResponse, type PortfolioTagInput,
   type JobCategoryInput,
   type UpdatePortfolioRequest, type UpdatePortfolioResponse,
@@ -30,4 +31,8 @@ export {
   type PortfolioDeleteErrorCode,
   type MyPortfolioSummariesResponse, type MyPortfolioSummary,
   type MyPortfolioSummaryTag, type MyPortfolioSummaryJobCategory, type MyPortfolioLinkedDoc,
+  type PublicPortfolioSummariesResponse, type PublicPortfolioSummary,
+  type PublicPortfolioSummaryTag, type PublicPortfolioSummaryJobCategory,
+  type PublicPortfolioSummaryThumbnail, type PublicPortfolioPagination,
+  type FetchPublicPortfolioSummariesParams,
 } from "./portfolio"

@@ -1,4 +1,4 @@
-// _shared/api | 포트폴리오 등록 / 수정 / 상세 조회 / 편집 조회 / 관심 토글 / 삭제 / 내 요약 목록 API
+// _shared/api | 포트폴리오 등록 / 수정 / 상세 조회 / 편집 조회 / 관심 토글 / 삭제 / 내 요약 / 공개 무한 스크롤 API
 // 등록     : POST   /api/portfolios — 사전조건: presigned URL → S3 업로드 후 imageFileMetaId 확보
 // 수정     : PUT    /api/portfolios/{portfolioId} — 전체 교체 시맨틱, body shape 은 등록과 동일
 // 상세     : GET    /api/portfolios/{portfolioId}
@@ -324,6 +324,82 @@ export interface MyPortfolioSummariesResponse {
 export async function fetchMyPortfolioSummaries(): Promise<MyPortfolioSummariesResponse> {
   const { data } = await httpClient.get<MyPortfolioSummariesResponse>(
     "/api/portfolios/summaries/mine"
+  )
+  return data
+}
+
+// ── 공개 포트폴리오 요약 목록 (무한 스크롤) ────────────────────────
+// GET /api/portfolios/summaries/public
+// 비로그인 호출 가능. effective updatedAt DESC 정렬, opaque cursor 페이지네이션.
+// size: 1~50 (default 20). 본문(content) 미포함 — 상세는 fetchPortfolioDetail.
+
+export interface PublicPortfolioSummaryTag {
+  name: string
+  sortOrder: number
+}
+
+export interface PublicPortfolioSummaryJobCategory {
+  /** TSID 문자열 */
+  id: string
+  depth: number
+  categoryCode: string
+  name: string
+}
+
+export interface PublicPortfolioSummaryThumbnail {
+  /** TSID 문자열 */
+  imageId: string
+  /** URL 해소 실패 시 null (imageId 는 유지) */
+  imageUrl: string | null
+}
+
+export interface PublicPortfolioSummary {
+  /** TSID 문자열 — 상세 라우팅 키 */
+  portfolioId: string
+  /** 썸네일 미등록 시 객체 자체가 null */
+  thumbnail: PublicPortfolioSummaryThumbnail | null
+  jobCategories: PublicPortfolioSummaryJobCategory[]
+  title: string
+  previewSummary: string
+  tags: PublicPortfolioSummaryTag[]
+  externalLinks: ExternalLink[]
+  /** 작성자 닉네임. 해소 실패 시 null */
+  nickname: string | null
+  viewCount: number
+  interestCount: number
+  /** ISO-8601 (UTC). effective updatedAt — 정렬 키와 동일 */
+  updatedAt: string
+}
+
+export interface PublicPortfolioPagination {
+  /** 다음 페이지 요청 시 그대로 echo. hasNext=false 면 null */
+  nextCursor: string | null
+  hasNext: boolean
+}
+
+export interface PublicPortfolioSummariesResponse {
+  items: PublicPortfolioSummary[]
+  pagination: PublicPortfolioPagination
+}
+
+export interface FetchPublicPortfolioSummariesParams {
+  /** 직전 응답의 nextCursor — 첫 페이지면 undefined */
+  cursor?: string
+  /** 1~50, default 20 */
+  size?: number
+}
+
+export async function fetchPublicPortfolioSummaries(
+  params: FetchPublicPortfolioSummariesParams = {}
+): Promise<PublicPortfolioSummariesResponse> {
+  const { data } = await httpClient.get<PublicPortfolioSummariesResponse>(
+    "/api/portfolios/summaries/public",
+    {
+      params: {
+        ...(params.cursor ? { cursor: params.cursor } : {}),
+        ...(params.size != null ? { size: params.size } : {}),
+      },
+    }
   )
   return data
 }

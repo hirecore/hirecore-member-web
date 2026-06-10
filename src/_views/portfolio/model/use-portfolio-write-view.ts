@@ -443,6 +443,8 @@ export function usePortfolioWriteView() {
       }
       // 마이페이지 요약 목록 — 등록/수정 모두 신규 항목 추가 또는 메타 변경이 반영되어야 함
       queryClient.invalidateQueries({ queryKey: ["portfolio", "summaries", "mine"] })
+      // 공개 무한 스크롤 목록 — PUBLIC 포트폴리오면 상단으로 올라오거나 메타가 갱신되어야 함
+      queryClient.invalidateQueries({ queryKey: ["portfolio", "summaries", "public"] })
       router.push(USER_ROUTES.portfolio.detail(portfolioId))
     } catch (e) {
       const fallback = isEditMode ? "포트폴리오 수정에 실패했습니다." : "포트폴리오 등록에 실패했습니다."

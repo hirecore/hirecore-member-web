@@ -2,16 +2,20 @@
 
 /**
  * _views/portfolio — 포트폴리오 목록 뷰
- * app/(portfolio)/portfolio-temp/page.tsx 에서 re-export
- * 공유 헤더는 app/(portfolio)/layout.tsx 의 MainHeader 에서 렌더링
+ * 캐논 라우트 (/) 는 실 API (공개 무한 스크롤) 사용, /temp 라우트는 mock prop 으로 mock 화면 유지.
+ * 공유 헤더는 (user)/(with-layout)/layout.tsx 의 MainHeader 에서 렌더링.
  */
 
-import { useState, useEffect, useMemo } from "react"
+import { useState, useEffect, useMemo, useRef, useCallback } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { USER_ROUTES, LOCAL_STORAGE_KEYS } from "@/_shared/config"
-import { PortfolioCard, PortfolioRowCard, usePortfolioList } from "@/_entities/portfolio"
-import type { Portfolio } from "@/_entities/portfolio"
+import {
+  PortfolioCard,
+  PortfolioRowCard,
+  usePortfolioList,
+  usePublicPortfolioInfiniteScroll,
+} from "@/_entities/portfolio"
 import "./portfolio-list-view.scss"
 import { useCurrentUser } from "@/_features/auth"
 import { PageContainer } from "@/_shared/ui/layout"
@@ -28,7 +32,12 @@ type ViewMode = "grid" | "list"
 /** 필터 식별자 — "all" 또는 L1/L2 카테고리 코드 */
 const ALL_FILTER = "all"
 
-export default function PortfolioListView() {
+interface PortfolioListViewProps {
+  /** true 면 mock 데이터를 노출 — /temp 라우트 전용. 캐논 / 는 실 API 사용. */
+  mock?: boolean
+}
+
+export default function PortfolioListView({ mock = false }: PortfolioListViewProps = {}) {
   const router = useRouter()
   const { data: user } = useCurrentUser()
 
@@ -85,7 +94,29 @@ export default function PortfolioListView() {
     setActiveL2((prev) => (prev === l2Code ? ALL_FILTER : l2Code))
   }
 
-  const portfolios = usePortfolioList()
+  // ── 데이터 소스 분기 ─────────────────────────────────────────────
+  // mock 모드: 기존 mock 배열. API 모드: 공개 무한 스크롤 응답을 누적 매핑.
+  const mockPortfolios = usePortfolioList()
+  const infinite = usePublicPortfolioInfiniteScroll({ enabled: !mock })
+  const portfolios = mock ? mockPortfolios : infinite.portfolios
+
+  // ── IntersectionObserver — 마지막 아이템 근접 시 다음 페이지 트리거 ──
+  // mock 모드에서는 옵저버를 설치하지 않는다.
+  const sentinelRef = useCallback((node: HTMLDivElement | null) => {
+    if (mock) return
+    if (!node) return
+    const observer = new IntersectionObserver((entries) => {
+      if (
+        entries[0]?.isIntersecting &&
+        infinite.hasNextPage &&
+        !infinite.isFetchingNextPage
+      ) {
+        infinite.fetchNextPage()
+      }
+    }, { rootMargin: "200px" })
+    observer.observe(node)
+    return () => observer.disconnect()
+  }, [mock, infinite.hasNextPage, infinite.isFetchingNextPage, infinite.fetchNextPage]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const filtered = portfolios.filter((p) => {
     // 카테고리 매칭 — 포트폴리오의 L3 코드로부터 L1/L2를 lookup
@@ -230,25 +261,44 @@ export default function PortfolioListView() {
           </div>
 
           {filtered.length > 0 ? (
-            <div className={`pl-list pl-list--${viewMode}`}>
-              {filtered.map((item) =>
-                viewMode === "grid" ? (
-                  <PortfolioCard
-                    key={item.id}
-                    item={item}
-                    liked={likedIds.has(item.id)}
-                    onLike={() => toggleLike(item.id)}
-                  />
-                ) : (
-                  <PortfolioRowCard
-                    key={item.id}
-                    item={item}
-                    liked={likedIds.has(item.id)}
-                    onLike={() => toggleLike(item.id)}
-                  />
-                )
+            <>
+              <div className={`pl-list pl-list--${viewMode}`}>
+                {filtered.map((item) =>
+                  viewMode === "grid" ? (
+                    <PortfolioCard
+                      key={item.id}
+                      item={item}
+                      liked={likedIds.has(item.id)}
+                      onLike={() => toggleLike(item.id)}
+                    />
+                  ) : (
+                    <PortfolioRowCard
+                      key={item.id}
+                      item={item}
+                      liked={likedIds.has(item.id)}
+                      onLike={() => toggleLike(item.id)}
+                    />
+                  )
+                )}
+              </div>
+
+              {/* 무한 스크롤 sentinel + 상태 표시 — mock 모드에서는 노출 안 함 */}
+              {!mock && (
+                <>
+                  {infinite.hasNextPage && (
+                    <div ref={sentinelRef} className="pl-infinite-sentinel" aria-hidden />
+                  )}
+                  {infinite.isFetchingNextPage && (
+                    <p className="pl-infinite-status" role="status">불러오는 중…</p>
+                  )}
+                  {!infinite.hasNextPage && portfolios.length > 0 && (
+                    <p className="pl-infinite-status pl-infinite-status--end" role="status">
+                      마지막 포트폴리오입니다
+                    </p>
+                  )}
+                </>
               )}
-            </div>
+            </>
           ) : (
             <div className="pl-empty">
               <div className="pl-empty__icon" aria-hidden>
@@ -258,10 +308,16 @@ export default function PortfolioListView() {
                   <path d="M4 30l9-8 7 6 5-5 7 7" stroke="currentColor" strokeWidth="1.5" strokeLinejoin="round" strokeLinecap="round" />
                 </svg>
               </div>
-              <p className="pl-empty__msg">검색 결과가 없습니다</p>
-              <button type="button" className="pl-empty__reset" onClick={() => { setSearchQuery(""); setActiveL1(ALL_FILTER); setActiveL2(ALL_FILTER) }}>
-                필터 초기화
-              </button>
+              <p className="pl-empty__msg">
+                {!mock && infinite.isLoading
+                  ? "포트폴리오를 불러오는 중입니다…"
+                  : "검색 결과가 없습니다"}
+              </p>
+              {!(!mock && infinite.isLoading) && (
+                <button type="button" className="pl-empty__reset" onClick={() => { setSearchQuery(""); setActiveL1(ALL_FILTER); setActiveL2(ALL_FILTER) }}>
+                  필터 초기화
+                </button>
+              )}
             </div>
           )}
         </PageContainer>
