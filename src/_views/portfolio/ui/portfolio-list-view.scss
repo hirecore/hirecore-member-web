@@ -349,8 +349,8 @@ $avatar-size: 26px;
     min-height: 7.5rem;
     overflow: hidden;
     // 흰 배경 썸네일과 카드 본문 경계 구분선
-    border-right: 1.5px solid rgba(0, 0, 0, 0.16);
-    .dark & { border-right-color: rgba(255, 255, 255, 0.14); }
+    border-right: 1px solid rgba(0, 0, 0, 0.055);
+    .dark & { border-right-color: rgba(255, 255, 255, 0.07); }
 
     @media (max-width: layout.$bp-sm) { width: 5.5rem; min-height: 6rem; }
   }
@@ -524,8 +524,8 @@ $avatar-size: 26px;
     height: 10.5rem;
     overflow: hidden;
     // 흰 배경 썸네일과 카드 본문 경계 구분선
-    border-bottom: 1.5px solid rgba(0, 0, 0, 0.16);
-    .dark & { border-bottom-color: rgba(255, 255, 255, 0.14); }
+    border-bottom: 1px solid rgba(0, 0, 0, 0.055);
+    .dark & { border-bottom-color: rgba(255, 255, 255, 0.07); }
   }
 
   &__thumb-img {
