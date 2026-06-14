@@ -28,20 +28,9 @@
     max-height: 280px;
     position: relative;
     background: rgba(0, 0, 0, 0.025);
-    .dark & { background: rgba(255, 255, 255, 0.03); }
-
     // 흰 배경 썸네일과 카드 본문 경계 구분선
-    &::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: 1.5px;
-      background: rgba(0, 0, 0, 0.16);
-      pointer-events: none;
-      .dark & { background: rgba(255, 255, 255, 0.14); }
-    }
+    border: 1.5px solid rgba(0, 0, 0, 0.16);
+    .dark & { background: rgba(255, 255, 255, 0.03); border-color: rgba(255, 255, 255, 0.14); }
   }
 
   &__thumb-img {
