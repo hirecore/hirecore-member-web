@@ -106,7 +106,7 @@ export function useEditorImagePasteHandler(
           })
       } else {
         // 다중 이미지 → WebP 변환 후 quota 선검사 → imageCarousel 노드로 삽입
-        Promise.all(limited.map(toWebP)).then((webpFiles) => {
+        Promise.all(limited.map((f) => toWebP(f))).then((webpFiles) => {
           const quotaInfo = storageInfoRef.current
           const totalNewBytes = webpFiles.reduce((sum, f) => sum + f.size, 0)
           if (quotaInfo) {

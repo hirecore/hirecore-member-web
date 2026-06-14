@@ -246,6 +246,19 @@
     font-size: 1rem;
     font-weight: 800;
     color: #fff;
+    overflow: hidden;
+    position: relative;
+
+    // 흰 배경 썸네일과 카드 본문 경계 구분선
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: inherit;
+      pointer-events: none;
+      .dark & { border-color: rgba(255, 255, 255, 0.08); }
+    }
   }
 
   &__body {

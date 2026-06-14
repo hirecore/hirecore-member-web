@@ -360,20 +360,49 @@ export function selectionWithinConvertibleTypes(
  * @param quality WebP 품질 0–1, 기본 0.85
  * @returns WebP File (변환 불가 시 원본 File)
  */
-export async function toWebP(file: File, quality = 0.85): Promise<File> {
-  if (file.type === "image/webp")    return file   // 이미 WebP
+export interface ToWebPOptions {
+  /** WebP 품질 0–1, 기본 0.85 */
+  quality?: number
+  /** 긴 변(가로/세로 중 큰 쪽) 최대 픽셀. 초과 시 비율 유지하며 축소. 미지정 시 원본 크기 유지. */
+  maxDimension?: number
+}
+
+function fitDimensions(
+  width: number,
+  height: number,
+  maxDimension?: number
+): { width: number; height: number } {
+  if (!maxDimension || maxDimension <= 0) return { width, height }
+  const longer = Math.max(width, height)
+  if (longer <= maxDimension) return { width, height }
+  const scale = maxDimension / longer
+  return {
+    width: Math.round(width * scale),
+    height: Math.round(height * scale),
+  }
+}
+
+export async function toWebP(
+  file: File,
+  options: ToWebPOptions = {}
+): Promise<File> {
+  const { quality = 0.85, maxDimension } = options
+
+  // 이미 WebP이면서 리사이즈 요구가 없으면 변환 생략
+  if (file.type === "image/webp" && !maxDimension) return file
 
   // SVG는 createImageBitmap이 불안정하므로 Image + Canvas로 래스터화
   if (file.type === "image/svg+xml") {
-    return await svgToWebP(file, quality)
+    return await svgToWebP(file, quality, maxDimension)
   }
 
   try {
     const bitmap = await createImageBitmap(file)
+    const { width, height } = fitDimensions(bitmap.width, bitmap.height, maxDimension)
     const canvas  = document.createElement("canvas")
-    canvas.width  = bitmap.width
-    canvas.height = bitmap.height
-    canvas.getContext("2d")!.drawImage(bitmap, 0, 0)
+    canvas.width  = width
+    canvas.height = height
+    canvas.getContext("2d")!.drawImage(bitmap, 0, 0, width, height)
     bitmap.close() // ImageBitmap 메모리 즉시 해제
 
     return await new Promise<File>((resolve) => {
@@ -396,7 +425,11 @@ export async function toWebP(file: File, quality = 0.85): Promise<File> {
  * SVG → WebP 변환 (Image + Canvas 방식)
  * createImageBitmap이 SVG에서 불안정하므로 별도 처리
  */
-async function svgToWebP(file: File, quality: number): Promise<File> {
+async function svgToWebP(
+  file: File,
+  quality: number,
+  maxDimension?: number
+): Promise<File> {
   const url = URL.createObjectURL(file)
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
@@ -406,8 +439,9 @@ async function svgToWebP(file: File, quality: number): Promise<File> {
       el.src = url
     })
 
-    const w = img.naturalWidth  || 800
-    const h = img.naturalHeight || 600
+    const rawW = img.naturalWidth  || 800
+    const rawH = img.naturalHeight || 600
+    const { width: w, height: h } = fitDimensions(rawW, rawH, maxDimension)
     const canvas = document.createElement("canvas")
     canvas.width  = w
     canvas.height = h

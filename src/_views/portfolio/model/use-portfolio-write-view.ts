@@ -296,7 +296,7 @@ export function usePortfolioWriteView() {
   const uploadThumbnail = useCallback(async (): Promise<string | null> => {
     const file = thumbnailFileRef.current
     if (!file) return thumbnailUrl
-    const webpFile = await toWebP(file)
+    const webpFile = await toWebP(file, { maxDimension: 1280, quality: 0.8 })
     const { width, height } = await getImageDimensions(webpFile)
     const { files } = await requestPresignedUrls([{
       purpose: "thumbnailImage",

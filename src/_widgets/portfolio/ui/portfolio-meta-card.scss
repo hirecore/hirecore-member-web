@@ -26,6 +26,20 @@
     overflow: hidden;
     margin-bottom: 1.25rem;
     max-height: 280px;
+    position: relative;
+
+    // 흰 배경 썸네일과 카드 본문 경계 구분선
+    &::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.08);
+      pointer-events: none;
+      .dark & { background: rgba(255, 255, 255, 0.08); }
+    }
   }
 
   &__thumb-img {
