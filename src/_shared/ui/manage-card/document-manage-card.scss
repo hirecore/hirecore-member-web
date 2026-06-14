@@ -311,9 +311,18 @@
   background: #f1f5f9;
   // 흰 배경 썸네일과 카드 본문 경계 구분선 — 이미지에 가려지지 않도록 컨테이너 border 로
   border-bottom: 1px solid rgba(0, 0, 0, 0.055);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .dark & { background: #1A2130; border-bottom-color: rgba(255, 255, 255, 0.07); }
 
-  img { width: 100%; height: 100%; object-fit: contain; }
+  img {
+    max-width: 60%;
+    max-height: 60%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
 
   &__default {
     width: 100%;
@@ -337,9 +346,18 @@
   background: #f1f5f9;
   // 흰 배경 썸네일과 카드 본문 경계 구분선
   border: 1px solid rgba(0, 0, 0, 0.055);
+  display: flex;
+  align-items: center;
+  justify-content: center;
   .dark & { background: #1A2130; border-color: rgba(255, 255, 255, 0.07); }
 
-  img { width: 100%; height: 100%; object-fit: contain; }
+  img {
+    max-width: 60%;
+    max-height: 60%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
 
   &__placeholder {
     width: 100%;
