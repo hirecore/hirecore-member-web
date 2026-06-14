@@ -94,7 +94,7 @@ export function LinkedPortfoliosSection({ portfolios, linkedIds, onChange }: Pro
                 <div className="lps-card__thumb">
                   {p.thumbnailUrl ? (
                     // eslint-disable-next-line @next/next/no-img-element
-                    <img src={p.thumbnailUrl} alt={p.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <img src={p.thumbnailUrl} alt={p.title} />
                   ) : (
                     <DefaultThumb title={p.title} />
                   )}

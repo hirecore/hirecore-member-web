@@ -311,7 +311,7 @@
   background: #f1f5f9;
   .dark & { background: #1A2130; }
 
-  img { width: 100%; height: 100%; object-fit: cover; }
+  img { width: 100%; height: 100%; object-fit: contain; }
 
   // 흰 배경 썸네일과 카드 본문 경계 구분선
   &::after {
@@ -320,10 +320,10 @@
     left: 0;
     right: 0;
     bottom: 0;
-    height: 1px;
-    background: rgba(0, 0, 0, 0.08);
+    height: 1.5px;
+    background: rgba(0, 0, 0, 0.16);
     pointer-events: none;
-    .dark & { background: rgba(255, 255, 255, 0.08); }
+    .dark & { background: rgba(255, 255, 255, 0.14); }
   }
 
   &__default {
@@ -348,17 +348,17 @@
   background: #f1f5f9;
   .dark & { background: #1A2130; }
 
-  img { width: 100%; height: 100%; object-fit: cover; }
+  img { width: 100%; height: 100%; object-fit: contain; }
 
   // 흰 배경 썸네일과 카드 본문 경계 구분선
   &::after {
     content: "";
     position: absolute;
     inset: 0;
-    border: 1px solid rgba(0, 0, 0, 0.08);
+    border: 1.5px solid rgba(0, 0, 0, 0.16);
     border-radius: inherit;
     pointer-events: none;
-    .dark & { border-color: rgba(255, 255, 255, 0.08); }
+    .dark & { border-color: rgba(255, 255, 255, 0.14); }
   }
 
   &__placeholder {
