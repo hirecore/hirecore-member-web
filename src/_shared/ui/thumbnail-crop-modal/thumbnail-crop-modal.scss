@@ -1,0 +1,213 @@
+/* ============================================================
+   ThumbnailCropModal — 썸네일 1:1 크롭 모달
+   기존 DeleteConfirmModal(dcm-) 와 동일한 디자인 시스템
+   prefix: tcm-
+   ============================================================ */
+
+@keyframes tcm-backdrop-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes tcm-modal-in {
+  from { opacity: 0; transform: translateY(14px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.tcm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  animation: tcm-backdrop-in 0.18s ease;
+}
+
+.tcm-modal {
+  position: relative;
+  background: #fff;
+  border-radius: 1.25rem;
+  padding: 1.25rem 1.25rem 1rem;
+  width: 100%;
+  max-width: 480px;
+  box-shadow:
+    0 0 0 1px rgba(0, 0, 0, 0.06),
+    0 24px 64px rgba(0, 0, 0, 0.18),
+    0 4px 16px rgba(0, 0, 0, 0.08);
+  animation: tcm-modal-in 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+
+  .dark & {
+    background: #151A22;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 24px 64px rgba(0, 0, 0, 0.55),
+      0 4px 16px rgba(0, 0, 0, 0.3);
+  }
+
+  &__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.875rem;
+  }
+
+  &__title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+    margin: 0;
+    letter-spacing: -0.015em;
+    .dark & { color: #f9fafb; }
+  }
+
+  &__close {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #6b7280;
+    transition: background 0.15s;
+    &:hover { background: rgba(0, 0, 0, 0.09); }
+    .dark & {
+      background: rgba(255, 255, 255, 0.07);
+      color: #9ca3af;
+      &:hover { background: rgba(255, 255, 255, 0.12); }
+    }
+  }
+
+  /* ── 비율 선택 chip 그룹 ── */
+  &__aspects {
+    display: flex;
+    gap: 0.4rem;
+    margin-bottom: 0.75rem;
+  }
+
+  &__aspect {
+    padding: 0.32rem 0.75rem;
+    border-radius: 999px;
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
+    background: transparent;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #6b7280;
+    cursor: pointer;
+    transition: all 0.13s;
+    letter-spacing: 0.01em;
+
+    &:hover:not(:disabled) {
+      border-color: #6b7280;
+      color: #374151;
+    }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.5;
+    }
+
+    &--selected {
+      border-color: #3b82f6;
+      background: #3b82f6;
+      color: #fff;
+      &:hover:not(:disabled) { background: #2563eb; border-color: #2563eb; color: #fff; }
+    }
+
+    .dark & {
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #9ca3af;
+      &:hover:not(:disabled) { border-color: rgba(255, 255, 255, 0.25); color: #e5e7eb; }
+      &.tcm-modal__aspect--selected {
+        border-color: #3b82f6;
+        background: #3b82f6;
+        color: #fff;
+      }
+    }
+  }
+
+  &__crop-area {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    background: #000;
+    border-radius: 0.75rem;
+    overflow: hidden;
+  }
+
+  &__controls {
+    display: flex;
+    align-items: center;
+    gap: 0.625rem;
+    margin-top: 0.875rem;
+  }
+
+  &__zoom-label {
+    font-size: 0.78rem;
+    color: #6b7280;
+    flex-shrink: 0;
+    .dark & { color: #9ca3af; }
+  }
+
+  &__zoom-slider {
+    flex: 1;
+    accent-color: #3b82f6;
+  }
+
+  &__hint {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    margin: 0.75rem 0 0;
+    text-align: center;
+    .dark & { color: #6b7280; }
+  }
+
+  &__actions {
+    display: flex;
+    gap: 0.625rem;
+    margin-top: 1rem;
+  }
+
+  &__btn {
+    flex: 1;
+    padding: 0.7rem 1rem;
+    border-radius: 0.875rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.12s;
+    letter-spacing: -0.01em;
+
+    &:active:not(:disabled) { transform: scale(0.98); }
+
+    &:disabled {
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    &--cancel {
+      background: rgba(0, 0, 0, 0.05);
+      color: #374151;
+      &:hover:not(:disabled) { background: rgba(0, 0, 0, 0.08); }
+      .dark & {
+        background: rgba(255, 255, 255, 0.07);
+        color: #d1d5db;
+        &:hover:not(:disabled) { background: rgba(255, 255, 255, 0.1); }
+      }
+    }
+
+    &--apply {
+      background: #3b82f6;
+      color: #fff;
+      &:hover:not(:disabled) { background: #2563eb; }
+    }
+  }
+}
