@@ -16,6 +16,8 @@ export { CodeBlockButton } from "./ui/code-block-button"
 export { TextAlignButton } from "./ui/text-align-button"
 export { UndoRedoButton } from "./ui/undo-redo-button"
 export { ImageUploadButton } from "./ui/image-upload-button"
+export { TableButton } from "./ui/table-button"
+export { TableHoverControls } from "./ui/table-hover-controls"
 export {
   ColorHighlightPopover,
   ColorHighlightPopoverContent,
@@ -36,7 +38,7 @@ export type { BubbleMenuAnchor } from "./model"
 export type { EditorUploadFeedbackResult } from "./model"
 
 // Lib
-export { handleImageUpload, MAX_FILE_SIZE, editorContent, toWebP, calcEditorSessionBytes } from "./lib"
+export { handleImageUpload, MAX_FILE_SIZE, editorContent, toWebP, calcEditorSessionBytes, isPosInsideTable, EXCLUDE_TABLE_DRAG_HANDLE_RULE } from "./lib"
 
 // Storage UI (WriteView에서 직접 내부 경로 접근을 막기 위해 public API로 노출)
 export { StorageBar } from "./ui/storage-meter/StorageBar"

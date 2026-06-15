@@ -95,6 +95,19 @@ const ALL_COMMANDS: SlashCommandItem[] = [
     },
   },
   {
+    title: "표",
+    description: "3행 3열 표 (머리글은 셀 안에서 선택)",
+    searchTerms: ["table", "grid", "표", "테이블"],
+    icon: "▦",
+    command: ({ editor, range }) => {
+      editor.chain()
+        .focus()
+        .deleteRange(range)
+        .insertTable({ rows: 3, cols: 3, withHeaderRow: false })
+        .run()
+    },
+  },
+  {
     title: "구분선",
     description: "섹션을 나누는 수평선",
     searchTerms: ["hr", "divider", "line", "구분선", "수평선"],

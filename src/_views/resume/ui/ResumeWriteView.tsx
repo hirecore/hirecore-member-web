@@ -19,6 +19,9 @@ import {
   TextAlignButton,
   UndoRedoButton,
   ImageUploadButton,
+  TableButton,
+  TableHoverControls,
+  EXCLUDE_TABLE_DRAG_HANDLE_RULE,
   ColorHighlightPopover,
   TextColorPopover,
   LinkPopover,
@@ -74,6 +77,7 @@ function EditorToolbar() {
         <HeadingDropdownMenu levels={[1, 2, 3, 4]} />
         <ListDropdownMenu types={["bulletList", "orderedList", "taskList"]} />
         <BlockquoteButton />
+        <TableButton />
         <CodeBlockButton />
       </ToolbarGroup>
       <ToolbarSeparator />
@@ -181,6 +185,9 @@ export function ResumeWriteView() {
           </Toolbar>
         </BubbleMenu>
       )}
+
+      {/* 표 노션 스타일 hover 컨트롤 */}
+      {editor && <TableHoverControls editor={editor} />}
 
       <div className="rw-root">
         <main className="rw-main">
@@ -326,8 +333,27 @@ export function ResumeWriteView() {
                 </div>
                 <div className="rw-editor-area">
                   {editor && (
-                    <DragHandle editor={editor} nested={{ edgeDetection: "none" }}>
-                      <div className="rw-drag-handle-icon">
+                    <DragHandle
+                      editor={editor}
+                      nested={{ edgeDetection: "none", rules: [EXCLUDE_TABLE_DRAG_HANDLE_RULE] }}
+                      onNodeChange={({ node }) => {
+                        const el = document.querySelector(".drag-handle") as HTMLElement | null
+                        if (!el) return
+                        if (node?.type.name === "table") el.dataset.targetTable = "1"
+                        else delete el.dataset.targetTable
+                      }}
+                    >
+                      <div
+                        className="rw-drag-handle-icon"
+                        onClick={() => {
+                          const el = document.querySelector(".drag-handle") as HTMLElement | null
+                          if (el?.dataset.targetTable === "1") {
+                            if (window.confirm("이 표를 삭제하시겠습니까?")) {
+                              editor.chain().focus().deleteTable().run()
+                            }
+                          }
+                        }}
+                      >
                         <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor">
                           <circle cx="5.5" cy="4" r="1.2" /><circle cx="10.5" cy="4" r="1.2" />
                           <circle cx="5.5" cy="8" r="1.2" /><circle cx="10.5" cy="8" r="1.2" />

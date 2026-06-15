@@ -213,7 +213,8 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 1rem;
+  // 타이틀과의 간격 — 한 눈에 정보 그룹 구분되도록 여유
+  margin-bottom: 1.5rem;
 }
 
 .rd-vis-badge {

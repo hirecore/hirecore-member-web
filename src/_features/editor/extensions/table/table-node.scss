@@ -1,0 +1,105 @@
+/* ============================================================
+   Table Node — Notion-style 표 시각 스타일
+   - 옅은 회색 보더 (Notion border token: rgba(55, 53, 47, 0.16))
+   - 머리글 셀(th)만 옅은 회색 배경
+   - 컬럼 리사이즈 핸들 Notion blue (#2383e2)
+   ============================================================ */
+
+.ProseMirror {
+  // 표 wrapper — 가로 스크롤 컨테이너
+  .tableWrapper {
+    overflow-x: auto;
+    margin: 1.25rem 0;
+    // 얇은 스크롤바 — 컨트롤(+ 행/열)과 시각 충돌 최소화
+    scrollbar-width: thin;
+    scrollbar-color: rgba(55, 53, 47, 0.25) transparent;
+
+    &::-webkit-scrollbar { height: 6px; }
+    &::-webkit-scrollbar-track { background: transparent; }
+    &::-webkit-scrollbar-thumb {
+      background: rgba(55, 53, 47, 0.25);
+      border-radius: 3px;
+    }
+  }
+
+  table {
+    border-collapse: collapse;
+    // 셀이 콘텐츠에 맞춰 확장될 수 있도록 auto, 사용자 리사이즈 width 는 최소 width 로 동작
+    table-layout: auto;
+    // 콘텐츠 길이만큼 늘어남. 콘텐츠가 작아도 wrapper 폭은 채움.
+    width: max-content;
+    min-width: 100%;
+    margin: 0;
+    border: 1px solid rgba(55, 53, 47, 0.16);
+    border-radius: 0;
+    background: #fff;
+
+    .dark & {
+      background: #2f3437;
+      border-color: rgba(255, 255, 255, 0.13);
+    }
+  }
+
+  td,
+  th {
+    min-width: 6rem;
+    padding: 0.5rem 0.75rem;
+    vertical-align: top;
+    border: 1px solid rgba(55, 53, 47, 0.16);
+    box-sizing: border-box;
+    position: relative;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #37352f;
+    // 줄바꿈 방지 — 긴 텍스트는 셀 폭을 늘리고, 표 전체가 wrapper 안에서 가로 스크롤
+    white-space: nowrap;
+
+    // 셀 내부 블록 요소(p 등)도 nowrap 유지
+    > * {
+      margin: 0;
+      white-space: nowrap;
+    }
+
+    .dark & {
+      border-color: rgba(255, 255, 255, 0.13);
+      color: rgba(255, 255, 255, 0.85);
+    }
+  }
+
+  // 머리글 셀 — 사용자가 BubbleMenu/메뉴에서 머리글 행/열 명시 선택했을 때만 적용
+  th {
+    background: rgba(55, 53, 47, 0.05);
+    font-weight: 600;
+    text-align: left;
+
+    .dark & { background: rgba(255, 255, 255, 0.055); }
+  }
+
+  // 셀 선택 강조 (tiptap selectedCell)
+  .selectedCell {
+    position: relative;
+    &::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(35, 131, 226, 0.14);
+      pointer-events: none;
+    }
+    .dark &::after { background: rgba(96, 165, 250, 0.18); }
+  }
+
+  // 컬럼 리사이즈 핸들 — Notion blue
+  .column-resize-handle {
+    position: absolute;
+    right: -2px;
+    top: 0;
+    bottom: -2px;
+    width: 3px;
+    background: #2383e2;
+    pointer-events: none;
+  }
+
+  &.resize-cursor {
+    cursor: col-resize;
+  }
+}

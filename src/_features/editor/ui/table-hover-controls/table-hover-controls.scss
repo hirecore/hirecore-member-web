@@ -1,0 +1,247 @@
+/* ============================================================
+   TableHoverControls — Notion-style
+   prefix: thc-
+   ============================================================ */
+
+.thc-layer {
+  pointer-events: none;
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  > * { pointer-events: auto; }
+}
+
+/* ── 메뉴 열렸을 때 대상 행/열 강조 ─────────────────── */
+.thc-highlight {
+  pointer-events: none;
+  position: fixed;
+  background: rgba(35, 131, 226, 0.10);   // Notion blue tint
+  border-radius: 2px;
+  transition: opacity 0.1s;
+
+  .dark & { background: rgba(96, 165, 250, 0.14); }
+}
+
+/* ── 열 드래그 중 source 열 (살짝 옅게) ────────────── */
+.thc-drag-source {
+  pointer-events: none;
+  position: fixed;
+  background: rgba(55, 53, 47, 0.06);
+  border-radius: 2px;
+  .dark & { background: rgba(255, 255, 255, 0.06); }
+}
+
+/* ── 열 드래그 중 target 열 (강조) ─────────────────── */
+.thc-drag-target {
+  pointer-events: none;
+  position: fixed;
+  background: rgba(35, 131, 226, 0.18);
+  border-radius: 2px;
+  .dark & { background: rgba(96, 165, 250, 0.22); }
+}
+
+/* ── 드래그 중 핸들 — 잡고 있는 상태 표시 ─────────── */
+.thc-handle[data-dragging="1"] {
+  cursor: grabbing !important;
+  color: rgba(35, 131, 226, 1) !important;
+  .thc-handle__dash { display: none; }
+  .thc-handle__grip { display: inline-flex; align-items: center; justify-content: center; }
+}
+
+/* ── 드래그 ghost — 선택된 행/열 반투명 복제본 (마우스 따라다님) ── */
+.thc-drag-ghost {
+  position: fixed;
+  pointer-events: none;
+  opacity: 0.78;
+  z-index: 60;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow:
+    0 12px 28px rgba(0, 0, 0, 0.18),
+    0 4px 10px rgba(0, 0, 0, 0.08);
+  // 살짝 들린 느낌
+  transform: rotate(-0.6deg);
+  transition: none;
+
+  table {
+    border-collapse: collapse;
+    background: #fff;
+    margin: 0;
+    border: 1px solid rgba(55, 53, 47, 0.16);
+    .dark & { background: #2f3437; border-color: rgba(255, 255, 255, 0.13); }
+  }
+
+  td, th {
+    border: 1px solid rgba(55, 53, 47, 0.16);
+    padding: 0.5rem 0.75rem;
+    font-size: 0.95rem;
+    line-height: 1.55;
+    color: #37352f;
+    white-space: nowrap;
+    vertical-align: top;
+    .dark & { border-color: rgba(255, 255, 255, 0.13); color: rgba(255, 255, 255, 0.85); }
+
+    > * { margin: 0; }
+  }
+
+  th {
+    background: rgba(55, 53, 47, 0.05);
+    font-weight: 600;
+    text-align: left;
+    .dark & { background: rgba(255, 255, 255, 0.055); }
+  }
+}
+
+/* ── 행/열 핸들 — 표 보더 라인 위에 떠 있음. 기본 dash, hover 시 grip-dots. ───── */
+.thc-handle {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  border-radius: 3px;
+  border: none;
+  // 보더 라인 위에 떠있는 느낌 — 배경 투명. hover 시에도 배경 없음 (color 만 변경)
+  background: transparent;
+  color: rgba(55, 53, 47, 0.55);
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.1s;
+
+  // 기본은 dash 만, hover 시 grip-dots 로 전환
+  &__dash { display: inline-flex; align-items: center; justify-content: center; }
+  &__grip { display: none; }
+
+  &:hover {
+    color: rgba(55, 53, 47, 0.95);
+    .thc-handle__dash { display: none; }
+    .thc-handle__grip { display: inline-flex; align-items: center; justify-content: center; }
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(35, 131, 226, 0.5);
+    outline-offset: 1px;
+    .thc-handle__dash { display: none; }
+    .thc-handle__grip { display: inline-flex; align-items: center; justify-content: center; }
+  }
+
+  .dark & {
+    color: rgba(255, 255, 255, 0.5);
+    &:hover { color: rgba(255, 255, 255, 0.95); }
+  }
+}
+
+/* ── + 행/열 추가 strip ─────────────────────────── */
+.thc-add {
+  position: fixed;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: rgba(55, 53, 47, 0.04);      // Notion 옅은 배경 — 항상 표시
+  color: rgba(55, 53, 47, 0.35);
+  cursor: pointer;
+  padding: 0;
+  border-radius: 3px;
+  transition: background 0.12s, color 0.12s;
+
+  &:hover {
+    background: rgba(35, 131, 226, 0.12);
+    color: rgba(35, 131, 226, 1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid rgba(35, 131, 226, 0.5);
+    outline-offset: 1px;
+  }
+
+  .dark & {
+    background: rgba(255, 255, 255, 0.04);
+    color: rgba(255, 255, 255, 0.35);
+    &:hover { background: rgba(96, 165, 250, 0.16); color: #93c5fd; }
+  }
+}
+
+/* ── 메뉴 popover ─────────────────────────────── */
+@keyframes thc-menu-in {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.thc-menu {
+  position: fixed;
+  z-index: 100;
+  min-width: 180px;
+  padding: 0.3rem;
+  background: #fff;
+  border-radius: 6px;
+  box-shadow:
+    0 0 0 1px rgba(15, 15, 15, 0.08),
+    0 4px 12px rgba(15, 15, 15, 0.1),
+    0 12px 28px rgba(15, 15, 15, 0.12);
+  display: flex;
+  flex-direction: column;
+  gap: 0.05rem;
+  animation: thc-menu-in 0.12s ease forwards;
+
+  .dark & {
+    background: #2f3437;                   // Notion 다크 메뉴 톤
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.08),
+      0 4px 12px rgba(0, 0, 0, 0.55),
+      0 12px 28px rgba(0, 0, 0, 0.45);
+  }
+
+  &__item {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    width: 100%;
+    padding: 0.42rem 0.55rem;
+    border-radius: 4px;
+    border: none;
+    background: transparent;
+    font-size: 0.82rem;
+    font-weight: 500;
+    color: rgba(55, 53, 47, 0.85);         // Notion 텍스트 색
+    cursor: pointer;
+    transition: background 0.08s;
+    letter-spacing: -0.005em;
+    text-align: left;
+
+    &:hover { background: rgba(55, 53, 47, 0.06); }
+
+    &--danger {
+      color: #eb5757;                      // Notion 빨강
+      &:hover { background: rgba(235, 87, 87, 0.1); }
+    }
+
+    .dark & {
+      color: rgba(255, 255, 255, 0.81);
+      &:hover { background: rgba(255, 255, 255, 0.055); }
+      &.thc-menu__item--danger {
+        color: #ff7369;
+        &:hover { background: rgba(255, 115, 105, 0.14); }
+      }
+    }
+  }
+
+  &__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    color: rgba(55, 53, 47, 0.45);
+
+    .thc-menu__item:hover & { color: inherit; }
+    .thc-menu__item--danger & { color: #eb5757; }
+
+    .dark & { color: rgba(255, 255, 255, 0.45); }
+    .dark .thc-menu__item--danger & { color: #ff7369; }
+  }
+
+  &__label { flex: 1; min-width: 0; }
+}

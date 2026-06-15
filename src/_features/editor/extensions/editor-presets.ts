@@ -12,6 +12,7 @@ import { Superscript } from "@tiptap/extension-superscript"
 import { TextStyle } from "@tiptap/extension-text-style"
 import { Color } from "@tiptap/extension-color"
 import { Selection } from "@tiptap/extensions"
+import { TableKit } from "@tiptap/extension-table"
 import { ResizableImage } from "./resizable-image"
 import { ImageCarousel } from "./image-carousel"
 import { SyntaxCodeBlock } from "./syntax-code-block"
@@ -19,6 +20,7 @@ import { HorizontalRule } from "./horizontal-rule"
 import { SlashCommand } from "./slash-command"
 import { SelectCurrentBlock } from "./select-current-block"
 import { BlockquoteBehavior } from "./blockquote-behavior"
+import { TableSelectAll } from "./table-select-all"
 
 // ── 읽기 전용 기본 확장 (이미지 제외) ─────────────────────────
 const READONLY_BASE = [
@@ -28,6 +30,9 @@ const READONLY_BASE = [
   TaskList, TaskItem.configure({ nested: true }),
   Highlight.configure({ multicolor: true }),
   TextStyle, Color, Typography, Superscript, Subscript,
+  // 읽기 모드 — wrapper(.tableWrapper) 명시 생성으로 가로 스크롤 컨테이너 보장.
+  // resizable: false 일 때는 TableView 가 자동 wrapper 를 안 만들기 때문에 renderWrapper 필요.
+  TableKit.configure({ table: { resizable: false, renderWrapper: true } }),
 ]
 
 /** 읽기 전용 — 이미지 포함 (이력서, 포트폴리오) */
@@ -50,6 +55,10 @@ const WRITE_BASE = [
   Highlight.configure({ multicolor: true }),
   TextStyle, Color, Typography, Superscript, Subscript,
   Selection, SlashCommand, SelectCurrentBlock, BlockquoteBehavior,
+  // 표 — 컬럼 리사이즈 활성화. 행/열 추가·삭제는 TableHoverControls 에서 처리.
+  TableKit.configure({ table: { resizable: true } }),
+  // Cmd+A / Ctrl+A — 셀 안에 있을 땐 본문 전체가 아닌 표 자체만 선택.
+  TableSelectAll,
 ]
 
 /** 쓰기 모드 — 텍스트 전용 (자기소개서) */

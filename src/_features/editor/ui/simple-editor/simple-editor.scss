@@ -26,6 +26,18 @@
   }
 }
 
+// 표 내부 커서일 때 — TableHoverControls 와 시각 충돌 방지를 위해 숨김
+.drag-handle.drag-handle--hidden {
+  display: none !important;
+}
+
+// drag handle 이 표를 가리킬 때만 외곽으로 밀어냄 — TableHoverControls 의 row/col 핸들과 분리
+// 일반 텍스트/문단 블록의 drag handle 은 위치 영향 없음
+.drag-handle[data-target-table="1"] {
+  margin-top: -14px;
+  margin-left: -12px;
+}
+
 // .simple-editor-content is used as selector hook for TipTap editor padding
 .simple-editor-content .tiptap.ProseMirror.simple-editor {
   flex: 1;

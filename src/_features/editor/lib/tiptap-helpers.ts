@@ -738,3 +738,52 @@ export function getSelectedBlockNodes(editor: Editor): PMNode[] {
 
   return blocks
 }
+
+/**
+ * 주어진 doc 위치가 표(table/row/cell/header) 내부인지 판정.
+ */
+export function isPosInsideTable(editor: Editor, pos: number): boolean {
+  try {
+    const $pos = editor.state.doc.resolve(pos)
+    for (let d = $pos.depth; d > 0; d--) {
+      const name = $pos.node(d).type.name
+      if (name === "table" || name === "tableRow" || name === "tableCell" || name === "tableHeader") {
+        return true
+      }
+    }
+  } catch {
+    /* 잘못된 pos 등 — false 반환 */
+  }
+  return false
+}
+
+/**
+ * tiptap DragHandle 의 nested.rules 에 넣을 룰.
+ * - 표(table) 자체는 허용 → 블록 이동 핸들 보존
+ * - 표 내부 구조(row/cell/header) 와 셀 안의 자식 노드(예: paragraph) 는 차단
+ *   → 셀 클릭 시 핸들 점이 뜨는 현상 방지
+ * 평가값 1000 이상이면 후보에서 완전히 배제됨.
+ */
+export const EXCLUDE_TABLE_DRAG_HANDLE_RULE = {
+  id: "excludeTableContent",
+  evaluate: ({
+    node, $pos,
+  }: {
+    node: { type: { name: string } }
+    $pos: { depth: number; node: (d: number) => { type: { name: string } } }
+  }) => {
+    const name = node.type.name
+    // 표 자체는 허용 (드래그로 블록 이동 가능)
+    if (name === "table") return 0
+    // 표의 구조 노드 — 직접 제외
+    if (name === "tableRow" || name === "tableCell" || name === "tableHeader") return 1000
+    // 표 내부의 다른 노드 (셀 안 paragraph 등) — 조상에 table 이 있으면 제외
+    for (let d = $pos.depth; d >= 0; d--) {
+      const ancestor = $pos.node(d).type.name
+      if (ancestor === "table" || ancestor === "tableRow" || ancestor === "tableCell" || ancestor === "tableHeader") {
+        return 1000
+      }
+    }
+    return 0
+  },
+}
