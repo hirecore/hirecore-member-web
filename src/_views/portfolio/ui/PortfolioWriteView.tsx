@@ -339,6 +339,8 @@ export default function PortfolioWriteView() {
               externalLinks={externalLinks}
               onAdd={(link) => setExternalLinks((prev) => [...prev, link])}
               onRemove={(i) => setExternalLinks((prev) => prev.filter((_, idx) => idx !== i))}
+              onReorder={(next) => setExternalLinks(next)}
+              onUpdate={(i, link) => setExternalLinks((prev) => prev.map((v, idx) => idx === i ? link : v))}
             />
           </PageContainer>
 
@@ -350,6 +352,7 @@ export default function PortfolioWriteView() {
               onInputChange={setTagInput}
               onKeyDown={handleTagKeyDown}
               onRemove={removeTag}
+              onReorder={(next) => setTags(next)}
             />
           </PageContainer>
         </main>

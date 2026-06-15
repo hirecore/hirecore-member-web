@@ -139,8 +139,53 @@
   background: #f9fafb;
   border: 1px solid rgba(0,0,0,0.06);
   border-radius: 0.5rem;
+  position: relative;
 
   .dark & { background: #111; border-color: rgba(255,255,255,0.07); }
+
+  // 드래그 중 — 살짝 떠 있는 인상
+  &--dragging {
+    z-index: 1;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+  }
+
+  // 수정 모드 — 배경 살짝 강조
+  &--editing {
+    background: #fff;
+    border-color: rgba(59, 130, 246, 0.35);
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.08);
+    flex-wrap: wrap;
+
+    .dark & {
+      background: #1a2030;
+      border-color: rgba(96, 165, 250, 0.4);
+    }
+  }
+
+  &__handle {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.125rem;
+    height: 1.375rem;
+    border: none;
+    background: transparent;
+    color: #d1d5db;
+    cursor: grab;
+    padding: 0;
+    border-radius: 0.25rem;
+    touch-action: none;
+    transition: color 0.12s, background 0.12s;
+
+    &:hover  { color: #6b7280; background: rgba(0, 0, 0, 0.04); }
+    &:active { cursor: grabbing; }
+
+    .dark & {
+      color: #4b5563;
+      &:hover { color: #9ca3af; background: rgba(255, 255, 255, 0.04); }
+    }
+  }
 
   &__label {
     flex-shrink: 0;
@@ -171,6 +216,14 @@
     .dark & { color: #9ca3af; &:hover { color: #60a5fa; } }
   }
 
+  &__actions {
+    display: flex;
+    align-items: center;
+    gap: 0.15rem;
+    flex-shrink: 0;
+  }
+
+  &__edit,
   &__remove {
     flex-shrink: 0;
     display: flex;
@@ -184,8 +237,96 @@
     color: #9ca3af;
     cursor: pointer;
     transition: background 0.12s, color 0.12s;
+    padding: 0;
 
+    .dark & { color: #6b7280; }
+  }
+
+  &__edit {
+    &:hover { background: rgba(59, 130, 246, 0.08); color: #2563eb; }
+    .dark &:hover { background: rgba(96, 165, 250, 0.1); color: #60a5fa; }
+  }
+
+  &__remove {
     &:hover { background: rgba(239,68,68,0.08); color: #ef4444; }
-    .dark & { color: #6b7280; &:hover { background: rgba(239,68,68,0.1); color: #f87171; } }
+    .dark &:hover { background: rgba(239,68,68,0.1); color: #f87171; }
+  }
+
+  /* ── 인라인 수정 입력 ── */
+  &__input {
+    border: 1.5px solid rgba(0, 0, 0, 0.1);
+    border-radius: 0.5rem;
+    background: #fff;
+    font-size: 0.78rem;
+    color: #111827;
+    padding: 0.4rem 0.625rem;
+    outline: none;
+    transition: border-color 0.13s, box-shadow 0.13s;
+
+    &:focus { border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.12); }
+
+    .dark & {
+      background: #0F131A;
+      border-color: rgba(255, 255, 255, 0.12);
+      color: #f9fafb;
+      &:focus { border-color: #60a5fa; box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.18); }
+    }
+
+    &--label { flex: 0 0 6.5rem; }
+    &--url   { flex: 1 1 0; min-width: 0; }
+
+    @media (max-width: 540px) {
+      &--label { flex: 0 0 100%; }
+      &--url   { flex: 1 1 100%; }
+    }
+  }
+
+  &__edit-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    flex-shrink: 0;
+  }
+
+  &__save,
+  &__cancel {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 1.625rem;
+    height: 1.625rem;
+    border-radius: 0.5rem;
+    border: none;
+    cursor: pointer;
+    transition: background 0.12s, color 0.12s, transform 0.1s;
+    padding: 0;
+
+    &:active { transform: scale(0.93); }
+  }
+
+  &__save {
+    background: #3b82f6;
+    color: #fff;
+    &:hover { background: #2563eb; }
+  }
+
+  &__cancel {
+    background: rgba(0, 0, 0, 0.05);
+    color: #6b7280;
+    &:hover { background: rgba(0, 0, 0, 0.08); color: #374151; }
+    .dark & {
+      background: rgba(255, 255, 255, 0.07);
+      color: #9ca3af;
+      &:hover { background: rgba(255, 255, 255, 0.1); color: #d1d5db; }
+    }
+  }
+
+  &__error {
+    flex-basis: 100%;
+    margin: 0.25rem 0 0;
+    font-size: 0.72rem;
+    color: #ef4444;
+    .dark & { color: #f87171; }
   }
 }

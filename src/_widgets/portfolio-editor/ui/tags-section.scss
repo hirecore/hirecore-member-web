@@ -1,4 +1,7 @@
-.pw-section--tags {
+// classPrefix(pw/rw/clw)별 동일한 시각 변형 — Resume/CoverLetter도 같은 톤
+.pw-section--tags,
+.rw-section--tags,
+.clw-section--tags {
   padding-top: 2rem;
   border-top: 1.5px dashed rgba(0, 0, 0, 0.08);
   margin-top: 2rem;
@@ -37,7 +40,15 @@
   color: #2563eb;
   font-size: 0.76rem;
   font-weight: 500;
+  user-select: none;          // 드래그 중 텍스트 선택 방지
+  touch-action: none;         // 터치 드래그 활성화
   .dark & { background: rgba(59, 130, 246, 0.18); color: #93c5fd; }
+
+  // 드래그 중 — 살짝 떠 있는 인상
+  &--dragging {
+    z-index: 1;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.18);
+  }
 
   &__remove {
     display: flex;

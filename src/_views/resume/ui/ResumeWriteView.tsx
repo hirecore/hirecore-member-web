@@ -28,7 +28,7 @@ import {
 } from "@/_features/editor"
 
 import { LinkedPortfoliosSection } from "@/_features/document-link"
-import { WriteActionBar, ExternalLinksSection, JobCategorySection } from "@/_widgets/portfolio-editor"
+import { WriteActionBar, ExternalLinksSection, JobCategorySection, TagsSection } from "@/_widgets/portfolio-editor"
 import { useResumeWriteView } from "../model/use-resume-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
 import { DraftSaveNotReadyModal } from "@/_shared/ui/draft-save-not-ready-modal"
@@ -351,37 +351,23 @@ export function ResumeWriteView() {
               externalLinks={externalLinks}
               onAdd={(link) => setExternalLinks((prev) => [...prev, link])}
               onRemove={(i) => setExternalLinks((prev) => prev.filter((_, idx) => idx !== i))}
+              onReorder={(next) => setExternalLinks(next)}
+              onUpdate={(i, link) => setExternalLinks((prev) => prev.map((v, idx) => idx === i ? link : v))}
               classPrefix="rw"
             />
 
             {/* 07. 태그 */}
-            <section className="rw-section">
-              <div className="rw-section__head">
-                <span className="rw-section__label">태그</span>
-                <span className="rw-section__optional">선택</span>
-              </div>
-              <div className="rw-tags-wrap">
-                {tags.map((tag) => (
-                  <span key={tag} className="rw-tag-chip">
-                    #{tag}
-                    <button type="button" className="rw-tag-chip__remove" onClick={() => setTags((t) => t.filter((v) => v !== tag))} aria-label={`${tag} 태그 삭제`}>
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-                <input
-                  type="text"
-                  className="rw-tag-input"
-                  placeholder={tags.length === 0 ? "태그 단어를 입력 후 Enter를 눌러주세요. (최대 10개)" : tags.length < 10 ? "Enter를 눌러 추가하세요." : ""}
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagKeyDown}
-                  disabled={tags.length >= 10}
-                />
-              </div>
-            </section>
+            <TagsSection
+              tags={tags}
+              tagInput={tagInput}
+              onInputChange={setTagInput}
+              onKeyDown={handleTagKeyDown}
+              onRemove={(tag) => setTags((t) => t.filter((v) => v !== tag))}
+              onReorder={(next) => setTags(next)}
+              classPrefix="rw"
+              emptyPlaceholder="태그 단어를 입력 후 Enter를 눌러주세요. (최대 10개)"
+              partialPlaceholder="Enter를 눌러 추가하세요."
+            />
 
             {/* 08. 포트폴리오 연결 */}
             <section className="rw-section">

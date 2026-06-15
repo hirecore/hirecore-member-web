@@ -25,7 +25,7 @@ import {
 } from "@/_features/editor"
 
 import { LinkedPortfoliosSection } from "@/_features/document-link"
-import { WriteActionBar, ExternalLinksSection, JobCategorySection } from "@/_widgets/portfolio-editor"
+import { WriteActionBar, ExternalLinksSection, JobCategorySection, TagsSection } from "@/_widgets/portfolio-editor"
 import { useCoverLetterWriteView } from "../model/use-cover-letter-write-view"
 import { PageContainer } from "@/_shared/ui/layout"
 import { DraftSaveNotReadyModal } from "@/_shared/ui/draft-save-not-ready-modal"
@@ -327,37 +327,23 @@ export function CoverLetterWriteView() {
               externalLinks={externalLinks}
               onAdd={(link) => setExternalLinks((prev) => [...prev, link])}
               onRemove={(i) => setExternalLinks((prev) => prev.filter((_, idx) => idx !== i))}
+              onReorder={(next) => setExternalLinks(next)}
+              onUpdate={(i, link) => setExternalLinks((prev) => prev.map((v, idx) => idx === i ? link : v))}
               classPrefix="clw"
             />
 
             {/* 07. 태그 */}
-            <section className="clw-section">
-              <div className="clw-section__head">
-                <span className="clw-section__label">태그</span>
-                <span className="clw-section__optional">선택</span>
-              </div>
-              <div className="clw-tags-wrap">
-                {tags.map((tag) => (
-                  <span key={tag} className="clw-tag-chip">
-                    #{tag}
-                    <button type="button" className="clw-tag-chip__remove" onClick={() => setTags((t) => t.filter((v) => v !== tag))} aria-label={`${tag} 태그 삭제`}>
-                      <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-                        <path d="M2 2l6 6M8 2l-6 6" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
-                      </svg>
-                    </button>
-                  </span>
-                ))}
-                <input
-                  type="text"
-                  className="clw-tag-input"
-                  placeholder={tags.length === 0 ? "태그 단어를 입력 후 Enter를 눌러주세요. (최대 10개)" : tags.length < 10 ? "Enter를 눌러 추가하세요." : ""}
-                  value={tagInput}
-                  onChange={(e) => setTagInput(e.target.value)}
-                  onKeyDown={handleTagKeyDown}
-                  disabled={tags.length >= 10}
-                />
-              </div>
-            </section>
+            <TagsSection
+              tags={tags}
+              tagInput={tagInput}
+              onInputChange={setTagInput}
+              onKeyDown={handleTagKeyDown}
+              onRemove={(tag) => setTags((t) => t.filter((v) => v !== tag))}
+              onReorder={(next) => setTags(next)}
+              classPrefix="clw"
+              emptyPlaceholder="태그 단어를 입력 후 Enter를 눌러주세요. (최대 10개)"
+              partialPlaceholder="Enter를 눌러 추가하세요."
+            />
 
             {/* 08. 포트폴리오 연결 */}
             <section className="clw-section">
