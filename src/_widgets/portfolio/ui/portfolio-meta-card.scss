@@ -111,9 +111,13 @@
   }
 
   &__links {
-    display: flex;
-    flex-direction: column;
-    gap: 0.2rem;
+    // 2열 grid — 라벨 컬럼이 가장 긴 라벨 너비로 통일되어 URL 시작점이 모든 행에서 같아짐
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    column-gap: 0.75rem;
+    row-gap: 0.2rem;
+    align-items: center;
+    min-width: 0;
   }
 
   &__stats {
@@ -124,28 +128,27 @@
 }
 
 /* ── 소셜 링크 ── */
+// .pr-meta-link 자체는 layout box 가 아니라, 자식(라벨/값)을 부모 grid 에 직접 노출
+// → 모든 행의 라벨이 같은 컬럼 너비를 공유, 값 시작 위치 통일
 .pr-meta-link {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
+  display: contents;
   font-size: 0.875rem;
-  min-width: 0;  // flex child로서 shrink 허용
 
   &__label {
-    flex-shrink: 0;
     font-weight: 600;
     color: #9ca3af;
-    min-width: 3.5rem;
+    font-size: 0.875rem;
     .dark & { color: #6b7280; }
   }
 
   &__val {
-    min-width: 0;          // 긴 URL이 flex child를 늘리지 않도록
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;   // 단일 행 ellipsis — href는 항상 전체 URL 유지
     color: #3b82f6;
     text-decoration: none;
+    font-size: 0.875rem;
     &:hover { text-decoration: underline; }
 
     &--empty {
