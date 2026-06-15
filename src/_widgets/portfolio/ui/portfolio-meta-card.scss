@@ -46,7 +46,8 @@
     justify-content: space-between;
     flex-wrap: wrap;
     gap: 0.5rem;
-    margin-bottom: 0.875rem;
+    // 타이틀과의 간격 — 한 눈에 정보 그룹 구분되도록 여유
+    margin-bottom: 1.5rem;
   }
 
   &__cats {
