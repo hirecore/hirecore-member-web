@@ -392,7 +392,7 @@ export function usePortfolioWriteView() {
     //  - thumbnailImageId 는 null 도 명시 전송해 "썸네일 제거" 의도를 전달
     // POST(등록)은 빈 컬렉션/null 을 굳이 보낼 필요가 없어 조건부 스프레드를 유지한다.
     const buildBody = (forUpdate: boolean) => ({
-      jobCategory: {
+      leafJobCategory: {
         code: confirmData.category.categoryCode,
         ...(confirmData.category.customCategory?.trim()
           ? { userInput: confirmData.category.customCategory.trim() }

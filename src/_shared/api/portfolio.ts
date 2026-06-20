@@ -27,7 +27,7 @@ export interface JobCategoryInput {
 }
 
 export interface CreatePortfolioRequest {
-  jobCategory: JobCategoryInput
+  leafJobCategory: JobCategoryInput
   collaborationType: "team" | "personal"
   visibility: Visibility
   title: string
