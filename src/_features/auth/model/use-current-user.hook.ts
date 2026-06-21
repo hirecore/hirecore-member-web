@@ -19,7 +19,7 @@ export const useCurrentUser = () => {
     queryKey: ["auth", "currentUser"],
     queryFn: async () => {
       try {
-        const res = await fetch(`/api/user/profile/summary`, {
+        const res = await fetch(`/api/users/profile/summary`, {
           credentials: "include",
           cache: "no-store",
         })
