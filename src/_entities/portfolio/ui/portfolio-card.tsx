@@ -98,12 +98,12 @@ export function PortfolioRowCard({ item, liked, onLike }: PortfolioCardProps) {
               </svg>
               {formatCount(item.viewCount)}
             </span>
-            {/* 관심 수 */}
+            {/* 관심 수 — likeCount 는 본인 관심 반영된 권위값 (옵티미스틱 갱신) */}
             <span className={`pl-stat pl-stat--like${liked ? " pl-stat--like-active" : ""}`}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} aria-hidden>
                 <path d="M12 21S3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
               </svg>
-              {formatCount(item.likeCount + (liked ? 1 : 0))}
+              {formatCount(item.likeCount)}
             </span>
             {/* 본인 포트폴리오에는 관심 등록 불가 → 버튼 자체를 미렌더 */}
             {!item.isOwner && (
@@ -290,12 +290,12 @@ export function PortfolioCard({ item, liked, onLike }: PortfolioCardProps) {
               </svg>
               {formatCount(item.viewCount)}
             </span>
-            {/* 관심 수 — liked 상태에서는 즉시 +1 피드백 */}
+            {/* 관심 수 — likeCount 는 본인 관심 반영된 권위값 (옵티미스틱 갱신) */}
             <span className={`pl-stat pl-stat--like${liked ? " pl-stat--like-active" : ""}`}>
               <svg width="12" height="12" viewBox="0 0 24 24" fill={liked ? "currentColor" : "none"} aria-hidden>
                 <path d="M12 21S3 14 3 8.5C3 5.42 5.42 3 8.5 3C10.24 3 11.91 3.81 13 5.08C14.09 3.81 15.76 3 17.5 3C20.58 3 23 5.42 23 8.5C23 14 14 21 12 21Z" stroke="currentColor" strokeWidth="1.6" strokeLinejoin="round" />
               </svg>
-              {formatCount(item.likeCount + (liked ? 1 : 0))}
+              {formatCount(item.likeCount)}
             </span>
             <time className="pl-stat" dateTime={item.updatedAt}>
               {formatUpdatedAt(item.updatedAt)}

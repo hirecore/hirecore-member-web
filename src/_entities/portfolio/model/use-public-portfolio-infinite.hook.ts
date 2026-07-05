@@ -43,6 +43,8 @@ function mapToPortfolio(item: PublicPortfolioSummary): Portfolio {
     likeCount: item.interestCount,
     updatedAt: item.updatedAt,
     isOwner: item.isOwner,
+    // 서버는 null 이면 키를 생략 → undefined 도 null 로 정규화 (3-상태 유지)
+    isInterested: item.isInterested ?? null,
   }
 }
 

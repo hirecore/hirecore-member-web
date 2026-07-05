@@ -15,7 +15,9 @@ import {
   PortfolioRowCard,
   usePortfolioList,
   usePublicPortfolioInfiniteScroll,
+  usePublicPortfolioInterestToggle,
 } from "@/_entities/portfolio"
+import type { Portfolio } from "@/_entities/portfolio"
 import "./portfolio-list-view.scss"
 import { useCurrentUser } from "@/_features/auth"
 import { PageContainer } from "@/_shared/ui/layout"
@@ -74,13 +76,37 @@ export default function PortfolioListView({ mock = false }: PortfolioListViewPro
     localStorage.setItem(LOCAL_STORAGE_KEYS.PORTFOLIO_LIST_VIEW_MODE, mode)
   }
 
-  const toggleLike = (id: string) => {
+  // mock 전용 로컬 토글 (/temp) — API 모드에서는 서버 상태(isInterested)를 사용
+  const toggleLikeLocal = (id: string) => {
     setLikedIds((prev) => {
       const next = new Set(prev)
       next.has(id) ? next.delete(id) : next.add(id)
       return next
     })
   }
+
+  const interestToggle = usePublicPortfolioInterestToggle()
+
+  // 카드 관심 버튼 클릭 핸들러
+  // - mock: 로컬 Set 토글 유지
+  // - 비로그인(isInterested == null): 로그인 페이지로 유도
+  //   (소유자도 null 이지만 카드에서 버튼 자체를 미렌더하므로 여기 도달하지 않음)
+  // - 로그인: 서버 관심 등록/해제 (무한 스크롤 캐시 옵티미스틱 갱신)
+  const handleToggleLike = (item: Portfolio) => {
+    if (mock) {
+      toggleLikeLocal(item.id)
+      return
+    }
+    if (item.isInterested == null) {
+      router.push(USER_ROUTES.auth.login)
+      return
+    }
+    interestToggle.mutate({ portfolioId: item.id, next: !item.isInterested })
+  }
+
+  // 카드에 전달할 관심 상태 — mock 은 로컬 Set, API 는 서버 isInterested
+  const isLiked = (item: Portfolio) =>
+    mock ? likedIds.has(item.id) : Boolean(item.isInterested)
 
   // L1 변경 시 L2 초기화 + 맨 위로 스크롤
   const handleL1Change = (l1Code: string) => {
@@ -268,15 +294,15 @@ export default function PortfolioListView({ mock = false }: PortfolioListViewPro
                     <PortfolioCard
                       key={item.id}
                       item={item}
-                      liked={likedIds.has(item.id)}
-                      onLike={() => toggleLike(item.id)}
+                      liked={isLiked(item)}
+                      onLike={() => handleToggleLike(item)}
                     />
                   ) : (
                     <PortfolioRowCard
                       key={item.id}
                       item={item}
-                      liked={likedIds.has(item.id)}
-                      onLike={() => toggleLike(item.id)}
+                      liked={isLiked(item)}
+                      onLike={() => handleToggleLike(item)}
                     />
                   )
                 )}

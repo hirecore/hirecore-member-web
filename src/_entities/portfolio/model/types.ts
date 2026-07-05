@@ -36,6 +36,14 @@ export interface Portfolio {
    * - true 면 카드의 관심(하트) 버튼을 숨김 처리.
    */
   isOwner?: boolean
+  /**
+   * 호출자의 관심 등록 상태 — API 응답의 isInterested 미러링 (3-상태).
+   * - `false`: 로그인·비소유자·미관심 → 등록 대상
+   * - `true` : 로그인·비소유자·관심함 → 해제 대상
+   * - `null` : 비로그인 또는 본인 글 → 관심 버튼 비활성 대상
+   * likeCount 에 이미 반영되어 있음 (본인 관심 포함). mock 데이터에는 채워지지 않으므로 옵셔널.
+   */
+  isInterested?: boolean | null
 }
 
 export interface LinkedDoc {

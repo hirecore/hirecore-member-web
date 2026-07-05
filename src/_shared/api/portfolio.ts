@@ -375,6 +375,17 @@ export interface PublicPortfolioSummary {
    * - 도메인 규칙: 본인 포트폴리오에는 관심 등록 불가 → 카드의 관심 버튼을 숨김/비활성에 사용.
    */
   isOwner: boolean
+  /**
+   * 호출자가 이 포트폴리오에 관심을 등록한 상태인지 여부 — 3-상태.
+   * - `false`: 로그인·비소유자·아직 관심 안 함 → 등록(POST) 대상
+   * - `true` : 로그인·비소유자·이미 관심 등록함 → 해제(DELETE) 대상
+   * - `null` : 비로그인 또는 본인 글(isOwner=true) → 관심 버튼 숨김/비활성
+   *
+   * ⚠️ 서버는 값이 null 이면 키 자체를 생략한다 (JSON 직렬화 규칙).
+   *    따라서 런타임에 undefined 로 도착할 수 있으며 null 과 동일하게 취급한다.
+   * interestCount 는 전체 관심 수의 권위값 — 등록 시 +1, 해제 시 -1 낙관적 갱신.
+   */
+  isInterested: boolean | null
   /** ISO-8601 (UTC). effective updatedAt — 정렬 키와 동일 */
   updatedAt: string
 }
